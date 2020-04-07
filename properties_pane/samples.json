@@ -1,0 +1,13 @@
+[
+	{
+		"validateAs": "number",
+		"constraintsFromField": {
+			"maxPrecision": "precision",
+			"maxScale": "scale"
+		},
+		"dependency": {
+			"key": "childType",
+			"value": "number"
+		}
+	}
+]

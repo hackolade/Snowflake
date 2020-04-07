@@ -1,0 +1,18 @@
+{
+	"name": "timestamp_ltz",
+	"erdAbbreviation": "<ts-ltz>",
+	"dtdAbbreviation": "{ts-ltz}",
+	"parentType": "string",
+	"useSample": true,
+	"hiddenOnEntity": "view",
+	"sample": "2011-02-03 04:05:00 +0000",
+	"defaultValues": {
+		"primaryKey": false,
+		"default": "",
+		"enum": [],
+		"sample":"",
+		"comments":"",
+		"pattern":"",
+		"format": ""
+	}
+}

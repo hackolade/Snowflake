@@ -1,0 +1,84 @@
+{
+	"model": {
+		"modelName": "New model",
+		"dbVersion": "",
+		"dbVendor": "Snowflake"
+	},
+	"container": {
+		"name": "New schema",
+		"indexes": [],
+		"DATA_RETENTION_TIME_IN_DAYS": 1
+	},
+	"collection": {
+		"collectionName": "New table",
+		"external": false,
+		"DATA_RETENTION_TIME_IN_DAYS": 1,
+		"formatTypeOptions": {
+			"NULL_IF": [{ "NULL_IF_item": "\\N" }]
+		}
+	},
+	"field": {
+		"name": "New column",
+		"caseSensitivity": "",
+		"accentSensitivity": "",
+		"punctuationSensitivity": "",
+		"firstLetterPreference": "",
+		"caseConversion": "",
+		"spaceTrimming": ""	,
+		"defaultOption": {
+			"value": "",
+			"valueDependencies": [{
+				"value": "Default",
+				"dependency": {
+					"key": "default",
+					"exist": true
+				}
+			},{
+				"value": "Autoincrement",
+				"dependency": [{
+					"key": "start_num",
+					"exist": true
+				},{
+					"key": "step_num",
+					"exist": true
+				}]
+			}]	
+		},
+		"autoincrement": {
+			"step_num": 1
+		},
+		"tPrecision": 9,
+		"subtype": {
+			"valueDependencies": [{
+				"value": "json",
+				"dependency": {
+					"key": "childType",
+					"value": "object"
+				}
+			}]
+		}
+	},
+	"patternField": {
+		"name": "^[a-zA-Z0-9_.-]+$"
+	},
+	"multipleField": {
+		"primaryKey": true
+	},
+	"subschema": {},
+	"arrayItem": {},
+	"choice": {},
+	"relationship": {},
+	"user": {},
+	"view": {
+		"viewOn": "",
+		"pipeline": ""
+	},
+	"SecIdxs": {
+		"name": "New Secondary Index",
+		"SecIndxKey": "",
+		"SecIndxID": "",
+		"SecIndxDescription": "",
+		"SecIndxFunction": "",
+		"SecIndxComments": ""
+	}
+}

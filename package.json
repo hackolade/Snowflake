@@ -1,0 +1,39 @@
+{
+    "name": "Snowflake",
+    "version": "0.1.0",
+    "versionDate": "2020-04-07",
+    "author": "hackolade",
+    "engines": {
+        "hackolade": "4.0.0",
+        "hackoladePlugin": "1.2.0"
+    },
+    "contributes": {
+        "target": {
+            "applicationTarget": "Snowflake",
+            "title": "Snowflake",
+            "versions": []
+        },
+        "features": {
+            "views": {
+				"enabled": true,
+                "viewLevel": "model",
+                "disablePipelines": true
+            },
+            "nestedCollections": false,
+            "disablePatternField": false,
+            "enableForwardEngineering": {
+                "jsonDocument": true,
+                "jsonSchema": true,
+                "excel": true,
+                "plugin": true
+			},
+            "enableReverseEngineering": true,
+            "disableChoices": true,
+            "enableJsonType": true,
+            "reverseSchemaIntoOneColumn": true,
+			"disableDenormalization": true
+        }
+    },
+    "description": "Hackolade plugin for Snowflake",
+    "disabled": false
+}

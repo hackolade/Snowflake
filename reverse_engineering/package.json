@@ -1,0 +1,11 @@
+{
+  "name": "Snowflake",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Hackolade",
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "snowflake-sdk": "^1.5.0"
+  },
+  "installed": true
+}

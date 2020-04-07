@@ -1,0 +1,75 @@
+[
+	{
+		"lowerTab": "Connection",
+		"structure": [
+			{
+				"inputLabel": "Name",
+				"inputKeyword": "name",
+				"inputType": "text",
+				"inputPlaceholder": "Name"
+				
+			},
+			{
+				"inputLabel": "Cloud platform",
+				"inputKeyword": "cloudPlatform",
+				"inputType": "select",
+				"options": [
+					{ "value": "", "label": "" },
+					{ "value": "AWS", "label": "Amazon Web Services" },
+					{ "value": "GCP", "label": "Google Cloud" },
+					{ "value": "Azure", "label": "Microsoft Azure" }
+				]
+			},
+			{
+				"inputLabel": "Host prefix",
+				"inputKeyword": "host",
+				"inputType": "text",
+				"inputPlaceholder": "<account>.<region>",
+				"dependency": {
+					"key": "cloudPlatform",
+					"value": "AWS"
+				}
+			},
+			{
+				"inputLabel": "Host prefix",
+				"inputKeyword": "host",
+				"inputType": "text",
+				"inputPlaceholder": "<account>.<region>.<gcp>",
+				"dependency": {
+					"key": "cloudPlatform",
+					"value": "GCP"
+				}
+			},
+			{
+				"inputLabel": "Host prefix",
+				"inputKeyword": "host",
+				"inputType": "text",
+				"inputPlaceholder": "<account>.<region>.<azure>",
+				"dependency": {
+					"key": "cloudPlatform",
+					"value": "Azure"
+				}
+			}
+		]
+	},
+	{
+		"tab": "Authentication",
+		"structure": [
+			{
+				"inputLabel": "User Name",
+				"inputKeyword": "username",
+				"inputType": "text",
+				"inputPlaceholder": "User Name"
+				
+			},
+			{
+				"inputLabel": "Password",
+				"inputKeyword": "password",
+				"inputType": "password",
+				"inputTooltip": "Password",
+				"isHiddenKey": true,
+				"defaultValue": ""
+			}
+		]
+	}
+]

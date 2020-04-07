@@ -1,0 +1,1334 @@
+/*
+* Copyright © 2016-2019 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+*
+* The copyright to the computer software herein is the property of IntegrIT S.A.
+* The software may be used and/or copied only with the written permission of 
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+* the agreement/contract under which the software has been supplied. 
+
+
+In order to define custom properties for any object's properties pane, you may copy/paste from the following,
+making sure that you maintain a proper JSON format.
+
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"propertyType": "text",
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Group",
+				"propertyType": "group",
+				"propertyKeyword": "grpProp",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+// “groupInput” can have the following states - 0 items, 1 item, and many items.
+// “blockInput” has only 2 states - 0 items or 1 item. 
+// This gives us an easy way to represent it as an object and not as an array internally which is beneficial for processing 
+// and forward-engineering in particular.
+			{
+				"propertyName": "Block",
+				"propertyType": "block",
+				"propertyKeyword": "grpProp",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+			{
+				"propertyName": "Field List",
+				"propertyKeyword": "keyList",
+				"propertyType": "fieldList",
+				"template": "orderedList"
+			}, 
+			{
+				"propertyName": "List with attribute",
+				"propertyKeyword": "keyListOrder",
+				"propertyType": "fieldList",
+				"template": "orderedList",
+				"attributeList": [
+					"ascending",
+					"descending"
+				]
+			}
+
+*/
+
+{
+	"lowerTab": "JsonDetails",
+	"structure": {
+		"varchar": [
+			"name",
+			"code",
+			"schemaId",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"string",
+					"text",
+					"char",
+					"character"
+				],
+				"data": "options",
+				"valueType": "string"
+			},
+			{
+				"propertyName": "Length",
+				"propertyKeyword": "length",
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"typeDecorator": true
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"propertyType": "checkbox"
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"default",
+			"minLength",
+			"maxLength",
+			"pattern",
+			"format",
+			"enum",
+			{
+				"propertyName": "Collate",
+				"propertyKeyword": "collate",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Locale",
+				"propertyKeyword": "locale",
+				"propertyType": "text",
+				"dependency": {
+					"key": "collate",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Case-sensitivity",
+				"propertyKeyword": "caseSensitivity",
+				"propertyType": "select",
+				"options": [
+					"",
+					"cs",
+					"ci"
+				],
+				"dependency": {
+					"key": "collate",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Accent-sensitivity",
+				"propertyKeyword": "accentSensitivity",
+				"propertyType": "select",
+				"options": [
+					"",
+					"as",
+					"ai"
+				],
+				"dependency": {
+					"key": "collate",
+					"value": true
+				}
+			},	
+			{
+				"propertyName": "Punctuation-sensitivity",
+				"propertyKeyword": "punctuationSensitivity",
+				"propertyType": "select",
+				"options": [
+					"",
+					"ps",
+					"pi"
+				],
+				"dependency": {
+					"key": "collate",
+					"value": true
+				}
+			},	
+			{
+				"propertyName": "First-letter preference",
+				"propertyKeyword": "firstLetterPreference",
+				"propertyType": "select",
+				"options": [
+					"",
+					"fl",
+					"fu"
+				],
+				"dependency": {
+					"key": "collate",
+					"value": true
+				}
+			},	
+			{
+				"propertyName": "Case-conversion",
+				"propertyKeyword": "caseConversion",
+				"propertyType": "select",
+				"options": [
+					"",
+					"lower",
+					"upper"
+				],
+				"dependency": {
+					"key": "collate",
+					"value": true
+				}
+			},	
+			{
+				"propertyName": "Space-trimming",
+				"propertyKeyword": "spaceTrimming",
+				"propertyType": "select",
+				"options": [
+					"",
+					"trim",
+					"ltrim",
+					"rtrim"
+				],
+				"dependency": {
+					"key": "collate",
+					"value": true
+				}
+			},	
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"number": [
+			"name",
+			"code",
+			"schemaId",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"decimal",
+					"numeric"
+				],
+				"data": "options",
+				"valueType": "string"
+			},
+			{
+				"propertyName": "Precision",
+				"propertyKeyword": "precision",
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"typeDecorator": true
+			},
+			{
+				"propertyName": "Scale",
+				"propertyKeyword": "scale",
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"typeDecorator": true
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			{
+				"propertyName": "Default option",
+				"propertyKeyword": "defaultOption",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"Default",
+					"Autoincrement",
+					"Sequence"
+				]
+			},
+			{
+				"propertyName": "Default",
+				"propertyKeyword": "default",
+				"propertyType": "numeric",
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Default"
+				}
+			},
+			{
+				"propertyName": "Sequence",
+				"propertyKeyword": "sequence",
+				"propertyType": "text",
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Sequence"
+				}
+			},
+			{
+				"propertyName": "Autoincrement",
+				"propertyType": "block",
+				"propertyKeyword": "autoincrement",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Start num",
+						"propertyKeyword": "start_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					},
+					{
+						"propertyName": "Step num",
+						"propertyKeyword": "step_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				],
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Autoincrement"
+				}
+			},
+			"unit",
+			"minimum",
+			"exclusiveMinimum",
+			"maximum",
+			"exclusiveMaximum",
+			"multipleOf",
+			"divisibleBy",
+			"pattern",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"integer": [
+			"name",
+			"code",
+			"schemaId",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"int",
+					"bigint",
+					"smallint",
+					"tinyint",
+					"byteint"
+				]
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			{
+				"propertyName": "Default option",
+				"propertyKeyword": "defaultOption",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"Default",
+					"Autoincrement",
+					"Sequence"
+				]
+			},
+			{
+				"propertyName": "Default",
+				"propertyKeyword": "default",
+				"propertyType": "numeric",
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Default"
+				}
+			},
+			{
+				"propertyName": "Sequence",
+				"propertyKeyword": "sequence",
+				"propertyType": "text",
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Sequence"
+				}
+			},
+			{
+				"propertyName": "Autoincrement",
+				"propertyType": "block",
+				"propertyKeyword": "autoincrement",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Start num",
+						"propertyKeyword": "start_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					},
+					{
+						"propertyName": "Step num",
+						"propertyKeyword": "step_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				],
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Autoincrement"
+				}
+			},
+			"unit",
+			"minimum",
+			"exclusiveMinimum",
+			"maximum",
+			"exclusiveMaximum",
+			"multipleOf",
+			"divisibleBy",
+			"pattern",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"float": [
+			"name",
+			"code",
+			"schemaId",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"float4",
+					"float8"
+				]
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			{
+				"propertyName": "Default option",
+				"propertyKeyword": "defaultOption",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"Default",
+					"Autoincrement",
+					"Sequence"
+				]
+			},
+			{
+				"propertyName": "Default",
+				"propertyKeyword": "default",
+				"propertyType": "numeric",
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Default"
+				}
+			},
+			{
+				"propertyName": "Sequence",
+				"propertyKeyword": "sequence",
+				"propertyType": "text",
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Sequence"
+				}
+			},
+			{
+				"propertyName": "Autoincrement",
+				"propertyType": "block",
+				"propertyKeyword": "autoincrement",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Start num",
+						"propertyKeyword": "start_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					},
+					{
+						"propertyName": "Step num",
+						"propertyKeyword": "step_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				],
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Autoincrement"
+				}
+			},
+			"unit",
+			"minimum",
+			"exclusiveMinimum",
+			"maximum",
+			"exclusiveMaximum",
+			"multipleOf",
+			"divisibleBy",
+			"pattern",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"double": [
+			"name",
+			"code",
+			"schemaId",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"double precision",
+					"real"
+				]
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			{
+				"propertyName": "Default option",
+				"propertyKeyword": "defaultOption",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"Default",
+					"Autoincrement",
+					"Sequence"
+				]
+			},
+			{
+				"propertyName": "Default",
+				"propertyKeyword": "default",
+				"propertyType": "numeric",
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Default"
+				}
+			},
+			{
+				"propertyName": "Sequence",
+				"propertyKeyword": "sequence",
+				"propertyType": "text",
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Sequence"
+				}
+			},
+			{
+				"propertyName": "Autoincrement",
+				"propertyType": "block",
+				"propertyKeyword": "autoincrement",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Start num",
+						"propertyKeyword": "start_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					},
+					{
+						"propertyName": "Step num",
+						"propertyKeyword": "step_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				],
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Autoincrement"
+				}
+			},
+			"unit",
+			"minimum",
+			"exclusiveMinimum",
+			"maximum",
+			"exclusiveMaximum",
+			"multipleOf",
+			"divisibleBy",
+			"pattern",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"boolean": [
+			"name",
+			"code",
+			"schemaId",
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"type",
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"default",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"binary": [
+			"name",
+			"schemaId",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"varbinary"
+				]
+			},
+			{
+				"propertyName": "Number of characters",
+				"propertyKeyword": "numChar",
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"required",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"___0": [],
+		"date": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"pattern",
+			"default",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"time": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			{
+				"propertyName": "Precision",
+				"propertyKeyword": "tPrecision",
+				"propertyType": "numeric",
+				"valueType": "number",
+				"typeDecorator": true,
+				"allowNegative": false,
+				"minValue": 0,
+				"maxValue": 9
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"pattern",
+			"default",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"timestamp_ntz": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"datetime",
+					"timestamp",
+					"timestampntz",
+					"timestamp without time zone"
+				]
+			},
+			{
+				"propertyName": "Precision",
+				"propertyKeyword": "tPrecision",
+				"propertyType": "numeric",
+				"valueType": "number",
+				"typeDecorator": true,
+				"allowNegative": false,
+				"minValue": 0,
+				"maxValue": 9
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"pattern",
+			"default",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"timestamp_ltz": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"timestampltz",
+					"timestamp with local time zone"
+				]
+			},
+			{
+				"propertyName": "Precision",
+				"propertyKeyword": "tPrecision",
+				"propertyType": "numeric",
+				"valueType": "number",
+				"typeDecorator": true,
+				"allowNegative": false,
+				"minValue": 0,
+				"maxValue": 9
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"pattern",
+			"default",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"timestamp_tz": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"",
+					"timestamptz",
+					"timestamp with time zone"
+				]
+			},
+			{
+				"propertyName": "Precision",
+				"propertyKeyword": "tPrecision",
+				"propertyType": "numeric",
+				"valueType": "number",
+				"typeDecorator": true,
+				"allowNegative": false,
+				"minValue": 0,
+				"maxValue": 9
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"dependencies",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"pattern",
+			"default",
+			"enum",
+			"sample",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"___1": [],
+		"variant": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			{
+				"propertyName": "Synonym",
+				"propertyKeyword": "mode",
+				"propertyType": "select",
+				"options": ["var"],
+				"hidden": true
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"type",
+			{
+				"propertyName": "Variant type",
+				"propertyKeyword": "variantType",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"JSON"
+				]
+			},
+			{
+				"propertyName": "Subtypes",
+                "propertyKeyword": "subtype",
+                "propertyType": "select",
+                "options": [
+                    { "name": "object", "value": "object" },
+                    { "name": "array", "value": "array" },
+                    { "name": "string", "value": "string" },
+                    { "name": "number", "value": "number" },
+                    { "name": "boolean", "value": "boolean" },
+                    { "name": "null", "value": "null" }
+                ]
+            },
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"minProperties",
+			"maxProperties",
+			"dependencies",
+			"additionalProperties",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"array": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"type",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"minProperties",
+			"maxProperties",
+			"dependencies",
+			"additionalProperties",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"object": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"type",
+			"primaryKey",
+			{
+				"propertyName": "Primary key constraint name",
+				"propertyKeyword": "primaryKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"propertyType": "checkbox"
+			},
+			"minProperties",
+			"maxProperties",
+			"dependencies",
+			"additionalProperties",
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		]
+	}
+} 

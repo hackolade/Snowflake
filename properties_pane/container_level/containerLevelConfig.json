@@ -1,0 +1,236 @@
+/*
+* Copyright © 2016-2019 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+*
+* The copyright to the computer software herein is the property of IntegrIT S.A.
+* The software may be used and/or copied only with the written permission of 
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+* the agreement/contract under which the software has been supplied. 
+
+
+In order to define custom properties for any object's properties pane, you may copy/paste from the following,
+making sure that you maintain a proper JSON format.
+
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"propertyType": "text",
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Group",
+				"propertyType": "group",
+				"propertyKeyword": "grpProp",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+// “groupInput” can have the following states - 0 items, 1 item, and many items.
+// “blockInput” has only 2 states - 0 items or 1 item. 
+// This gives us an easy way to represent it as an object and not as an array internally which is beneficial for processing 
+// and forward-engineering in particular.
+			{
+				"propertyName": "Block",
+				"propertyType": "block",
+				"propertyKeyword": "grpProp",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+			{
+				"propertyName": "Field List",
+				"propertyKeyword": "keyList",
+				"propertyType": "fieldList",
+				"template": "orderedList"
+			}, 
+			{
+				"propertyName": "List with attribute",
+				"propertyKeyword": "keyListOrder",
+				"propertyType": "fieldList",
+				"template": "orderedList",
+				"attributeList": [
+					"ascending",
+					"descending"
+				]
+			}
+
+*/
+
+[
+	{
+		"lowerTab": "Details",
+		"structure": [
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Database",
+				"propertyKeyword": "database",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Transient",
+				"propertyKeyword": "transient",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Managed access",
+				"propertyKeyword": "managedAccess",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Data retention in days",
+				"propertyKeyword": "DATA_RETENTION_TIME_IN_DAYS",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"minValue": 0,
+				"maxValue": 90
+
+			},
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"containerLevelKeys": []
+	},
+	{
+		"lowerTab": "UDFs",
+		"structure": [{
+			"propertyName": "UDFs",
+			"propertyType": "group",
+			"propertyKeyword": "UDFs",
+			"shouldValidate": false,
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"shouldValidate": false,
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Language",
+					"propertyKeyword": "storedProcLanguage",
+					"shouldValidate": false,
+					"propertyTooltip": "language",
+					"propertyType": "select",
+					"defaultValue": "sql",
+					"options": [
+						"sql",
+						"javascript"
+					]
+				},
+				{
+					"propertyName": "Description",
+					"propertyKeyword": "storedProcDescription",
+					"shouldValidate": false,
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Argument signature",
+					"propertyKeyword": "storedProcArgument",
+					"shouldValidate": false,
+					"propertyTooltip": "Argument signature",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Returns data type",
+					"propertyKeyword": "storedProcDataType",
+					"shouldValidate": false,
+					"propertyTooltip": "Data type",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Function",
+					"propertyKeyword": "storedProcFunction",
+					"shouldValidate": false,
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea",
+					"markdown": false
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "storedProcComments",
+					"shouldValidate": false,
+					"propertyTooltip": "comments",
+					"addTimestampButton": false,
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
+	}
+]

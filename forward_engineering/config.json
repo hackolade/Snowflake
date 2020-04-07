@@ -1,0 +1,14 @@
+{
+	"extension": "sql",
+	"filterName": "SQL",
+	"type": "ddl",
+	"ddlType": "snowflake",
+	"namePrefix": "Snowflake",
+	"hasUpdateScript": true,
+	"resolvedDefinitions": true,
+	"level": {
+		"container": true,
+		"entity": true,
+		"view": true
+	}
+}
