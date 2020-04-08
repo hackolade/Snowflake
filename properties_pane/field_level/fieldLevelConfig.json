@@ -1254,6 +1254,18 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyKeyword": "physicalType",
 				"hidden": true
+			},
+			{
+				"propertyKeyword": "foreignCollection",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "foreignField",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "relationshipType",
+				"hidden": true
 			}
 		],
 		"array": [
@@ -1297,6 +1309,18 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyKeyword": "foreignCollection",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "foreignField",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "relationshipType",
+				"hidden": true
 			}
 		],
 		"object": [
@@ -1340,6 +1364,18 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyKeyword": "foreignCollection",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "foreignField",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "relationshipType",
+				"hidden": true
 			}
 		]
 	}
