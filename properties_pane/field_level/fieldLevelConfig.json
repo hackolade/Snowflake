@@ -1229,10 +1229,10 @@ making sure that you maintain a proper JSON format.
                     { "name": "boolean", "value": "boolean" },
                     { "name": "null", "value": "null" }
                 ],
-				"dependency": {
-					"key": "childType",
-					"value": "variant"
-				}
+                "dependency": {
+                    "key": "childType",
+                    "value": "variant"
+                }
             },
 			{
 				"propertyName": "Not null",
