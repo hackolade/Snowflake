@@ -1211,10 +1211,14 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "select",
 				"options": [
 					"JSON"
-				]
+				],
+				"dependency": {
+					"key": "childType",
+					"value": "variant"
+				}
 			},
 			{
-				"propertyName": "Subtypes",
+				"propertyName": "Subtype",
                 "propertyKeyword": "subtype",
                 "propertyType": "select",
                 "options": [
@@ -1224,7 +1228,11 @@ making sure that you maintain a proper JSON format.
                     { "name": "number", "value": "number" },
                     { "name": "boolean", "value": "boolean" },
                     { "name": "null", "value": "null" }
-                ]
+                ],
+                "dependency": {
+                    "key": "childType",
+                    "value": "variant"
+                }
             },
 			{
 				"propertyName": "Not null",
@@ -1242,6 +1250,22 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyKeyword": "physicalType",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "foreignCollection",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "foreignField",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "relationshipType",
+				"hidden": true
 			}
 		],
 		"array": [
@@ -1285,6 +1309,18 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyKeyword": "foreignCollection",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "foreignField",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "relationshipType",
+				"hidden": true
 			}
 		],
 		"object": [
@@ -1328,6 +1364,18 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyKeyword": "foreignCollection",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "foreignField",
+				"hidden": true
+			},
+			{
+				"propertyKeyword": "relationshipType",
+				"hidden": true
 			}
 		]
 	}
