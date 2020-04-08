@@ -1218,7 +1218,7 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Subtypes",
+				"propertyName": "Subtype",
                 "propertyKeyword": "subtype",
                 "propertyType": "select",
                 "options": [
