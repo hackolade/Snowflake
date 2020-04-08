@@ -1211,7 +1211,11 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "select",
 				"options": [
 					"JSON"
-				]
+				],
+				"dependency": {
+					"key": "childType",
+					"value": "variant"
+				}
 			},
 			{
 				"propertyName": "Subtypes",
@@ -1224,7 +1228,11 @@ making sure that you maintain a proper JSON format.
                     { "name": "number", "value": "number" },
                     { "name": "boolean", "value": "boolean" },
                     { "name": "null", "value": "null" }
-                ]
+                ],
+				"dependency": {
+					"key": "childType",
+					"value": "variant"
+				}
             },
 			{
 				"propertyName": "Not null",
@@ -1242,6 +1250,10 @@ making sure that you maintain a proper JSON format.
 				"addTimestampButton": true,
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyKeyword": "physicalType",
+				"hidden": true
 			}
 		],
 		"array": [
