@@ -232,5 +232,47 @@ making sure that you maintain a proper JSON format.
 				}
 			]
 		}]
+	},
+	{
+		"lowerTab": "Sequences",
+		"structure": [{
+			"propertyName": "Sequence",
+			"propertyType": "group",
+			"propertyKeyword": "sequences",
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Start with",
+					"propertyKeyword": "sequenceStart",
+					"propertyType": "numeric"
+				},
+				{
+					"propertyName": "Increment by",
+					"propertyKeyword": "sequenceIncrement",
+					"propertyType": "numeric"
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "sequenceComments",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Remarks",
+					"propertyKeyword": "sequenceRemarks",
+					"shouldValidate": false,
+					"addTimestampButton": true,
+					"propertyTooltip": "remarks",
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
 	}
 ]

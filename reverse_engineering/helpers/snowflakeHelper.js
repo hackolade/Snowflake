@@ -631,6 +631,17 @@ const getFunctions = async dbName => {
 	});
 };
 
+const getSequences = async dbName => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.sequences`);
+
+	return rows.map(row => ({
+		name: row['SEQUENCE_NAME'],
+		sequenceStart: Number(_.get(row, 'START_VALUE')) || 1,
+		sequenceIncrement: Number(_.get(row, 'INCREMENT')) || 1,
+		sequenceComments: row['COMMENT'] || ''
+	}));
+};
+
 const getContainerData = async schema => {
 	if (containers[schema]) {
 		return containers[schema];
@@ -644,13 +655,15 @@ const getContainerData = async schema => {
 		const schemaRows = await execute(`select * from "${dbNameWithoutQuotes}".information_schema.schemata where SCHEMA_NAME='${removeQuotes(schemaName)}'`);
 		const schemaData = _.first(schemaRows);
 		const functions = await getFunctions(dbName);
+		const sequences = await getSequences(dbName);
 
 		const data = {
 			transient: _.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
 			DATA_RETENTION_TIME_IN_DAYS: _.get(schemaData, 'RETENTION_TIME') || 0,
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
-			UDFs: functions
+			UDFs: functions,
+			sequences
 		};
 		containers[schema] = data;
 
