@@ -614,8 +614,8 @@ const getExternalTableData  = async fullName => {
 	}
 };
 
-const getFunctions = async dbName => {
-	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.functions`);
+const getFunctions = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.functions where FUNCTION_SCHEMA='${schemaName}'`);
 
 	return rows.map(row => {
 		const storedProcArgument = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'];
@@ -631,14 +631,46 @@ const getFunctions = async dbName => {
 	});
 };
 
-const getSequences = async dbName => {
-	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.sequences`);
+const getSequences = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.sequences where SEQUENCE_SCHEMA='${schemaName}'`);
 
 	return rows.map(row => ({
 		name: row['SEQUENCE_NAME'],
 		sequenceStart: Number(_.get(row, 'START_VALUE')) || 1,
 		sequenceIncrement: Number(_.get(row, 'INCREMENT')) || 1,
 		sequenceComments: row['COMMENT'] || ''
+	}));
+};
+
+const convertFileFormatsOptions = optionsData => {
+	const selectOptions = ['COMPRESSION', 'BINARY_FORMAT'];
+	const groupOptions = ['NULL_IF'];
+	const checkboxOptions = ['TRIM_SPACE', 'ERROR_ON_COLUMN_COUNT_MISMATCH', 'VALIDATE_UTF8', 'EMPTY_FIELD_AS_NULL', 'SKIP_BYTE_ORDER_MARK'];
+	const numericOptions = ['SKIP_HEADER'];
+
+	return Object.keys(optionsData).reduce((options, key) => {
+		const value = optionsData[key];
+		if (selectOptions.includes(key)) {
+			return { ...options, [key]: _.toUpper(value) };
+		} else if (groupOptions.includes(key)) {
+			return { ...options, [key]: value.slice(1, -1).split(',').map(value => ({ [`${key}_item`]: _.trim(value) })) };
+		} else if (checkboxOptions.includes(key)) {
+			return { ...options, [key]: _.isBoolean(value) ? value : _.toUpper(value) !== 'FALSE' };
+		} else if (numericOptions.includes(key)) {
+			return { ...options, [key]: isNaN(value) ? '' : Number(value) };
+		}
+
+		return { ...options, [key]: value };
+	}, {});
+};
+
+const getFileFormats = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.FILE_FORMATS where FILE_FORMAT_SCHEMA='${schemaName}'`);
+
+	return rows.map(row => ({
+		name: row['FILE_FORMAT_NAME'],
+		fileFormat: _.toUpper(row['FILE_FORMAT_TYPE']),
+		formatTypeOptions: convertFileFormatsOptions(row)
 	}));
 };
 
@@ -654,8 +686,9 @@ const getContainerData = async schema => {
 		const dbData = _.first(dbRows);
 		const schemaRows = await execute(`select * from "${dbNameWithoutQuotes}".information_schema.schemata where SCHEMA_NAME='${removeQuotes(schemaName)}'`);
 		const schemaData = _.first(schemaRows);
-		const functions = await getFunctions(dbName);
-		const sequences = await getSequences(dbName);
+		const functions = await getFunctions(dbName, schemaName);
+		const sequences = await getSequences(dbName, schemaName);
+		const fileFormats = await getFileFormats(dbName, schemaName);
 
 		const data = {
 			transient: _.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
@@ -663,7 +696,8 @@ const getContainerData = async schema => {
 			DATA_RETENTION_TIME_IN_DAYS: _.get(schemaData, 'RETENTION_TIME') || 0,
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
-			sequences
+			sequences,
+			fileFormats
 		};
 		containers[schema] = data;
 

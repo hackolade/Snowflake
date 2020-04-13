@@ -538,6 +538,46 @@ making sure that you maintain a proper JSON format.
 					"values": [
 						{
 							"key": "fileFormat",
+							"value": "ORC"
+						},
+						{
+							"key": "externalFileFormat",
+							"value": "ORC"
+						}
+					]
+				},
+				"structure": [
+					{
+						"propertyName": "Trim space",
+						"propertyKeyword": "TRIM_SPACE",
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "NULL if",
+						"propertyType": "group",
+						"propertyKeyword": "NULL_IF",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "value",
+								"propertyKeyword": "NULL_IF_item",
+								"propertyTooltip": "",
+								"propertyType": "text"
+							}
+						]
+					}
+				]
+			},
+			{
+				"propertyName": "Format type options",
+				"propertyType": "block",
+				"propertyKeyword": "formatTypeOptions",
+				"propertyTooltip": "",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "fileFormat",
 							"value": "PARQUET"
 						},
 						{
