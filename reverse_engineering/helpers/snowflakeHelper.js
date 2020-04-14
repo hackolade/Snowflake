@@ -670,7 +670,8 @@ const getFileFormats = async (dbName, schemaName) => {
 	return rows.map(row => ({
 		name: row['FILE_FORMAT_NAME'],
 		fileFormat: _.toUpper(row['FILE_FORMAT_TYPE']),
-		formatTypeOptions: convertFileFormatsOptions(row)
+		formatTypeOptions: convertFileFormatsOptions(row),
+		fileFormatComments: row['COMMENT'] || ''
 	}));
 };
 
