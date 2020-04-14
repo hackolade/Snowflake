@@ -191,7 +191,7 @@ making sure that you maintain a proper JSON format.
 					]
 				},
 				{
-					"propertyName": "Description",
+					"propertyName": "Comments",
 					"propertyKeyword": "storedProcDescription",
 					"shouldValidate": false,
 					"propertyTooltip": "description",
@@ -222,7 +222,7 @@ making sure that you maintain a proper JSON format.
 					"markdown": false
 				},
 				{
-					"propertyName": "Comments",
+					"propertyName": "Remarks",
 					"propertyKeyword": "storedProcComments",
 					"shouldValidate": false,
 					"propertyTooltip": "comments",
