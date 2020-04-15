@@ -485,6 +485,10 @@ const getEntityData = async fullName => {
 			const externalTableData = await getExternalTableData(fullName);
 			entityLevelData = { ...data, ...externalTableData };
 		}
+		if (!fileFormat) {
+			entityLevelData.customFileFormatName = _.toUpper(_.get(stageData.find(item => item.property === 'FORMAT_NAME'), 'property_value', ''));
+		}
+
 		const fileFormatKey = external ? 'externalFileFormat' : 'fileFormat';
 		if (hasStageCopyOptions(stageData)) {
 			entityLevelData.stageCopyOptions = getStageCopyOptions(stageData)
@@ -492,7 +496,7 @@ const getEntityData = async fullName => {
 
 		return {
 			...entityLevelData,
-			[fileFormatKey]: fileFormat,
+			[fileFormatKey]: fileFormat || 'custom',
 			external,
 			clusteringKey,
 			formatTypeOptions: getFileFormatOptions(stageData),

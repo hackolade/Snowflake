@@ -219,7 +219,8 @@ making sure that you maintain a proper JSON format.
 					"AVRO",
 					"ORC",
 					"PARQUET",
-					"XML"
+					"XML",
+					"custom"
 				],
 				"dependency": {
 					"key": "external",
@@ -238,11 +239,31 @@ making sure that you maintain a proper JSON format.
 					"AVRO",
 					"ORC",
 					"PARQUET",
-					"XML"
+					"XML",
+					"custom"
 				],
 				"dependency": {
 					"key": "external",
 					"value": true
+				}
+			},
+			{
+				"propertyName": "Custom file format name",
+				"propertyKeyword": "customFileFormatName",
+				"propertyTooltip": "",
+				"propertyType": "text",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "fileFormat",
+							"value": "custom"
+						},
+						{
+							"key": "externalFileFormat",
+							"value": "custom"
+						}
+					]
 				}
 			},
 			{
