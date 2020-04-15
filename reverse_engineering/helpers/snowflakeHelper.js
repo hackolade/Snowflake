@@ -630,7 +630,7 @@ const getFunctions = async (dbName, schemaName) => {
 			storedProcArgument,
 			storedProcDataType: row['DATA_TYPE'],
 			storedProcFunction: row['FUNCTION_DEFINITION'],
-			storedProcComments: row['COMMENT']
+			storedProcDescription: row['COMMENT'] || ''
 		}
 	});
 };
