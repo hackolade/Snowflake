@@ -31,7 +31,8 @@
             "disableChoices": true,
             "enableJsonType": true,
             "reverseSchemaIntoOneColumn": true,
-			"disableDenormalization": true
+            "disableDenormalization": true,
+            "enableComplexTypesNormalization": true
         }
     },
     "description": "Hackolade plugin for Snowflake",
