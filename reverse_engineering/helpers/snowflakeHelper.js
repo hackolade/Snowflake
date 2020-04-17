@@ -649,11 +649,27 @@ const getSequences = async (dbName, schemaName) => {
 const convertFileFormatsOptions = optionsData => {
 	const selectOptions = ['COMPRESSION', 'BINARY_FORMAT'];
 	const groupOptions = ['NULL_IF'];
-	const checkboxOptions = ['TRIM_SPACE', 'ERROR_ON_COLUMN_COUNT_MISMATCH', 'VALIDATE_UTF8', 'EMPTY_FIELD_AS_NULL', 'SKIP_BYTE_ORDER_MARK'];
+	const checkboxOptions = [
+		'ERROR_ON_COLUMN_COUNT_MISMATCH',
+		'VALIDATE_UTF8',
+		'EMPTY_FIELD_AS_NULL',
+		'ALLOW_DUPLICATE',
+		'STRIP_OUTER_ARRAY',
+		'STRIP_NULL_VALUES',
+		'IGNORE_UTF8_ERRORS',
+		'TRIM_SPACE',
+		'SNAPPY_COMPRESSION',
+		'BINARY_AS_TEXT',
+		'PRESERVE_SPACE',
+		'STRIP_OUTER_ELEMENT',
+		'DISABLE_SNOWFLAKE_DATA',
+		'DISABLE_AUTO_CONVERT',
+		'SKIP_BYTE_ORDER_MARK',
+	];
 	const numericOptions = ['SKIP_HEADER'];
 
 	return Object.keys(optionsData).reduce((options, key) => {
-		const value = optionsData[key];
+		const value = _.isNil(optionsData[key]) ? '' : optionsData[key];
 		if (selectOptions.includes(key)) {
 			return { ...options, [key]: _.toUpper(value) };
 		} else if (groupOptions.includes(key)) {
@@ -671,11 +687,19 @@ const convertFileFormatsOptions = optionsData => {
 const getFileFormats = async (dbName, schemaName) => {
 	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.FILE_FORMATS where FILE_FORMAT_SCHEMA='${schemaName}'`);
 
-	return rows.map(row => ({
-		name: row['FILE_FORMAT_NAME'],
-		fileFormat: _.toUpper(row['FILE_FORMAT_TYPE']),
-		formatTypeOptions: convertFileFormatsOptions(row),
-		fileFormatComments: row['COMMENT'] || ''
+	return Promise.all(rows.map(async row => {
+		const describeProperties = await execute(`DESCRIBE FILE FORMAT "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"."${row['FILE_FORMAT_NAME']}"`);
+		const propertiesRow = describeProperties.reduce((properties, { property, property_value }) => ({
+			...properties,
+			[property]: property_value
+		}), {});
+
+		return {
+			name: row['FILE_FORMAT_NAME'],
+			fileFormat: _.toUpper(row['FILE_FORMAT_TYPE']),
+			formatTypeOptions: convertFileFormatsOptions({ ...row, ...propertiesRow }),
+			fileFormatComments: row['COMMENT'] || ''
+		};
 	}));
 };
 
