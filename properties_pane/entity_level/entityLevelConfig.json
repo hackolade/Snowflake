@@ -219,7 +219,8 @@ making sure that you maintain a proper JSON format.
 					"AVRO",
 					"ORC",
 					"PARQUET",
-					"XML"
+					"XML",
+					"custom"
 				],
 				"dependency": {
 					"key": "external",
@@ -238,11 +239,31 @@ making sure that you maintain a proper JSON format.
 					"AVRO",
 					"ORC",
 					"PARQUET",
-					"XML"
+					"XML",
+					"custom"
 				],
 				"dependency": {
 					"key": "external",
 					"value": true
+				}
+			},
+			{
+				"propertyName": "Custom file format name",
+				"propertyKeyword": "customFileFormatName",
+				"propertyTooltip": "",
+				"propertyType": "text",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "fileFormat",
+							"value": "custom"
+						},
+						{
+							"key": "externalFileFormat",
+							"value": "custom"
+						}
+					]
 				}
 			},
 			{
@@ -524,6 +545,46 @@ making sure that you maintain a proper JSON format.
 							"DEFLATE",
 							"RAW_DEFLATE",
 							"NONE"
+						]
+					}
+				]
+			},
+			{
+				"propertyName": "Format type options",
+				"propertyType": "block",
+				"propertyKeyword": "formatTypeOptions",
+				"propertyTooltip": "",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "fileFormat",
+							"value": "ORC"
+						},
+						{
+							"key": "externalFileFormat",
+							"value": "ORC"
+						}
+					]
+				},
+				"structure": [
+					{
+						"propertyName": "Trim space",
+						"propertyKeyword": "TRIM_SPACE",
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "NULL if",
+						"propertyType": "group",
+						"propertyKeyword": "NULL_IF",
+						"propertyTooltip": "",
+						"structure": [
+							{
+								"propertyName": "value",
+								"propertyKeyword": "NULL_IF_item",
+								"propertyTooltip": "",
+								"propertyType": "text"
+							}
 						]
 					}
 				]

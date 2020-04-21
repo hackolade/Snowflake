@@ -485,6 +485,10 @@ const getEntityData = async fullName => {
 			const externalTableData = await getExternalTableData(fullName);
 			entityLevelData = { ...data, ...externalTableData };
 		}
+		if (!fileFormat) {
+			entityLevelData.customFileFormatName = _.toUpper(_.get(stageData.find(item => item.property === 'FORMAT_NAME'), 'property_value', ''));
+		}
+
 		const fileFormatKey = external ? 'externalFileFormat' : 'fileFormat';
 		if (hasStageCopyOptions(stageData)) {
 			entityLevelData.stageCopyOptions = getStageCopyOptions(stageData)
@@ -492,7 +496,7 @@ const getEntityData = async fullName => {
 
 		return {
 			...entityLevelData,
-			[fileFormatKey]: fileFormat,
+			[fileFormatKey]: fileFormat || 'custom',
 			external,
 			clusteringKey,
 			formatTypeOptions: getFileFormatOptions(stageData),
@@ -614,8 +618,8 @@ const getExternalTableData  = async fullName => {
 	}
 };
 
-const getFunctions = async dbName => {
-	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.functions`);
+const getFunctions = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.functions where FUNCTION_SCHEMA='${schemaName}'`);
 
 	return rows.map(row => {
 		const storedProcArgument = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'];
@@ -626,9 +630,77 @@ const getFunctions = async dbName => {
 			storedProcArgument,
 			storedProcDataType: row['DATA_TYPE'],
 			storedProcFunction: row['FUNCTION_DEFINITION'],
-			storedProcComments: row['COMMENT']
+			storedProcDescription: row['COMMENT'] || ''
 		}
 	});
+};
+
+const getSequences = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.sequences where SEQUENCE_SCHEMA='${schemaName}'`);
+
+	return rows.map(row => ({
+		name: row['SEQUENCE_NAME'],
+		sequenceStart: Number(_.get(row, 'START_VALUE')) || 1,
+		sequenceIncrement: Number(_.get(row, 'INCREMENT')) || 1,
+		sequenceComments: row['COMMENT'] || ''
+	}));
+};
+
+const convertFileFormatsOptions = optionsData => {
+	const selectOptions = ['COMPRESSION', 'BINARY_FORMAT'];
+	const groupOptions = ['NULL_IF'];
+	const checkboxOptions = [
+		'ERROR_ON_COLUMN_COUNT_MISMATCH',
+		'VALIDATE_UTF8',
+		'EMPTY_FIELD_AS_NULL',
+		'ALLOW_DUPLICATE',
+		'STRIP_OUTER_ARRAY',
+		'STRIP_NULL_VALUES',
+		'IGNORE_UTF8_ERRORS',
+		'TRIM_SPACE',
+		'SNAPPY_COMPRESSION',
+		'BINARY_AS_TEXT',
+		'PRESERVE_SPACE',
+		'STRIP_OUTER_ELEMENT',
+		'DISABLE_SNOWFLAKE_DATA',
+		'DISABLE_AUTO_CONVERT',
+		'SKIP_BYTE_ORDER_MARK',
+	];
+	const numericOptions = ['SKIP_HEADER'];
+
+	return Object.keys(optionsData).reduce((options, key) => {
+		const value = _.isNil(optionsData[key]) ? '' : optionsData[key];
+		if (selectOptions.includes(key)) {
+			return { ...options, [key]: _.toUpper(value) };
+		} else if (groupOptions.includes(key)) {
+			return { ...options, [key]: value.slice(1, -1).split(',').map(value => ({ [`${key}_item`]: _.trim(value) })) };
+		} else if (checkboxOptions.includes(key)) {
+			return { ...options, [key]: _.isBoolean(value) ? value : _.toUpper(value) !== 'FALSE' };
+		} else if (numericOptions.includes(key)) {
+			return { ...options, [key]: isNaN(value) ? '' : Number(value) };
+		}
+
+		return { ...options, [key]: value };
+	}, {});
+};
+
+const getFileFormats = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.FILE_FORMATS where FILE_FORMAT_SCHEMA='${schemaName}'`);
+
+	return Promise.all(rows.map(async row => {
+		const describeProperties = await execute(`DESCRIBE FILE FORMAT "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"."${row['FILE_FORMAT_NAME']}"`);
+		const propertiesRow = describeProperties.reduce((properties, { property, property_value }) => ({
+			...properties,
+			[property]: property_value
+		}), {});
+
+		return {
+			name: row['FILE_FORMAT_NAME'],
+			fileFormat: _.toUpper(row['FILE_FORMAT_TYPE']),
+			formatTypeOptions: convertFileFormatsOptions({ ...row, ...propertiesRow }),
+			fileFormatComments: row['COMMENT'] || ''
+		};
+	}));
 };
 
 const getContainerData = async schema => {
@@ -643,14 +715,18 @@ const getContainerData = async schema => {
 		const dbData = _.first(dbRows);
 		const schemaRows = await execute(`select * from "${dbNameWithoutQuotes}".information_schema.schemata where SCHEMA_NAME='${removeQuotes(schemaName)}'`);
 		const schemaData = _.first(schemaRows);
-		const functions = await getFunctions(dbName);
+		const functions = await getFunctions(dbName, schemaName);
+		const sequences = await getSequences(dbName, schemaName);
+		const fileFormats = await getFileFormats(dbName, schemaName);
 
 		const data = {
 			transient: _.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
 			DATA_RETENTION_TIME_IN_DAYS: _.get(schemaData, 'RETENTION_TIME') || 0,
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
-			UDFs: functions
+			UDFs: functions,
+			sequences,
+			fileFormats
 		};
 		containers[schema] = data;
 

@@ -191,7 +191,7 @@ making sure that you maintain a proper JSON format.
 					]
 				},
 				{
-					"propertyName": "Description",
+					"propertyName": "Comments",
 					"propertyKeyword": "storedProcDescription",
 					"shouldValidate": false,
 					"propertyTooltip": "description",
@@ -222,7 +222,7 @@ making sure that you maintain a proper JSON format.
 					"markdown": false
 				},
 				{
-					"propertyName": "Comments",
+					"propertyName": "Remarks",
 					"propertyKeyword": "storedProcComments",
 					"shouldValidate": false,
 					"propertyTooltip": "comments",
@@ -232,5 +232,474 @@ making sure that you maintain a proper JSON format.
 				}
 			]
 		}]
+	},
+	{
+		"lowerTab": "Sequences",
+		"structure": [{
+			"propertyName": "Sequence",
+			"propertyType": "group",
+			"propertyKeyword": "sequences",
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Start with",
+					"propertyKeyword": "sequenceStart",
+					"propertyType": "numeric"
+				},
+				{
+					"propertyName": "Increment by",
+					"propertyKeyword": "sequenceIncrement",
+					"propertyType": "numeric"
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "sequenceComments",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Remarks",
+					"propertyKeyword": "sequenceRemarks",
+					"shouldValidate": false,
+					"addTimestampButton": true,
+					"propertyTooltip": "remarks",
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
+	},
+	{
+		"lowerTab": "File formats",
+		"structure": [{
+			"propertyName": "File format",
+			"propertyType": "group",
+			"propertyKeyword": "fileFormats",
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "File format type",
+					"propertyKeyword": "fileFormat",
+					"propertyTooltip": "Select from list of options",
+					"propertyType": "select",
+					"options": [
+						"",
+						"CSV",
+						"JSON",
+						"AVRO",
+						"ORC",
+						"PARQUET",
+						"XML"
+					]
+				},
+				{
+					"propertyName": "Format type options",
+					"propertyType": "block",
+					"propertyKeyword": "formatTypeOptions",
+					"propertyTooltip": "",
+					"dependency": {
+						"key": "fileFormat",
+						"value": "CSV"
+					},
+					"defaultValue": {
+						"COMPRESSION": "AUTO",
+						"RECORD_DELIMITER": "\\r\\n",
+						"FIELD_DELIMITER": ",",
+						"FILE_EXTENSION": "NONE",
+						"SKIP_HEADER": 0,
+						"DATE_FORMAT": "AUTO",
+						"TIME_FORMAT": "AUTO",
+						"TIMESTAMP_FORMAT": "AUTO",
+						"BINARY_FORMAT": "HEX",
+						"ESCAPE": "NONE",
+						"ESCAPE_UNENCLOSED_FIELD": "\\",
+						"TRIM_SPACE": false, 
+						"FIELD_OPTIONALLY_ENCLOSED_BY": "NONE",
+						"NULL_IF": [{ "NULL_IF_item": "\\N" }],
+						"ERROR_ON_COLUMN_COUNT_MISMATCH": true,
+						"VALIDATE_UTF8": true,
+						"EMPTY_FIELD_AS_NULL": true,
+						"SKIP_BYTE_ORDER_MARK": true,
+						"ENCODING": "UTF8",
+						"SNAPPY_COMPRESSION": true,
+						"BINARY_AS_TEXT": true,
+						"ON_ERROR": "ABORT_STATEMENT"
+					},
+					"structure": [
+						{
+							"propertyName": "Compression",
+							"propertyKeyword": "COMPRESSION",
+							"propertyTooltip": "Select from list of options",
+							"propertyType": "select",
+							"options": [
+								"AUTO",
+								"GZIP",
+								"BZ2",
+								"BROTLI",
+								"ZSTD",
+								"DEFLATE",
+								"RAW_DEFLATE",
+								"NONE"
+							]
+						},
+						{
+							"propertyName": "Record delimiter",
+							"propertyKeyword": "RECORD_DELIMITER",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "Field delimiter",
+							"propertyKeyword": "FIELD_DELIMITER",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "File extension",
+							"propertyKeyword": "FILE_EXTENSION",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "Skip header",
+							"propertyKeyword": "SKIP_HEADER",
+							"propertyType": "numeric",
+							"valueType": "number",
+							"minValue": 0,
+							"maxValue": 1,
+							"step": 1
+						},
+						{
+							"propertyName": "Date format",
+							"propertyKeyword": "DATE_FORMAT",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "Time format",
+							"propertyKeyword": "TIME_FORMAT",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "Timestamp format",
+							"propertyKeyword": "TIMESTAMP_FORMAT",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "Binary format",
+							"propertyKeyword": "BINARY_FORMAT",
+							"propertyTooltip": "Select from list of options",
+							"propertyType": "select",
+							"options": [
+								"HEX",
+								"BASE64",
+								"UTF8"
+							]
+						},
+						{
+							"propertyName": "Escape character",
+							"propertyKeyword": "ESCAPE",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "Escape unenclosed field",
+							"propertyKeyword": "ESCAPE_UNENCLOSED_FIELD",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "Trim space",
+							"propertyKeyword": "TRIM_SPACE",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Field optionally enclosed by",
+							"propertyKeyword": "FIELD_OPTIONALLY_ENCLOSED_BY",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "NULL if",
+							"propertyType": "group",
+							"propertyKeyword": "NULL_IF",
+							"propertyTooltip": "",
+							"structure": [
+								{
+									"propertyName": "value",
+									"propertyKeyword": "NULL_IF_item",
+									"propertyTooltip": "",
+									"propertyType": "text"
+								}
+							]
+						},
+						{
+							"propertyName": "Error on column count mismatch",
+							"propertyKeyword": "ERROR_ON_COLUMN_COUNT_MISMATCH",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Validate UTF8",
+							"propertyKeyword": "VALIDATE_UTF8",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Empty field as NULL",
+							"propertyKeyword": "EMPTY_FIELD_AS_NULL",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Skip byte order mark",
+							"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Encoding",
+							"propertyKeyword": "ENCODING",
+							"propertyType": "text"
+						}
+					]
+				},
+				{
+					"propertyName": "Format type options",
+					"propertyType": "block",
+					"propertyKeyword": "formatTypeOptions",
+					"propertyTooltip": "",
+					"dependency": {
+						"key": "fileFormat",
+						"value": "JSON"
+					},
+					"defaultValue": {
+						"COMPRESSION": "GZIP",
+						"FILE_EXTENSION": "JSON"
+					},
+					"structure": [
+						{
+							"propertyName": "Compression",
+							"propertyKeyword": "COMPRESSION",
+							"propertyTooltip": "Select from list of options",
+							"propertyType": "select",
+							"options": [
+								"AUTO",
+								"GZIP",
+								"BZ2",
+								"BROTLI",
+								"ZSTD",
+								"DEFLATE",
+								"RAW_DEFLATE",
+								"NONE"
+							]
+						},
+						{
+							"propertyName": "File extension",
+							"propertyKeyword": "FILE_EXTENSION",
+							"propertyType": "text"
+						},
+						{
+							"propertyName": "Enable octal",
+							"propertyKeyword": "ENABLE_OCTAL",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Allow duplicate",
+							"propertyKeyword": "ALLOW_DUPLICATE",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Strip outer array",
+							"propertyKeyword": "STRIP_OUTER_ARRAY",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Strip NULL values",
+							"propertyKeyword": "STRIP_NULL_VALUES",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Ignore UTF8 errors",
+							"propertyKeyword": "IGNORE_UTF8_ERRORS",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Skip byte order mark",
+							"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+							"propertyType": "checkbox"
+						}
+					]
+				},
+				{
+					"propertyName": "Format type options",
+					"propertyType": "block",
+					"propertyKeyword": "formatTypeOptions",
+					"propertyTooltip": "",
+					"dependency": {
+						"key": "fileFormat",
+						"value": "AVRO"
+					},
+					"structure": [
+						{
+							"propertyName": "Compression",
+							"propertyKeyword": "COMPRESSION",
+							"propertyTooltip": "Select from list of options",
+							"propertyType": "select",
+							"options": [
+								"AUTO",
+								"GZIP",
+								"BZ2",
+								"BROTLI",
+								"ZSTD",
+								"DEFLATE",
+								"RAW_DEFLATE",
+								"NONE"
+							]
+						}
+					]
+				},
+				{
+					"propertyName": "Format type options",
+					"propertyType": "block",
+					"propertyKeyword": "formatTypeOptions",
+					"propertyTooltip": "",
+					"dependency": {
+						"key": "fileFormat",
+						"value": "ORC"
+					},
+					"structure": [
+						{
+							"propertyName": "Trim space",
+							"propertyKeyword": "TRIM_SPACE",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "NULL if",
+							"propertyType": "group",
+							"propertyKeyword": "NULL_IF",
+							"propertyTooltip": "",
+							"structure": [
+								{
+									"propertyName": "value",
+									"propertyKeyword": "NULL_IF_item",
+									"propertyTooltip": "",
+									"propertyType": "text"
+								}
+							]
+						}
+					]
+				},
+				{
+					"propertyName": "Format type options",
+					"propertyType": "block",
+					"propertyKeyword": "formatTypeOptions",
+					"propertyTooltip": "",
+					"dependency": {
+						"key": "fileFormat",
+						"value": "PARQUET"
+					},
+					"structure": [
+						{
+							"propertyName": "Compression",
+							"propertyKeyword": "COMPRESSION",
+							"propertyTooltip": "Select from list of options",
+							"propertyType": "select",
+							"options": [
+								"AUTO",
+								"LZO",
+								"SNAPPY",
+								"NONE"
+							]
+						},
+						{
+							"propertyName": "Snappy compression",
+							"propertyKeyword": "SNAPPY_COMPRESSION",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Binary as text",
+							"propertyKeyword": "BINARY_AS_TEXT",
+							"propertyType": "checkbox"
+						}
+					]
+				},
+				{
+					"propertyName": "Format type options",
+					"propertyType": "block",
+					"propertyKeyword": "formatTypeOptions",
+					"propertyTooltip": "",
+					"dependency": {
+						"key": "fileFormat",
+						"value": "XML"
+					},
+					"structure": [
+						{
+							"propertyName": "Compression",
+							"propertyKeyword": "COMPRESSION",
+							"propertyTooltip": "Select from list of options",
+							"propertyType": "select",
+							"options": [
+								"AUTO",
+								"GZIP",
+								"BZ2",
+								"BROTLI",
+								"ZSTD",
+								"DEFLATE",
+								"RAW_DEFLATE",
+								"NONE"
+							]
+						},
+						{
+							"propertyName": "Ignore UTF8 errors",
+							"propertyKeyword": "IGNORE_UTF8_ERRORS",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Preserve space",
+							"propertyKeyword": "PRESERVE_SPACE",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Strip outer element",
+							"propertyKeyword": "STRIP_OUTER_ELEMENT",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Disable Snowflake data",
+							"propertyKeyword": "DISABLE_SNOWFLAKE_DATA",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Disable auto convert",
+							"propertyKeyword": "DISABLE_AUTO_CONVERT",
+							"propertyType": "checkbox"
+						},
+						{
+							"propertyName": "Skip byte order mark",
+							"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+							"propertyType": "checkbox"
+						}
+					]
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "fileFormatComments",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Remarks",
+					"propertyKeyword": "fileFormatRemarks",
+					"shouldValidate": false,
+					"addTimestampButton": true,
+					"propertyTooltip": "remarks",
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
 	}
 ]
+
