@@ -60,7 +60,7 @@
 				"inputKeyword": "authType",
 				"inputType": "select",
 				"options": [
-					{ "value": "credentials", "label": "Snowflake credentials" },
+					{ "value": "credentials", "label": "Snowflake" },
 					{ "value": "okta", "label": "Okta SSO" }
 				]
 			},
