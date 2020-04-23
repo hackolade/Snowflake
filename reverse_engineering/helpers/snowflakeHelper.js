@@ -1,16 +1,86 @@
 const snowflake = require('snowflake-sdk');
 const _ = require('lodash');
+const axios = require('axios');
+const uuid = require('uuid');
+
+const ALREADY_CONNECTED_STATUS = 405502;
+
 let connection;
 let containers = {};
 
 const noConnectionError = { message: 'Connection error' };
+const oktaAuthenticatorError = { message: 'Can\'t get SSO URL. Please, check the authenticator' };
+const oktaCredentialsError = { message: 'Incorrect Okta username/password' };
 
-const connect = ({ host, username, password }) => {
+const connect = async ({ host, username, password, authType, authenticator }) => {
+	const account = getAccount(host);
+	const accessUrl = getAccessUrl(account);
+
+	if (authType === 'okta') {
+		return authByOkta({ account, accessUrl, username, password, authenticator });
+	} else {
+		return authByCredentials({ account, username, password });
+	}
+};
+
+const authByOkta = async ({ account, accessUrl, username, password, authenticator }) => {
+	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request`, { data: {
+		ACCOUNT_NAME: getAccountName(account), 
+		LOGIN_NAME: username,
+		AUTHENTICATOR: getOktaAuthenticatorUrl(authenticator)
+	} });
+
+	const tokenUrl = _.get(ssoUrlsData, 'data.data.tokenUrl', '');
+	const ssoUrl = _.get(ssoUrlsData, 'data.data.ssoUrl', '');
+	if (!tokenUrl || !ssoUrl) {
+		return Promise.reject(oktaAuthenticatorError);
+	}
+
+	const identityProviderTokenData = await axios.post(tokenUrl, { username, password }).catch(err => {
+		return Promise.reject({ ...err, ...oktaCredentialsError });
+	});
+	const identityProviderToken = _.get(identityProviderTokenData, 'data.cookieToken', '');
+	if (!identityProviderToken) {
+		return Promise.reject(oktaCredentialsError);
+	}
+
+	const samlUrl = `${ssoUrl}?onetimetoken=${encodeURIComponent(identityProviderToken)}`;
+	const samlResponseData = await axios.get(samlUrl, { headers: { HTTP_HEADER_ACCEPT: '*/*' } });
+	const rawSamlResponse = _.get(samlResponseData, 'data', '');
+
+	const requestId = uuid.v4();
+	const authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
+	const authData = await axios.post(authUrl, { data: { RAW_SAML_RESPONSE: rawSamlResponse }});
+	const masterToken = _.get(authData, 'data.data.masterToken', '');
+	const sessionToken = _.get(authData, 'data.data.token', '');
+
 	return new Promise((resolve, reject) => {
-		const account = (host || '')
-			.trim()
-			.replace(/\.snowflakecomputing\.com.*$/gi,'')
-			.replace(/^http(s)?:\/\//gi, '');
+		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password });
+		connection.connect(err => {
+			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
+				connection = null;
+				return reject(err); 
+			}
+
+			resolve();
+		});
+	});
+};
+
+const getOktaAuthenticatorUrl = (authenticator = '') => {
+	if (/^http(s)?/mi.test(authenticator)) {
+		return authenticator;
+	}
+
+	if (/\.okta\.com\/?$/.test(authenticator)) {
+		return `https://${authenticator}`;
+	}
+
+	return `https://${authenticator}.okta.com`;
+};
+
+const authByCredentials = ({ account, username, password }) => {
+	return new Promise((resolve, reject) => {
 		connection = snowflake.createConnection({ account, username, password });
 		connection.connect(err => {
 			if (err) {
@@ -22,6 +92,15 @@ const connect = ({ host, username, password }) => {
 		});
 	});
 };
+
+const getAccount = hostUrl => (hostUrl || '')
+	.trim()
+	.replace(/\.snowflakecomputing\.com.*$/gi,'')
+	.replace(/^http(s)?:\/\//gi, '');
+	
+const getAccessUrl = account => `https://${account}.snowflakecomputing.com`;
+
+const getAccountName = account => _.first(account.split('.'));
 
 const disconnect = () => {
 	if (!connection) {

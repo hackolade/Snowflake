@@ -56,6 +56,25 @@
 		"tab": "Authentication",
 		"structure": [
 			{
+				"inputLabel": "Auth type",
+				"inputKeyword": "authType",
+				"inputType": "select",
+				"options": [
+					{ "value": "credentials", "label": "Snowflake credentials" },
+					{ "value": "okta", "label": "Okta SSO" }
+				]
+			},
+			{
+				"inputLabel": "Authenticator",
+				"inputKeyword": "authenticator",
+				"inputType": "text",
+				"inputPlaceholder": "https://<okta_account_name>.okta.com",
+				"dependency": {
+					"key": "authType",
+					"value": "okta"
+				}
+			},
+			{
 				"inputLabel": "User Name",
 				"inputKeyword": "username",
 				"inputType": "text",
