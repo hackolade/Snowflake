@@ -44,7 +44,7 @@ const authByOkta = async ({ account, accessUrl, username, password, authenticato
 		return Promise.reject(oktaCredentialsError);
 	}
 
-	const samlUrl = `${ssoUrl}?onetimetoken=${encodeURIComponent(identityProviderToken)}`;
+	const samlUrl = `${ssoUrl}?onetimetoken=${encodeURIComponent(identityProviderToken)}&RelayState=${encodeURIComponent('/some/deep/link')}`;
 	const samlResponseData = await axios.get(samlUrl, { headers: { HTTP_HEADER_ACCEPT: '*/*' } });
 	const rawSamlResponse = _.get(samlResponseData, 'data', '');
 
