@@ -7,7 +7,7 @@ const connect = async (connectionInfo, logger, cb) => {
 	logger.clear();
 	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 	try {
-		await snowflakeHelper.connect(connectionInfo);
+		await snowflakeHelper.connect(logger, connectionInfo);
 		cb();
 	} catch (err) {
 		cb(err);
@@ -25,7 +25,7 @@ const disconnect = async (connectionInfo, logger, cb) => {
 
 const testConnection = async (connectionInfo, logger, cb) => {
 	try {
-		await snowflakeHelper.testConnection(connectionInfo);
+		await snowflakeHelper.testConnection(logger, connectionInfo);
 		cb();
 	} catch (err) {
 		cb(err);
@@ -42,7 +42,7 @@ const getDocumentKinds = (connectionInfo, logger, cb) => {
 
 const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
 	try {
-		await snowflakeHelper.connect(connectionInfo);
+		await snowflakeHelper.connect(logger, connectionInfo);
 		const namesBySchemas = await snowflakeHelper.getEntitiesNames();
 
 		cb(null, namesBySchemas);
