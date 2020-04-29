@@ -11,27 +11,33 @@ let containers = {};
 const noConnectionError = { message: 'Connection error' };
 const oktaAuthenticatorError = { message: 'Can\'t get SSO URL. Please, check the authenticator' };
 const oktaCredentialsError = { message: 'Incorrect Okta username/password' };
+const DEFAULT_CLIENT_APP_ID = 'PythonConnector';
+const DEFAULT_CLIENT_APP_VERSION = '2.2.4';
 
-const connect = async ({ host, username, password, authType, authenticator }) => {
+const connect = async (logger, { host, username, password, authType, authenticator }) => {
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 
 	if (authType === 'okta') {
-		return authByOkta({ account, accessUrl, username, password, authenticator });
+		return authByOkta(logger, { account, accessUrl, username, password, authenticator });
 	} else {
 		return authByCredentials({ account, username, password });
 	}
 };
 
-const authByOkta = async ({ account, accessUrl, username, password, authenticator }) => {
+const authByOkta = async (logger, { account, accessUrl, username, password, authenticator }) => {
+	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request`, { data: {
-		ACCOUNT_NAME: getAccountName(account), 
+		ACCOUNT_NAME: accountName, 
 		LOGIN_NAME: username,
 		AUTHENTICATOR: getOktaAuthenticatorUrl(authenticator)
 	} });
 
+	logger.log('info', `Starting Okta connection...`, 'Connection');
 	const tokenUrl = _.get(ssoUrlsData, 'data.data.tokenUrl', '');
 	const ssoUrl = _.get(ssoUrlsData, 'data.data.ssoUrl', '');
+	logger.log('info', `Token URL: ${tokenUrl}\nSSO URL: ${ssoUrl}`, 'Connection');
+
 	if (!tokenUrl || !ssoUrl) {
 		return Promise.reject(oktaAuthenticatorError);
 	}
@@ -39,23 +45,41 @@ const authByOkta = async ({ account, accessUrl, username, password, authenticato
 	const identityProviderTokenData = await axios.post(tokenUrl, { username, password }).catch(err => {
 		return Promise.reject({ ...err, ...oktaCredentialsError });
 	});
+	logger.log('info', `Successfully connected to Okta`, 'Connection');
 	const identityProviderToken = _.get(identityProviderTokenData, 'data.cookieToken', '');
 	if (!identityProviderToken) {
 		return Promise.reject(oktaCredentialsError);
 	}
 
+	logger.log('info', `One-time IDP token has been provided`, 'Connection');
+
 	const samlUrl = `${ssoUrl}?onetimetoken=${encodeURIComponent(identityProviderToken)}&RelayState=${encodeURIComponent('/some/deep/link')}`;
 	const samlResponseData = await axios.get(samlUrl, { headers: { HTTP_HEADER_ACCEPT: '*/*' } });
 	const rawSamlResponse = _.get(samlResponseData, 'data', '');
 
+	if (!rawSamlResponse) {	
+		logger.log('info', `RAW_SAML_RESPONSE is empty`, 'Connection');
+	} else {
+		logger.log('info', `Warning: RAW_SAML_RESPONSE has been provided`, 'Connection')
+	}
+
 	const requestId = uuid.v4();
 	const authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
-	const authData = await axios.post(authUrl, { data: { RAW_SAML_RESPONSE: rawSamlResponse }});
+	const authData = await axios.post(authUrl, {
+		data: {
+			CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
+			CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
+			RAW_SAML_RESPONSE: rawSamlResponse,
+			LOGIN_NAME: username,
+			ACCOUNT_NAME: accountName
+		}
+	});
 	const masterToken = _.get(authData, 'data.data.masterToken', '');
 	const sessionToken = _.get(authData, 'data.data.token', '');
+	logger.log('info', `Tokens have been provided`, 'Connection');
 
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password });
+		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account });
 		connection.connect(err => {
 			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
 				connection = null;
@@ -117,8 +141,8 @@ const disconnect = () => {
 	})
 }
 
-const testConnection = async info => {
-	await connect(info);
+const testConnection = async (logger, info) => {
+	await connect(logger, info);
 	await execute('SELECT 1 as t;');
 	await disconnect();
 };
