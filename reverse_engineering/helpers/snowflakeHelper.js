@@ -11,19 +11,23 @@ let containers = {};
 const noConnectionError = { message: 'Connection error' };
 const oktaAuthenticatorError = { message: 'Can\'t get SSO URL. Please, check the authenticator' };
 const oktaCredentialsError = { message: 'Incorrect Okta username/password' };
+
 const DEFAULT_CLIENT_APP_ID = 'JavaScript';
 const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
+const DEFAULT_WAREHOUSE = 'COMPUTE_WH';
 
-const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role }) => {
+const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse }) => {
+	warehouse = warehouse || DEFAULT_WAREHOUSE;
+
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 
 	if (authType === 'okta') {
-		return authByOkta(logger, { account, accessUrl, username, password, authenticator, role });
+		return authByOkta(logger, { account, accessUrl, username, password, authenticator, role, warehouse });
 	} if (authType === 'externalbrowser') {
-		return authByExternalBrowser(logger, { account, accessUrl, token, proofKey, username, password, role })
+		return authByExternalBrowser(logger, { account, accessUrl, token, proofKey, username, password, role, warehouse })
 	} else {
-		return authByCredentials({ account, username, password, role });
+		return authByCredentials({ account, username, password, role, warehouse });
 	}
 };
 
@@ -68,8 +72,10 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	const requestId = uuid.v4();
 	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
 	if (role) {
-		authUrl += `&roleName=${encodeURIComponent(role)}`
+		authUrl += `&roleName=${encodeURIComponent(role)}`;
 	}
+	authUrl += `&roleName=${encodeURIComponent(warehouse)}`;
+
 	const authData = await axios.post(authUrl, {
 		data: {
 			CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
@@ -93,7 +99,7 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	logger.log('info', `Tokens have been provided`, 'Connection');
 
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password, role });
+		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password, role, warehouse });
 		connection.connect(err => {
 			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
 				connection = null;
@@ -105,7 +111,7 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	});
 };
 
-const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, password, role }) => {
+const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, password, role, warehouse }) => {
 	const accountName = getAccountName(account);
 
 	const requestId = uuid.v4();
@@ -113,6 +119,8 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 	if (role) {
 		authUrl += `&roleName=${encodeURIComponent(role)}`
 	}
+	authUrl += `&roleName=${encodeURIComponent(warehouse)}`;
+
 	const authData = await axios.post(authUrl, {
 		data: {
 			CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
@@ -142,14 +150,14 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 	logger.log('info', `Tokens have been provided`, 'Connection');
 
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password, role });
+		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password, role, warehouse });
 		connection.connect(err => {
 			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
 				connection = null;
 				return reject(err); 
 			}
 
-			resolve();
+			execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`).then(resolve, resolve);
 		});
 	});
 };

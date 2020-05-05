@@ -91,6 +91,12 @@
 				"defaultValue": ""
 			},
 			{
+				"inputLabel": "Warehouse",
+				"inputKeyword": "warehouse",
+				"inputType": "text",
+				"defaultValue": "COMPUTE_WH"
+			},
+			{
 				"inputLabel": "Role Name",
 				"inputKeyword": "role",
 				"inputType": "text",
