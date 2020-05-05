@@ -15,6 +15,7 @@ const oktaCredentialsError = { message: 'Incorrect Okta username/password' };
 const DEFAULT_CLIENT_APP_ID = 'JavaScript';
 const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
 const DEFAULT_WAREHOUSE = 'COMPUTE_WH';
+const DEFAULT_ROLE = 'PUBLIC';
 
 const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse }) => {
 	warehouse = warehouse || DEFAULT_WAREHOUSE;
@@ -71,9 +72,9 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 
 	const requestId = uuid.v4();
 	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
-	if (role) {
-		authUrl += `&roleName=${encodeURIComponent(role)}`;
-	}
+	role = role || DEFAULT_ROLE;
+
+	authUrl += `&roleName=${encodeURIComponent(role)}`;
 	authUrl += `&roleName=${encodeURIComponent(warehouse)}`;
 
 	const authData = await axios.post(authUrl, {
@@ -116,10 +117,8 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 
 	const requestId = uuid.v4();
 	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
-	if (role) {
-		authUrl += `&roleName=${encodeURIComponent(role)}`
-	}
-	authUrl += `&roleName=${encodeURIComponent(warehouse)}`;
+	role = role || DEFAULT_ROLE;
+	authUrl += `&roleName=${encodeURIComponent(role)}`;
 
 	const authData = await axios.post(authUrl, {
 		data: {
@@ -157,7 +156,8 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 				return reject(err); 
 			}
 
-			execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`).then(resolve, resolve);
+			execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`)
+				.then(resolve, err => reject('Warehouse is not available. Please check your role and warehouse'));
 		});
 	});
 };
