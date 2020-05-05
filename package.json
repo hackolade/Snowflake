@@ -4,7 +4,7 @@
     "versionDate": "2020-04-29",
     "author": "hackolade",
     "engines": {
-        "hackolade": "4.0.0",
+        "hackolade": "4.0.4",
         "hackoladePlugin": "1.2.0"
     },
     "contributes": {
@@ -15,7 +15,7 @@
         },
         "features": {
             "views": {
-				"enabled": true,
+                "enabled": true,
                 "viewLevel": "model",
                 "disablePipelines": true
             },
