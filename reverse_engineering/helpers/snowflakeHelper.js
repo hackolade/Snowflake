@@ -11,21 +11,23 @@ let containers = {};
 const noConnectionError = { message: 'Connection error' };
 const oktaAuthenticatorError = { message: 'Can\'t get SSO URL. Please, check the authenticator' };
 const oktaCredentialsError = { message: 'Incorrect Okta username/password' };
-const DEFAULT_CLIENT_APP_ID = 'PythonConnector';
-const DEFAULT_CLIENT_APP_VERSION = '2.2.4';
+const DEFAULT_CLIENT_APP_ID = 'JavaScript';
+const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
 
-const connect = async (logger, { host, username, password, authType, authenticator }) => {
+const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role }) => {
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 
 	if (authType === 'okta') {
-		return authByOkta(logger, { account, accessUrl, username, password, authenticator });
+		return authByOkta(logger, { account, accessUrl, username, password, authenticator, role });
+	} if (authType === 'externalbrowser') {
+		return authByExternalBrowser(logger, { account, accessUrl, token, proofKey, username, password, role })
 	} else {
-		return authByCredentials({ account, username, password });
+		return authByCredentials({ account, username, password, role });
 	}
 };
 
-const authByOkta = async (logger, { account, accessUrl, username, password, authenticator }) => {
+const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role }) => {
 	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request`, { data: {
 		ACCOUNT_NAME: accountName, 
@@ -64,7 +66,10 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	}
 
 	const requestId = uuid.v4();
-	const authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
+	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
+	if (role) {
+		authUrl += `&roleName=${encodeURIComponent(role)}`
+	}
 	const authData = await axios.post(authUrl, {
 		data: {
 			CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
@@ -74,12 +79,70 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 			ACCOUNT_NAME: accountName
 		}
 	});
-	const masterToken = _.get(authData, 'data.data.masterToken', '');
-	const sessionToken = _.get(authData, 'data.data.token', '');
+	let tokensData = authData.data;
+	if (_.isString(tokensData)) {
+		try {
+			tokensData = JSON.parse(tokensData);
+		} catch (err) {}
+	}
+	if (!tokensData.success) {
+		return Promise.reject(tokensData.message);
+	}
+	const masterToken = _.get(tokensData, 'data.masterToken', '');
+	const sessionToken = _.get(tokensData, 'data.token', '');
 	logger.log('info', `Tokens have been provided`, 'Connection');
 
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account });
+		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password, role });
+		connection.connect(err => {
+			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
+				connection = null;
+				return reject(err); 
+			}
+
+			resolve();
+		});
+	});
+};
+
+const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, password, role }) => {
+	const accountName = getAccountName(account);
+
+	const requestId = uuid.v4();
+	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
+	if (role) {
+		authUrl += `&roleName=${encodeURIComponent(role)}`
+	}
+	const authData = await axios.post(authUrl, {
+		data: {
+			CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
+			CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
+			TOKEN: token,
+			AUTHENTICATOR: 'EXTERNALBROWSER',
+			PROOF_KEY: proofKey,
+			LOGIN_NAME: username,
+			ACCOUNT_NAME: accountName
+		}}, { 
+		headers: {
+			Accept: 'application/json',
+			Authorization: 'Basic'
+		}
+	});
+	let tokensData = authData.data;
+	if (_.isString(tokensData)) {
+		try {
+			tokensData = JSON.parse(tokensData);
+		} catch (err) {}
+	}
+	if (!tokensData.success) {
+		return Promise.reject(tokensData.message);
+	}
+	const masterToken = _.get(tokensData, 'data.masterToken', '');
+	const sessionToken = _.get(tokensData, 'data.token', '');
+	logger.log('info', `Tokens have been provided`, 'Connection');
+
+	return new Promise((resolve, reject) => {
+		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password, role });
 		connection.connect(err => {
 			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
 				connection = null;
@@ -103,9 +166,9 @@ const getOktaAuthenticatorUrl = (authenticator = '') => {
 	return `https://${authenticator}.okta.com`;
 };
 
-const authByCredentials = ({ account, username, password }) => {
+const authByCredentials = ({ account, username, password, role }) => {
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ account, username, password });
+		connection = snowflake.createConnection({ account, username, password, role });
 		connection.connect(err => {
 			if (err) {
 				connection = null;
@@ -124,9 +187,10 @@ const getAccount = hostUrl => (hostUrl || '')
 	
 const getAccessUrl = account => `https://${account}.snowflakecomputing.com`;
 
-const getAccountName = account => _.first(account.split('.'));
+const getAccountName = account => _.toUpper(_.first(account.split('.')));
 
 const disconnect = () => {
+	connectionRole = '';
 	if (!connection) {
 		return Promise.reject(noConnectionError);
 	}
@@ -247,7 +311,7 @@ const getSchemaDDL = async schemaName => {
 		const queryResult = await execute(`SELECT get_ddl('schema', '${fullSchemaName}');`);
 
 		return getFirstObjectItem(_.first(queryResult));
-	} catch {
+	} catch (err) {
 		return '';
 	}
 };
@@ -257,7 +321,7 @@ const getDDL = async tableName => {
 		const queryResult = await execute(`SELECT get_ddl('table', '${tableName}');`);
 
 		return getFirstObjectItem(_.first(queryResult));
-	} catch {
+	} catch (err) {
 		return '';
 	}
 };
@@ -267,7 +331,7 @@ const getViewDDL = async viewName => {
 		const queryResult = await execute(`SELECT get_ddl('view', '${viewName}');`);
 
 		return getFirstObjectItem(_.first(queryResult));
-	} catch {
+	} catch (err) {
 		return '';
 	}
 };
@@ -855,5 +919,7 @@ module.exports = {
 	splitEntityNames,
 	getEntityData,
 	getViewData,
-	getContainerData
+	getContainerData,
+	getAccount,
+	getAccessUrl
 };

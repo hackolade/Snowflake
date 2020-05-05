@@ -1,6 +1,7 @@
 'use strict';
 
 const snowflakeHelper = require('./helpers/snowflakeHelper');
+const ssoHelper = require('./helpers/ssoHelper');
 const _ = require('lodash');
 
 const connect = async (connectionInfo, logger, cb) => {
@@ -25,12 +26,25 @@ const disconnect = async (connectionInfo, logger, cb) => {
 
 const testConnection = async (connectionInfo, logger, cb) => {
 	try {
-		await snowflakeHelper.testConnection(logger, connectionInfo);
+		if (connectionInfo.authType === 'externalbrowser') {
+			await getExternalBrowserUrl(connectionInfo, logger, cb);
+		} else {
+			await snowflakeHelper.testConnection(logger, connectionInfo);
+		}
 		cb();
 	} catch (err) {
 		cb(err);
 	}
 };
+
+const getExternalBrowserUrl = async (connectionInfo, logger, cb) => {
+	try {
+		const ssoData = await ssoHelper.getSsoUrlData(logger, connectionInfo);
+		cb(null, ssoData);
+	} catch (err) {
+		cb(err);
+	}
+}
 
 const getDatabases = (connectionInfo, logger, cb) => {
 	cb();
@@ -158,5 +172,6 @@ module.exports = {
 	getDatabases,
 	getDocumentKinds,
 	getDbCollectionsNames,
-	getDbCollectionsData
+	getDbCollectionsData,
+	getExternalBrowserUrl
 }

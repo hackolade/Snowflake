@@ -61,7 +61,8 @@
 				"inputType": "select",
 				"options": [
 					{ "value": "credentials", "label": "Snowflake" },
-					{ "value": "okta", "label": "Okta SSO" }
+					{ "value": "okta", "label": "Okta SSO" },
+					{ "value": "externalbrowser", "label": "External browser" }
 				]
 			},
 			{
@@ -87,6 +88,12 @@
 				"inputType": "password",
 				"inputTooltip": "Password",
 				"isHiddenKey": true,
+				"defaultValue": ""
+			},
+			{
+				"inputLabel": "Role Name",
+				"inputKeyword": "role",
+				"inputType": "text",
 				"defaultValue": ""
 			}
 		]
