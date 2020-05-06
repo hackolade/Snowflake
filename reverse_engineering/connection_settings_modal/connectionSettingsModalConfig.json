@@ -94,7 +94,7 @@
 				"inputLabel": "Warehouse",
 				"inputKeyword": "warehouse",
 				"inputType": "text",
-				"defaultValue": "COMPUTE_WH"
+				"defaultValue": ""
 			},
 			{
 				"inputLabel": "Role Name",
