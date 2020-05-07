@@ -112,7 +112,7 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	});
 };
 
-const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, password, role, warehouse }) => {
+const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, warehouse }) => {
 	const accountName = getAccountName(account);
 
 	const requestId = uuid.v4();
@@ -149,7 +149,7 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 	logger.log('info', `Tokens have been provided`, 'Connection');
 
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password, role, warehouse });
+		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password: 'password', role, warehouse });
 		connection.connect(err => {
 			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
 				connection = null;

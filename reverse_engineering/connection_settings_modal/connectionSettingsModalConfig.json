@@ -59,6 +59,7 @@
 				"inputLabel": "Auth type",
 				"inputKeyword": "authType",
 				"inputType": "select",
+				"defaultValue": "Snowflake",
 				"options": [
 					{ "value": "credentials", "label": "Snowflake" },
 					{ "value": "okta", "label": "Okta SSO" },
@@ -88,7 +89,11 @@
 				"inputType": "password",
 				"inputTooltip": "Password",
 				"isHiddenKey": true,
-				"defaultValue": ""
+				"defaultValue": "",
+				"dependency": {
+					"key": "authType",
+					"value": ["", "okta", "credentials"]
+				}
 			},
 			{
 				"inputLabel": "Warehouse",
