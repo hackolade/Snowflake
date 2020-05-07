@@ -63,7 +63,7 @@
 				"options": [
 					{ "value": "credentials", "label": "Snowflake" },
 					{ "value": "okta", "label": "Okta SSO" },
-					{ "value": "externalbrowser", "label": "External browser" }
+					{ "value": "externalbrowser", "label": "External browser SSO" }
 				]
 			},
 			{
@@ -77,10 +77,10 @@
 				}
 			},
 			{
-				"inputLabel": "User Name",
+				"inputLabel": "User name",
 				"inputKeyword": "username",
 				"inputType": "text",
-				"inputPlaceholder": "User Name"
+				"inputPlaceholder": "username@example.com"
 				
 			},
 			{
@@ -102,7 +102,7 @@
 				"defaultValue": ""
 			},
 			{
-				"inputLabel": "Role Name",
+				"inputLabel": "Role name",
 				"inputKeyword": "role",
 				"inputType": "text",
 				"defaultValue": ""
