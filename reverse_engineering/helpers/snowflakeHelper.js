@@ -32,7 +32,7 @@ const connect = async (logger, { host, username, password, authType, authenticat
 	}
 };
 
-const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role }) => {
+const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, warehouse }) => {
 	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request`, { data: {
 		ACCOUNT_NAME: accountName, 

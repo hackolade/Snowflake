@@ -933,5 +933,52 @@ making sure that you maintain a proper JSON format.
 			}
 		],
 		"columnsRatio": [3.7, 5]
+	},
+	{
+		"lowerTab": "Composite keys",
+		"structure": [{
+			"propertyName": "Primary key",
+			"propertyType": "group",
+			"groupItemLimit": 1,
+			"propertyKeyword": "primaryKey",
+			"propertyTooltip": "",
+			"structure": [{
+				"propertyName": "Constraint name",
+				"propertyKeyword": "constraintName",
+				"propertyTooltip": "",
+				"propertyType": "text"
+			}, {
+				"propertyName": "Key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "compositeKeySetter",
+				"disabledItemStrategy": "default",
+				"setPrimaryKey": false,
+				"abbr": "pk",
+				"attributeList": [],
+				"template": "collectiontree",
+				"isCompositeKey": true
+			}]
+		}, {
+			"propertyName": "Unique key",
+			"propertyType": "group",
+			"propertyKeyword": "uniqueKey",
+			"propertyTooltip": "",
+			"structure": [{
+				"propertyName": "Constraint name",
+				"propertyKeyword": "constraintName",
+				"propertyTooltip": "",
+				"propertyType": "text"
+			}, {
+				"propertyName": "Key",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "compositeKeySetter",
+				"disabledItemStrategy": "default",
+				"setPrimaryKey": false,
+				"abbr": " ",
+				"attributeList": [],
+				"template": "collectiontree",
+				"isCompositeKey": true
+			}]
+		}]
 	}
 ]
