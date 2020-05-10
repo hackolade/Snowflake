@@ -117,6 +117,8 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 
 const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, warehouse }) => {
 	const accountName = getAccountName(account);
+	warehouse = _.trim(warehouse);
+	role = _.trim(role);
 
 	const requestId = uuid.v4();
 	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
@@ -160,7 +162,45 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 			}
 
 			execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`)
-				.then(resolve, err => reject('Warehouse is not available. Please check your role and warehouse'));
+				.then(resolve, async err => {
+					logger.log('error', err.message, 'Connection');
+					await execute(`USE ROLE "${role}"`).catch(err => {});
+					const userData = await execute(`DESC USER "${username}"`).catch(err => []);
+					let warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {logger.log('error', err.message, 'Connection'); return []});
+					const roles = await execute(`SHOW ROLES;`).catch(err => {logger.log('error', err.message, 'Connection'); return []});
+					const roleNames = roles.map(role => role.name);
+					const defaultRoleData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_ROLE');
+					if (_.isEmpty(warehouses)) {
+						const userRole = _.get(defaultRoleData, 'value', '');
+						if (userRole !== 'null') {
+							await execute(`USE ROLE "${userRole}"`).catch(err => {});
+						}
+						warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {logger.log('error', err.message, 'Connection'); return []});
+						if (_.isEmpty(warehouses)) {
+							reject('Warehouse is not available. Please check your role and warehouse');
+						}
+					}
+					const names = warehouses.map(wh => wh.name);
+	
+					const defaultWarehouseData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_WAREHOUSE');
+					const defaultUserWarehouse = _.get(defaultWarehouseData, 'value', '');
+					const defaultWarehouse = names.includes(defaultUserWarehouse) ? defaultUserWarehouse : _.first(names);
+
+					logger.log('info', `Available warehouses: ${names.join()}; Available roles: ${roleNames.join()}`, 'Connection');
+					logger.log('info', `Fallback to ${defaultWarehouse} warehouse`, 'Connection');
+
+					execute(`USE WAREHOUSE "${removeQuotes(defaultWarehouse)}";`).then(
+						resolve,
+						async err => {
+							const currentInfo = await execute(`select current_warehouse() as warehouse, current_role() as role;`).catch(err => []);
+							const infoRow = _.first(currentInfo);
+							const currentWarehouse = _.get(infoRow, 'WAREHOUSE', '');
+							const currentRole = _.get(infoRow, 'ROLE', '');
+							logger.log('info', `Current warehouse: ${currentWarehouse}\n Current role: ${currentRole}`, 'Connection');
+							resolve();
+						}
+					);
+				});
 		});
 	});
 };
