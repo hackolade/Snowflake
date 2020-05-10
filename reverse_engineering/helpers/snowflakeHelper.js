@@ -68,9 +68,9 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	const rawSamlResponse = _.get(samlResponseData, 'data', '');
 
 	if (!rawSamlResponse) {	
-		logger.log('info', `RAW_SAML_RESPONSE is empty`, 'Connection');
+		logger.log('info', `Warning: RAW_SAML_RESPONSE is empty`, 'Connection');
 	} else {
-		logger.log('info', `Warning: RAW_SAML_RESPONSE has been provided`, 'Connection')
+		logger.log('info', `RAW_SAML_RESPONSE has been provided`, 'Connection')
 	}
 
 	const requestId = uuid.v4();
