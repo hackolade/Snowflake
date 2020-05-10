@@ -23,6 +23,8 @@ const connect = async (logger, { host, username, password, authType, authenticat
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 
+	logger.log('info', `Auth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`, 'Connection');
+
 	if (authType === 'okta') {
 		return authByOkta(logger, { account, accessUrl, username, password, authenticator, role, warehouse });
 	} if (authType === 'externalbrowser') {
@@ -33,6 +35,7 @@ const connect = async (logger, { host, username, password, authType, authenticat
 };
 
 const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, warehouse }) => {
+	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request`, { data: {
 		ACCOUNT_NAME: accountName, 
