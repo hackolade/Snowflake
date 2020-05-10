@@ -165,7 +165,8 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 				.then(resolve, async err => {
 					logger.log('error', err.message, 'Connection');
 					await execute(`USE ROLE "${role}"`).catch(err => {});
-					const userData = await execute(`DESC USER "${username}"`).catch(err => []);
+					let userData = await execute(`DESC USER "${username}"`).catch(err => []);
+					userData = userData.filter(data => data.property !== 'PASSWORD');
 					logger.log('info', `User info: ${JSON.stringify(userData)}`, 'Connection');
 					let warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {logger.log('error', err.message, 'Connection'); return []});
 					const roles = await execute(`SHOW ROLES;`).catch(err => {logger.log('error', err.message, 'Connection'); return []});
