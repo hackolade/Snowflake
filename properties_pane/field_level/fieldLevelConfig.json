@@ -154,7 +154,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -171,8 +211,53 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
 				"propertyKeyword": "unique",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"foreignCollection",
 			"foreignField",
@@ -335,7 +420,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -349,6 +474,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"foreignCollection",
 			"foreignField",
@@ -456,7 +631,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -470,6 +685,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"foreignCollection",
 			"foreignField",
@@ -574,7 +839,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -588,6 +893,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"foreignCollection",
 			"foreignField",
@@ -692,7 +1047,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -706,6 +1101,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"foreignCollection",
 			"foreignField",
@@ -799,7 +1244,47 @@ making sure that you maintain a proper JSON format.
 			},
 			"type",
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -813,6 +1298,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+		{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"default",
 			"sample",
@@ -856,7 +1391,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -870,6 +1445,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"required",
 			{
@@ -898,7 +1523,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -912,6 +1577,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"pattern",
 			"default",
@@ -952,7 +1667,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -966,6 +1721,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+		{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"pattern",
 			"default",
@@ -1020,7 +1825,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -1034,6 +1879,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"pattern",
 			"default",
@@ -1086,7 +1981,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -1100,6 +2035,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"pattern",
 			"default",
@@ -1152,7 +2137,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"dependencies",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -1166,6 +2191,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"pattern",
 			"default",
@@ -1283,7 +2358,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"type",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -1297,6 +2412,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"minProperties",
 			"maxProperties",
@@ -1338,7 +2503,47 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"type",
-			"primaryKey",
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "compositePrimaryKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
 			{
 				"propertyName": "Primary key constraint name",
 				"propertyKeyword": "primaryKeyConstraintName",
@@ -1352,6 +2557,56 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "compositeUniqueKey",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "compositeUniqueKey",
+					"value": true
+				},
+				"disabled": true
+			},
+			{
+				"propertyName": "Unique",
+				"propertyKeyword": "unique",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositePrimaryKey",
+								"value": false
+							}, {
+								"key": "compositePrimaryKey",
+								"exist": false
+							}]
+						},
+						{
+							"type": "or",
+							"values": [{
+								"key": "compositeUniqueKey",
+								"value": false
+							}, {
+								"key": "compositeUniqueKey",
+								"exist": false
+							}]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Unique key constraint name",
+				"propertyKeyword": "uniqueKeyConstraintName",
+				"propertyType": "text",
+				"dependency": {
+					"key": "unique",
+					"value": true
+				}
 			},
 			"minProperties",
 			"maxProperties",
