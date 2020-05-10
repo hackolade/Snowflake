@@ -80,8 +80,7 @@
 				"inputLabel": "User name",
 				"inputKeyword": "username",
 				"inputType": "text",
-				"inputPlaceholder": "username@example.com"
-				
+				"inputPlaceholder": "<username> or <name@example.com>"
 			},
 			{
 				"inputLabel": "Password",
