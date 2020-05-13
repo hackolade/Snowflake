@@ -25,6 +25,7 @@
 				"inputKeyword": "host",
 				"inputType": "text",
 				"inputPlaceholder": "<account>.<region>",
+				"inputTooltip": "account name provided by Snowflake, or <account> for US West region, or <account>.<region> for all others",
 				"dependency": {
 					"key": "cloudPlatform",
 					"value": "AWS"
@@ -35,6 +36,7 @@
 				"inputKeyword": "host",
 				"inputType": "text",
 				"inputPlaceholder": "<account>.<region>.<gcp>",
+				"inputTooltip": "account name provided by Snowflake, or <account>.<region>.<gcp>",
 				"dependency": {
 					"key": "cloudPlatform",
 					"value": "GCP"
@@ -45,10 +47,18 @@
 				"inputKeyword": "host",
 				"inputType": "text",
 				"inputPlaceholder": "<account>.<region>.<azure>",
+				"inputTooltip": "account name provided by Snowflake, or <account>.<region>.<azure>",
 				"dependency": {
 					"key": "cloudPlatform",
 					"value": "Azure"
 				}
+			},
+			{
+				"inputLabel": "Warehouse",
+				"inputKeyword": "warehouse",
+				"inputType": "text",
+				"inputTooltip": "Optionally specify the active/current warehouse for the session",
+				"defaultValue": ""
 			}
 		]
 	},
@@ -71,7 +81,7 @@
 				"inputKeyword": "authenticator",
 				"inputType": "text",
 				"inputPlaceholder": "https://<okta_account_name>.okta.com",
-				"inputTooltip": "Note: Native SSO is not available if you use MFA. Use \"External Browser\" instead",
+				"inputTooltip": "Multi-Factor Auth is not available with this option. Use the \"Identity Provider SSO (via external browser)\" option instead",
 				"dependency": {
 					"key": "authType",
 					"value": "okta"
@@ -81,7 +91,23 @@
 				"inputLabel": "User name",
 				"inputKeyword": "username",
 				"inputType": "text",
-				"inputPlaceholder": "<username> or <name@example.com>"
+				"inputPlaceholder": "<name@example.com>",
+				"inputTooltip": "Okta username in email format",
+				"dependency": {
+					"key": "authType",
+					"value": "okta"
+				}
+			},
+			{
+				"inputLabel": "User name",
+				"inputKeyword": "username",
+				"inputType": "text",
+				"inputPlaceholder": "<username>",
+				"inputTooltip": "Network or AzureAD username or Okta username in email format",
+				"dependency": {
+					"key": "authType",
+					"value": "externalbrowser"
+				}
 			},
 			{
 				"inputLabel": "Password",
@@ -96,15 +122,10 @@
 				}
 			},
 			{
-				"inputLabel": "Warehouse",
-				"inputKeyword": "warehouse",
-				"inputType": "text",
-				"defaultValue": ""
-			},
-			{
 				"inputLabel": "Role name",
 				"inputKeyword": "role",
 				"inputType": "text",
+				"inputTooltip": "Required entry.  Or enter ALL to combine all your user roles",
 				"defaultValue": ""
 			}
 		]
