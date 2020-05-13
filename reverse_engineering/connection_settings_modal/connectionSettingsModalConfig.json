@@ -78,11 +78,10 @@
 				}
 			},
 			{
-				"inputLabel": "User Name",
+				"inputLabel": "User name",
 				"inputKeyword": "username",
 				"inputType": "text",
-				"inputPlaceholder": "User Name"
-				
+				"inputPlaceholder": "<username> or <name@example.com>"
 			},
 			{
 				"inputLabel": "Password",
@@ -103,7 +102,7 @@
 				"defaultValue": ""
 			},
 			{
-				"inputLabel": "Role Name",
+				"inputLabel": "Role name",
 				"inputKeyword": "role",
 				"inputType": "text",
 				"defaultValue": ""
