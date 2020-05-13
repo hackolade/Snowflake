@@ -62,8 +62,8 @@
 				"defaultValue": "Snowflake",
 				"options": [
 					{ "value": "credentials", "label": "Snowflake" },
-					{ "value": "okta", "label": "Okta SSO" },
-					{ "value": "externalbrowser", "label": "External browser SSO" }
+					{ "value": "okta", "label": "Native SSO (Okta only)" },
+					{ "value": "externalbrowser", "label": "Identity Provider SSO (via external browser)" }
 				]
 			},
 			{
@@ -71,6 +71,7 @@
 				"inputKeyword": "authenticator",
 				"inputType": "text",
 				"inputPlaceholder": "https://<okta_account_name>.okta.com",
+				"inputTooltip": "Note: Native SSO is not available if you use MFA. Use \"External Browser\" instead",
 				"dependency": {
 					"key": "authType",
 					"value": "okta"

@@ -17,13 +17,13 @@ const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
 const DEFAULT_WAREHOUSE = 'COMPUTE_WH';
 const DEFAULT_ROLE = 'PUBLIC';
 
-const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse }) => {
+const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform }) => {
 	warehouse = warehouse || DEFAULT_WAREHOUSE;
 
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 
-	logger.log('info', `Auth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`, 'Connection');
+	logger.log('info', `Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`, 'Connection');
 
 	if (authType === 'okta') {
 		return authByOkta(logger, { account, accessUrl, username, password, authenticator, role, warehouse });
