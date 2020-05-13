@@ -91,6 +91,15 @@
 				"inputLabel": "User name",
 				"inputKeyword": "username",
 				"inputType": "text",
+				"dependency": {
+					"key": "authType",
+					"value": "credentials"
+				}
+			},
+			{
+				"inputLabel": "User name",
+				"inputKeyword": "username",
+				"inputType": "text",
 				"inputPlaceholder": "<name@example.com>",
 				"inputTooltip": "Okta username in email format",
 				"dependency": {
