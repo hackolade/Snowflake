@@ -69,7 +69,7 @@
 				"inputLabel": "Auth type",
 				"inputKeyword": "authType",
 				"inputType": "select",
-				"defaultValue": "Snowflake",
+				"defaultValue": "credentials",
 				"options": [
 					{ "value": "credentials", "label": "Snowflake" },
 					{ "value": "okta", "label": "Native SSO (Okta only)" },
