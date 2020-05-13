@@ -71,7 +71,7 @@
 				"inputKeyword": "authenticator",
 				"inputType": "text",
 				"inputPlaceholder": "https://<okta_account_name>.okta.com",
-				"inputTooltip": "Note: Native SSO is not available if you use MFA. Use \"External Browser\" instead",
+				"inputTooltip": "Multi-Factor Auth not available with this option. Use \"Identity Provider SSO (via external browser)\" instead",
 				"dependency": {
 					"key": "authType",
 					"value": "okta"
@@ -81,7 +81,23 @@
 				"inputLabel": "User name",
 				"inputKeyword": "username",
 				"inputType": "text",
-				"inputPlaceholder": "<username> or <name@example.com>"
+				"inputPlaceholder": "<name@example.com>",
+				"inputTooltip": "Okta username in email format",
+				"dependency": {
+					"key": "authType",
+					"value": "okta"
+				}
+			},
+			{
+				"inputLabel": "User name",
+				"inputKeyword": "username",
+				"inputType": "text",
+				"inputPlaceholder": "<username>",
+				"inputTooltip": "Network or AzureAD username",
+				"dependency": {
+					"key": "authType",
+					"value": "externalbrowser"
+				}
 			},
 			{
 				"inputLabel": "Password",
