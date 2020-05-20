@@ -32,7 +32,10 @@
             "enableJsonType": true,
             "reverseSchemaIntoOneColumn": true,
             "disableDenormalization": true,
-            "enableComplexTypesNormalization": true
+            "enableComplexTypesNormalization": true,
+            "relationships": {
+                "compositeRelationships": true
+            }
         }
     },
     "description": "Hackolade plugin for Snowflake",
