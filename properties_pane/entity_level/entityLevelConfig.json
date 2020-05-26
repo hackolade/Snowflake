@@ -838,7 +838,6 @@ making sure that you maintain a proper JSON format.
 					"value": false
 				}
 			},
-			
 			{
 				"propertyName": "Clone parameters",
 				"propertyType": "block",
@@ -881,6 +880,13 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text"
 					}
 				]
+			},
+			{
+				"propertyName": "As Select Statement",
+				"propertyKeyword": "selectStatement",
+				"propertyType": "details",
+				"template": "textarea",
+				"markdown": false
 			},
 			{
 				"propertyName": "Refresh on create",
