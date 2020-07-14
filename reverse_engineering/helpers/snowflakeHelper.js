@@ -16,6 +16,7 @@ const DEFAULT_CLIENT_APP_ID = 'JavaScript';
 const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
 const DEFAULT_WAREHOUSE = 'COMPUTE_WH';
 const DEFAULT_ROLE = 'PUBLIC';
+const HACKOLADE_APPLICATION = 'Hackolade'
 
 const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform }) => {
 	warehouse = warehouse || DEFAULT_WAREHOUSE;
@@ -37,7 +38,7 @@ const connect = async (logger, { host, username, password, authType, authenticat
 const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, warehouse }) => {
 	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
-	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request`, { data: {
+	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request?Application=${HACKOLADE_APPLICATION}`, { data: {
 		ACCOUNT_NAME: accountName, 
 		LOGIN_NAME: username,
 		AUTHENTICATOR: getOktaAuthenticatorUrl(authenticator)
@@ -74,11 +75,11 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	}
 
 	const requestId = uuid.v4();
-	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
+	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}&Application=${HACKOLADE_APPLICATION}`;
 	role = role || DEFAULT_ROLE;
 
 	authUrl += `&roleName=${encodeURIComponent(role)}`;
-	authUrl += `&roleName=${encodeURIComponent(warehouse)}`;
+	authUrl += `&warehouse=${encodeURIComponent(warehouse)}`;
 
 	const authData = await axios.post(authUrl, {
 		data: {
@@ -121,7 +122,7 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 	role = _.trim(role);
 
 	const requestId = uuid.v4();
-	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}`;
+	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}&Application=${HACKOLADE_APPLICATION}`;
 	role = role || DEFAULT_ROLE;
 	authUrl += `&roleName=${encodeURIComponent(role)}`;
 
