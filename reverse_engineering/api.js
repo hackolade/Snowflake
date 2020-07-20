@@ -2,9 +2,11 @@
 
 const snowflakeHelper = require('./helpers/snowflakeHelper');
 const ssoHelper = require('./helpers/ssoHelper');
-const _ = require('lodash');
+const { setDependencies, dependencies } = require('./helpers/appDependencies');
+let _;
 
-const connect = async (connectionInfo, logger, cb) => {
+const connect = async (connectionInfo, logger, cb, app) => {
+	initDependencies(app);
 	logger.clear();
 	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 	try {
@@ -37,9 +39,10 @@ const testConnection = async (connectionInfo, logger, cb) => {
 	}
 };
 
-const getExternalBrowserUrl = async (connectionInfo, logger, cb) => {
+const getExternalBrowserUrl = async (connectionInfo, logger, cb, app) => {
 	try {
-		const ssoData = await ssoHelper.getSsoUrlData(logger, connectionInfo);
+		initDependencies(app);
+		const ssoData = await ssoHelper.getSsoUrlData(logger, _, connectionInfo);
 		cb(null, ssoData);
 	} catch (err) {
 		handleError(logger, err, cb);
@@ -54,8 +57,9 @@ const getDocumentKinds = (connectionInfo, logger, cb) => {
 	cb();
 };
 
-const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
+const getDbCollectionsNames = async (connectionInfo, logger, cb, app) => {
 	try {
+		initDependencies(app);
 		await snowflakeHelper.connect(logger, connectionInfo);
 		const namesBySchemas = await snowflakeHelper.getEntitiesNames();
 
@@ -65,8 +69,9 @@ const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
 	}
 };
 
-const getDbCollectionsData = async (data, logger, cb) => {
+const getDbCollectionsData = async (data, logger, cb, app) => {
 	try {
+		initDependencies(app);
 		const collections = data.collectionData.collections;
 		const dataBaseNames = data.collectionData.dataBaseNames;
 		const entitiesPromises = await dataBaseNames.reduce(async (packagesPromise, schema) => {
@@ -174,6 +179,12 @@ const handleError = (logger, error, cb) => {
 	logger.log('error', { error }, 'Reverse Engineering error');
 
 	cb(message);
+};
+
+const initDependencies = app => {
+	setDependencies(app);
+	_ = dependencies.lodash;
+	snowflakeHelper.setDependencies(dependencies);
 };
 
 module.exports = {
