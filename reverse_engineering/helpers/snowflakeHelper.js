@@ -1,5 +1,4 @@
 const snowflake = require('snowflake-sdk');
-const _ = require('lodash');
 const axios = require('axios');
 const uuid = require('uuid');
 
@@ -16,7 +15,8 @@ const DEFAULT_CLIENT_APP_ID = 'JavaScript';
 const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
 const DEFAULT_WAREHOUSE = 'COMPUTE_WH';
 const DEFAULT_ROLE = 'PUBLIC';
-const HACKOLADE_APPLICATION = 'Hackolade'
+const HACKOLADE_APPLICATION = 'Hackolade';
+let _;
 
 const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform }) => {
 	warehouse = warehouse || DEFAULT_WAREHOUSE;
@@ -957,6 +957,8 @@ const getContainerData = async schema => {
 	}
 }
 
+const setDependencies = ({ lodash }) => _ = lodash;
+
 module.exports = {
 	connect,
 	disconnect,
@@ -975,5 +977,6 @@ module.exports = {
 	getViewData,
 	getContainerData,
 	getAccount,
-	getAccessUrl
+	getAccessUrl,
+	setDependencies
 };
