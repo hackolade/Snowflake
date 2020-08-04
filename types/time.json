@@ -18,6 +18,9 @@
 		"format": ""
 	},
 	"descriptor": [{
+		"schema": {
+			"tPrecision": ""
+		},
 		"format": "hh:mm:ss"
 	}, {
 		"schema": {
@@ -33,6 +36,6 @@
 		"schema": {
 			"tPrecision": 9
 		},
-		"format": "hh:mm:ss.nnnnnn"
+		"format": "hh:mm:ss.nnnnnnnnn"
 	}]
 }

@@ -19,11 +19,11 @@
 		"schema": {
 			"tPrecision": 3
 		},
-		"format": "YYYY-DD-MM hh:mm:ss.nnnZ"
+		"format": "YYYY-MM-DD hh:mm:ss.nnnZ"
 	}, {
 		"schema": {
 			"tPrecision": 6
 		},
-		"format": "YYYY-DD-MM hh:mm:ss.nnnnnnZ"
+		"format": "YYYY-MM-DD hh:mm:ss.nnnnnnZ"
 	}]
 }
