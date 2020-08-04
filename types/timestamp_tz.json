@@ -14,5 +14,23 @@
 		"comments":"",
 		"pattern":"",
 		"format": ""
-	}
+	},
+	"descriptor": [{
+		"format": "YYYY-DD-MM hh:mm:ss"
+	}, {
+		"schema": {
+			"tPrecision": 3
+		},
+		"format": "YYYY-DD-MM hh:mm:ss.nnn"
+	}, {
+		"schema": {
+			"tPrecision": 6
+		},
+		"format": "YYYY-DD-MM hh:mm:ss.nnnnnn"
+	}, {
+		"schema": {
+			"tPrecision": 9
+		},
+		"format": "YYYY-DD-MM hh:mm:ss.nnnnnnnnn"
+	}]
 }
