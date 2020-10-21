@@ -35,7 +35,8 @@
             "enableComplexTypesNormalization": true,
             "relationships": {
                 "compositeRelationships": true
-            }
+            },
+            "FEScriptCommentsSupported": true
         }
     },
     "description": "Hackolade plugin for Snowflake",
