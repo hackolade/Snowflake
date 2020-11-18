@@ -28,6 +28,20 @@
 		{
 			"capacity": 8,
 			"mode": "floating"
+		},
+		{
+			"schema": {
+				"mode": "double precision"
+			},
+			"capacity": 8,
+			"mode": "floating"
+		},
+		{
+			"schema": {
+				"mode": "real"
+			},
+			"capacity": 4,
+			"mode": "floating"
 		}
 	]
 }
