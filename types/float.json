@@ -23,5 +23,14 @@
 		"foreignField": [],
 		"enum": [],
 		"sample": ""
-	}
+	},
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "float4"
+			},
+			"capacity": 4,
+			"mode": "floating"
+		}
+	]
 }

@@ -15,5 +15,8 @@
 		"default": "",
 		"enum": [],
 		"sample": ""
+	},
+	"descriptor": {
+		"mode": "binary"
 	}
 }

@@ -23,7 +23,32 @@
 		"foreignCollection": "",
 		"foreignField": [],
 		"enum": [],
-		"mode": "int32",
 		"sample": ""
-	}
+	},
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "tinyint"
+			},
+			"capacity": 1
+		},
+		{
+			"schema": {
+				"mode": "smallint"
+			},
+			"capacity": 2
+		},
+		{
+			"schema": {
+				"mode": "int"
+			},
+			"capacity": 4
+		},
+		{
+			"schema": {
+				"mode": "bigint"
+			},
+			"capacity": 8
+		}
+	]
 }

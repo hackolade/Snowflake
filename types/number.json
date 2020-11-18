@@ -27,5 +27,12 @@
 		"foreignField": [],
 		"enum": [],
 		"sample": ""
+	},
+	"descriptor": {
+		"schema": {
+			"mode": "decimal"
+		},
+		"capacity": 16,
+		"mode": "decimal"
 	}
 }
