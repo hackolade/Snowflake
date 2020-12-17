@@ -145,26 +145,32 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "clusteringKey",
 				"propertyType": "group",
 				"dependency": {
-					"key": "external",
-					"value": false
-				},
-				"structure": [{
-					"propertyName": "Expression",
-					"propertyKeyword": "expression",
-					"propertyType": "text"
-				}, {
-					"propertyName": "Key",
-					"propertyKeyword": "clusteringKey",
-					"propertyType": "compositeKeySetter",
-					"disabledItemStrategy": "default",
-					"abbr": "CK",
-					"setPrimaryKey": false,
-					"template": "collectiontree",
-					"isCompositeKey": true,
-					"templateOptions": {
-						"maxFields": 1
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
 					}
-				}]
+				},
+				"structure": [
+					{
+						"propertyName": "Expression",
+						"propertyKeyword": "expression",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Key",
+						"propertyKeyword": "clusteringKey",
+						"propertyType": "compositeKeySetter",
+						"disabledItemStrategy": "default",
+						"abbr": "CK",
+						"setPrimaryKey": false,
+						"template": "collectiontree",
+						"isCompositeKey": true,
+						"templateOptions": {
+							"maxFields": 1
+						}
+					}
+				]
 			},
 			{
 				"propertyName": "Partition by",
@@ -216,8 +222,11 @@ making sure that you maintain a proper JSON format.
 					"custom"
 				],
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -289,9 +298,13 @@ making sure that you maintain a proper JSON format.
 					"BINARY_FORMAT": "HEX",
 					"ESCAPE": "NONE",
 					"ESCAPE_UNENCLOSED_FIELD": "\\",
-					"TRIM_SPACE": false, 
+					"TRIM_SPACE": false,
 					"FIELD_OPTIONALLY_ENCLOSED_BY": "NONE",
-					"NULL_IF": [{ "NULL_IF_item": "\\N" }],
+					"NULL_IF": [
+						{
+							"NULL_IF_item": "\\N"
+						}
+					],
 					"ERROR_ON_COLUMN_COUNT_MISMATCH": true,
 					"VALIDATE_UTF8": true,
 					"EMPTY_FIELD_AS_NULL": true,
@@ -696,8 +709,11 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Stage copy options",
 				"propertyKeyword": "stageCopyOptions",
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				},
 				"propertyType": "block",
 				"structure": [
@@ -808,8 +824,11 @@ making sure that you maintain a proper JSON format.
 				"minValue": 0,
 				"maxValue": 90,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -821,8 +840,11 @@ making sure that you maintain a proper JSON format.
 				"withEmptyOption": true,
 				"excludeCurrent": true,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -834,8 +856,11 @@ making sure that you maintain a proper JSON format.
 				"withEmptyOption": true,
 				"excludeCurrent": true,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -845,13 +870,16 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"dependency": {
 					"type": "not",
-					"values": [{
-						"key": "clone",
-						"exist": false
-					},{
-						"key": "clone",
-						"value": ""
-					}]
+					"values": [
+						{
+							"key": "clone",
+							"exist": false
+						},
+						{
+							"key": "clone",
+							"value": ""
+						}
+					]
 				},
 				"structure": [
 					{
@@ -931,49 +959,61 @@ making sure that you maintain a proper JSON format.
 				"valueType": "string"
 			}
 		],
-		"columnsRatio": [3.7, 5]
+		"columnsRatio": [
+			3.7,
+			5
+		]
 	},
 	{
 		"lowerTab": "Composite keys",
-		"structure": [{
-			"propertyName": "Primary key",
-			"propertyType": "group",
-			"groupItemLimit": 1,
-			"propertyKeyword": "primaryKey",
-			"propertyTooltip": "",
-			"structure": [{
-				"propertyName": "Constraint name",
-				"propertyKeyword": "constraintName",
+		"structure": [
+			{
+				"propertyName": "Primary key",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKey",
 				"propertyTooltip": "",
-				"propertyType": "text"
-			}, {
-				"propertyName": "Key",
-				"propertyKeyword": "compositePrimaryKey",
-				"propertyType": "primaryKeySetter",
-				"abbr": "pk",
-				"attributeList": []
-			}]
-		}, {
-			"propertyName": "Unique key",
-			"propertyType": "group",
-			"propertyKeyword": "uniqueKey",
-			"propertyTooltip": "",
-			"structure": [{
-				"propertyName": "Constraint name",
-				"propertyKeyword": "constraintName",
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Key",
+						"propertyKeyword": "compositePrimaryKey",
+						"propertyType": "primaryKeySetter",
+						"abbr": "pk",
+						"attributeList": []
+					}
+				]
+			},
+			{
+				"propertyName": "Unique key",
+				"propertyType": "group",
+				"propertyKeyword": "uniqueKey",
 				"propertyTooltip": "",
-				"propertyType": "text"
-			}, {
-				"propertyName": "Key",
-				"propertyKeyword": "compositeUniqueKey",
-				"propertyType": "compositeKeySetter",
-				"disabledItemStrategy": "default",
-				"setPrimaryKey": false,
-				"abbr": " ",
-				"attributeList": [],
-				"template": "collectiontree",
-				"isCompositeKey": true
-			}]
-		}]
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Key",
+						"propertyKeyword": "compositeUniqueKey",
+						"propertyType": "compositeKeySetter",
+						"disabledItemStrategy": "default",
+						"setPrimaryKey": false,
+						"abbr": " ",
+						"attributeList": [],
+						"template": "collectiontree",
+						"isCompositeKey": true
+					}
+				]
+			}
+		]
 	}
 ]
