@@ -807,6 +807,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Data retention in days",
 				"propertyKeyword": "DATA_RETENTION_TIME_IN_DAYS",
+				"propertyTooltip": "Number of days for which Snowflake retains historical data for performing Time Travel actions (SELECT, CLONE, UNDROP) on the object. A value of 0 effectively disables Time Travel for the specified database, schema, or table",
 				"propertyValidate": true,
 				"propertyType": "numeric",
 				"valueType": "number",
