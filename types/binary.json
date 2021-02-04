@@ -13,8 +13,10 @@
 		"foreignEntity": "",
 		"foreignField": [],
 		"default": "",
-		"gridFS": "",
 		"enum": [],
 		"sample": ""
+	},
+	"descriptor": {
+		"mode": "binary"
 	}
 }

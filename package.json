@@ -1,7 +1,7 @@
 {
     "name": "Snowflake",
-    "version": "0.1.16",
-    "versionDate": "2020-07-15",
+    "version": "0.1.22",
+    "versionDate": "2021-01-08",
     "author": "hackolade",
     "engines": {
         "hackolade": "4.0.4",
@@ -35,7 +35,8 @@
             "enableComplexTypesNormalization": true,
             "relationships": {
                 "compositeRelationships": true
-            }
+            },
+            "FEScriptCommentsSupported": true
         }
     },
     "description": "Hackolade plugin for Snowflake",
