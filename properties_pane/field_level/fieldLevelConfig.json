@@ -120,6 +120,11 @@ making sure that you maintain a proper JSON format.
 		"varchar": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"schemaId",
 			"type",
 			{
@@ -156,6 +161,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -211,6 +217,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -380,6 +387,11 @@ making sure that you maintain a proper JSON format.
 		"number": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"schemaId",
 			"type",
 			{
@@ -422,6 +434,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -477,6 +490,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -606,6 +620,11 @@ making sure that you maintain a proper JSON format.
 		"integer": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"schemaId",
 			"type",
 			{
@@ -633,6 +652,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -688,6 +708,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -817,6 +838,11 @@ making sure that you maintain a proper JSON format.
 		"float": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"schemaId",
 			"type",
 			{
@@ -841,6 +867,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -896,6 +923,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1025,6 +1053,11 @@ making sure that you maintain a proper JSON format.
 		"double": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"schemaId",
 			"type",
 			{
@@ -1049,6 +1082,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1104,6 +1138,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1233,6 +1268,11 @@ making sure that you maintain a proper JSON format.
 		"boolean": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"schemaId",
 			{
 				"propertyName": "Comments",
@@ -1246,6 +1286,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1301,6 +1342,7 @@ making sure that you maintain a proper JSON format.
 			},
 		{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1362,6 +1404,12 @@ making sure that you maintain a proper JSON format.
 		],
 		"binary": [
 			"name",
+			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"schemaId",
 			"type",
 			{
@@ -1393,6 +1441,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1448,6 +1497,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1510,6 +1560,11 @@ making sure that you maintain a proper JSON format.
 		"date": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -1525,6 +1580,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1580,6 +1636,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1644,6 +1701,11 @@ making sure that you maintain a proper JSON format.
 		"time": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -1669,6 +1731,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1724,6 +1787,7 @@ making sure that you maintain a proper JSON format.
 			},
 		{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1788,6 +1852,11 @@ making sure that you maintain a proper JSON format.
 		"timestamp_ntz": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -1827,6 +1896,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1882,6 +1952,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -1946,6 +2017,11 @@ making sure that you maintain a proper JSON format.
 		"timestamp_ltz": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -1983,6 +2059,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -2038,6 +2115,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -2102,6 +2180,11 @@ making sure that you maintain a proper JSON format.
 		"timestamp_tz": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -2139,6 +2222,7 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -2194,6 +2278,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -2259,6 +2344,11 @@ making sure that you maintain a proper JSON format.
 		"variant": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -2346,6 +2436,11 @@ making sure that you maintain a proper JSON format.
 		"array": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -2360,6 +2455,7 @@ making sure that you maintain a proper JSON format.
 			"type",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -2415,6 +2511,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -2491,6 +2588,11 @@ making sure that you maintain a proper JSON format.
 		"object": [
 			"name",
 			"code",
+			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -2505,6 +2607,7 @@ making sure that you maintain a proper JSON format.
 			"type",
 			{
 				"propertyName": "Primary key",
+				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
 				"propertyType": "checkbox",
 				"dependency": {
@@ -2560,6 +2663,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Unique",
+				"propertyNameFull":"Composite Unique Key",
 				"propertyKeyword": "compositeUniqueKey",
 				"propertyType": "checkbox",
 				"dependency": {
