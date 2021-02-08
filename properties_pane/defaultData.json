@@ -7,12 +7,10 @@
 	"container": {
 		"name": "New schema",
 		"indexes": [],
-		"DATA_RETENTION_TIME_IN_DAYS": 1
 	},
 	"collection": {
 		"collectionName": "New table",
 		"external": false,
-		"DATA_RETENTION_TIME_IN_DAYS": 1,
 		"formatTypeOptions": {
 			"NULL_IF": [{ "NULL_IF_item": "\\N" }]
 		}
