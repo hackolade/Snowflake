@@ -943,7 +943,6 @@ const getContainerData = async schema => {
 		const data = {
 			transient: _.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
-			DATA_RETENTION_TIME_IN_DAYS: _.get(schemaData, 'RETENTION_TIME') || 0,
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
 			sequences,
