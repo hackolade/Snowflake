@@ -150,8 +150,11 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "clusteringKey",
 				"propertyType": "group",
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				},
 				"structure": [{
 					"propertyName": "Expression",
@@ -221,8 +224,11 @@ making sure that you maintain a proper JSON format.
 					"custom"
 				],
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -701,8 +707,11 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Stage copy options",
 				"propertyKeyword": "stageCopyOptions",
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				},
 				"propertyType": "block",
 				"structure": [
@@ -814,8 +823,11 @@ making sure that you maintain a proper JSON format.
 				"minValue": 0,
 				"maxValue": 90,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -827,8 +839,11 @@ making sure that you maintain a proper JSON format.
 				"withEmptyOption": true,
 				"excludeCurrent": true,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -840,8 +855,11 @@ making sure that you maintain a proper JSON format.
 				"withEmptyOption": true,
 				"excludeCurrent": true,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
