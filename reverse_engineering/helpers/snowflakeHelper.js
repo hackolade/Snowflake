@@ -843,15 +843,15 @@ const getFunctions = async (dbName, schemaName) => {
 	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.functions where FUNCTION_SCHEMA='${schemaName}'`);
 
 	return rows.map(row => {
-		const storedProcArgument = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'];
+		const functionLanguage = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'];
 
 		return {
 			name: row['FUNCTION_NAME'],
-			storedProcLanguage: _.toLower(row['FUNCTION_LANGUAGE']),
-			storedProcArgument,
-			storedProcDataType: row['DATA_TYPE'],
-			storedProcFunction: row['FUNCTION_DEFINITION'],
-			storedProcDescription: row['COMMENT'] || ''
+			functionLanguage: _.toLower(row['FUNCTION_LANGUAGE']),
+			functionArguments,
+			functionReturnType: row['DATA_TYPE'],
+			functionBody: row['FUNCTION_DEFINITION'],
+			functionDescription: row['COMMENT'] || ''
 		}
 	});
 };
