@@ -6,7 +6,7 @@
 	},
 	"container": {
 		"name": "New schema",
-		"indexes": [],
+		"indexes": []
 	},
 	"collection": {
 		"collectionName": "New table",
