@@ -595,14 +595,40 @@ const handleObject = ( documents, rowName ) => {
 	};
 };
 
-const getJsonSchema = async (documents, tableName) => {
+const getJsonSchema = async (logger, limit, tableName) => {
 	try {
 		const rows = await execute(`DESC TABLE ${tableName};`);
+		const hasJsonFields = rows.some(row => ['variant', 'object', 'array'].includes(_.toLower(row.type)));
+		if (!hasJsonFields) {
+			return {
+				jsonSchema: { properties: {} },
+				documents: [],
+			}
+		}
+
+		const documents = await getDocuments(tableName, limit).catch(err => {
+			logger.log('error', err.message, 'Connection');
+			return [];
+		});
+		
 		return {
-			properties: getJsonSchemaFromRows(documents, rows)
+			documents,
+			jsonSchema: {
+				properties: getJsonSchemaFromRows(documents, rows)
+			}
 		};
 	} catch (err) {
-		return { properties: {} };
+		const documents = await getDocuments(tableName, limit).catch(err => {
+			logger.log('error', err.message, 'Connection');
+			return [];
+		});
+
+		return {
+			documents,
+			jsonSchema: {
+				properties: {}
+			}
+		};
 	}
 };
 
@@ -721,7 +747,7 @@ const getEntityData = async fullName => {
 			external,
 			clusteringKey,
 			formatTypeOptions: getFileFormatOptions(stageData),
-			transient: _.get(data, 'IS_TRANSIENT', false) && _.get(data, 'IS_TRANSIENT') !== 'NO',
+			transient: Boolean(_.get(data, 'IS_TRANSIENT', false) && _.get(data, 'IS_TRANSIENT') !== 'NO'),
 			description: _.get(data, 'COMMENT') || ''
 		};
 	} catch (err) {
@@ -941,7 +967,7 @@ const getContainerData = async schema => {
 		const fileFormats = await getFileFormats(dbName, schemaName);
 
 		const data = {
-			transient: _.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
+			transient: Boolean(_.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO'),
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
