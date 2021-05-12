@@ -1,7 +1,7 @@
 {
     "name": "Snowflake",
-    "version": "0.1.31",
-    "versionDate": "2021-04-02",
+    "version": "0.1.32",
+    "versionDate": "2021-05-11",
     "author": "hackolade",
     "engines": {
         "hackolade": "4.3.20",
