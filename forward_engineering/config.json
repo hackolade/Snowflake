@@ -6,6 +6,7 @@
 	"namePrefix": "Snowflake",
 	"hasUpdateScript": true,
 	"resolvedDefinitions": true,
+	"combinedContainers": true,
 	"level": {
 		"container": true,
 		"entity": true,
