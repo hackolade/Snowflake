@@ -11,5 +11,9 @@
 		"container": true,
 		"entity": true,
 		"view": true
+	},
+	"feLevelSelector": {
+		"container": true,
+		"model": true
 	}
 }
