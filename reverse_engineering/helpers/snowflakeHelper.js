@@ -1,4 +1,4 @@
-const snowflake = require('snowflake-sdk');
+const snowflake = require('../custom_modules/snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
 
@@ -87,7 +87,10 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 			CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
 			RAW_SAML_RESPONSE: rawSamlResponse,
 			LOGIN_NAME: username,
-			ACCOUNT_NAME: accountName
+			ACCOUNT_NAME: accountName,
+			CLIENT_ENVIRONMENT: {
+				APPLICATION: HACKOLADE_APPLICATION,
+			},
 		}
 	});
 	let tokensData = authData.data;
@@ -134,7 +137,10 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 			AUTHENTICATOR: 'EXTERNALBROWSER',
 			PROOF_KEY: proofKey,
 			LOGIN_NAME: username,
-			ACCOUNT_NAME: accountName
+			ACCOUNT_NAME: accountName,
+			CLIENT_ENVIRONMENT: {
+				APPLICATION: HACKOLADE_APPLICATION,
+			},
 		}}, { 
 		headers: {
 			Accept: 'application/json',
@@ -222,7 +228,7 @@ const getOktaAuthenticatorUrl = (authenticator = '') => {
 
 const authByCredentials = ({ account, username, password, role }) => {
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ account, username, password, role });
+		connection = snowflake.createConnection({ account, username, password, role, application: HACKOLADE_APPLICATION });
 		connection.connect(err => {
 			if (err) {
 				connection = null;

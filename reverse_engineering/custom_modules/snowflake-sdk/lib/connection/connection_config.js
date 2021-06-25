@@ -257,6 +257,9 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
     clientEnvironment.OS = os.platform();
     clientEnvironment.OS_VERSION = os.release();
     clientEnvironment.OCSP_MODE = GlobalConfig.getOcspMode();
+    if (options.application) {
+      clientEnvironment.APPLICATION = options.application;
+    }
   }
 
   /**
