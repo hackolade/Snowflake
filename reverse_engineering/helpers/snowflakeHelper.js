@@ -747,7 +747,7 @@ const getEntityData = async fullName => {
 			external,
 			clusteringKey,
 			formatTypeOptions: getFileFormatOptions(stageData),
-			transient: _.get(data, 'IS_TRANSIENT', false) && _.get(data, 'IS_TRANSIENT') !== 'NO',
+			transient: Boolean(_.get(data, 'IS_TRANSIENT', false) && _.get(data, 'IS_TRANSIENT') !== 'NO'),
 			description: _.get(data, 'COMMENT') || ''
 		};
 	} catch (err) {
@@ -967,7 +967,7 @@ const getContainerData = async schema => {
 		const fileFormats = await getFileFormats(dbName, schemaName);
 
 		const data = {
-			transient: _.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
+			transient: Boolean(_.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO'),
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
