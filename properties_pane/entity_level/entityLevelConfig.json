@@ -118,6 +118,11 @@ making sure that you maintain a proper JSON format.
 		"lowerTab": "Details",
 		"structure": [
 			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
+			{
 				"propertyName": "Comments",
 				"propertyKeyword": "description",
 				"propertyTooltip": "comments",
@@ -145,8 +150,11 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "clusteringKey",
 				"propertyType": "group",
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				},
 				"structure": [{
 					"propertyName": "Expression",
@@ -216,8 +224,11 @@ making sure that you maintain a proper JSON format.
 					"custom"
 				],
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -696,8 +707,11 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Stage copy options",
 				"propertyKeyword": "stageCopyOptions",
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				},
 				"propertyType": "block",
 				"structure": [
@@ -802,14 +816,18 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Data retention in days",
 				"propertyKeyword": "DATA_RETENTION_TIME_IN_DAYS",
+				"propertyTooltip": "Number of days for which Snowflake retains historical data for performing Time Travel actions (SELECT, CLONE, UNDROP) on the object. A value of 0 effectively disables Time Travel for the specified database, schema, or table",
 				"propertyValidate": true,
 				"propertyType": "numeric",
 				"valueType": "number",
 				"minValue": 0,
 				"maxValue": 90,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -821,8 +839,11 @@ making sure that you maintain a proper JSON format.
 				"withEmptyOption": true,
 				"excludeCurrent": true,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -834,8 +855,11 @@ making sure that you maintain a proper JSON format.
 				"withEmptyOption": true,
 				"excludeCurrent": true,
 				"dependency": {
-					"key": "external",
-					"value": false
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
 				}
 			},
 			{
@@ -973,6 +997,13 @@ making sure that you maintain a proper JSON format.
 				"attributeList": [],
 				"template": "collectiontree",
 				"isCompositeKey": true
+			},
+			{
+				"propertyName": "Alternate key",
+				"propertyKeyword": "alternateKey",
+				"propertyTooltip": "",
+				"propertyType": "checkbox",
+				"setFieldPropertyBy": "compositeUniqueKey"
 			}]
 		}]
 	}

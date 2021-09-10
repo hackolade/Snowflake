@@ -1,4 +1,4 @@
-const snowflake = require('snowflake-sdk');
+const snowflake = require('../custom_modules/snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
 
@@ -87,7 +87,10 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 			CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
 			RAW_SAML_RESPONSE: rawSamlResponse,
 			LOGIN_NAME: username,
-			ACCOUNT_NAME: accountName
+			ACCOUNT_NAME: accountName,
+			CLIENT_ENVIRONMENT: {
+				APPLICATION: HACKOLADE_APPLICATION,
+			},
 		}
 	});
 	let tokensData = authData.data;
@@ -134,7 +137,10 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 			AUTHENTICATOR: 'EXTERNALBROWSER',
 			PROOF_KEY: proofKey,
 			LOGIN_NAME: username,
-			ACCOUNT_NAME: accountName
+			ACCOUNT_NAME: accountName,
+			CLIENT_ENVIRONMENT: {
+				APPLICATION: HACKOLADE_APPLICATION,
+			},
 		}}, { 
 		headers: {
 			Accept: 'application/json',
@@ -222,7 +228,7 @@ const getOktaAuthenticatorUrl = (authenticator = '') => {
 
 const authByCredentials = ({ account, username, password, role }) => {
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ account, username, password, role });
+		connection = snowflake.createConnection({ account, username, password, role, application: HACKOLADE_APPLICATION });
 		connection.connect(err => {
 			if (err) {
 				connection = null;
@@ -595,14 +601,40 @@ const handleObject = ( documents, rowName ) => {
 	};
 };
 
-const getJsonSchema = async (documents, tableName) => {
+const getJsonSchema = async (logger, limit, tableName) => {
 	try {
 		const rows = await execute(`DESC TABLE ${tableName};`);
+		const hasJsonFields = rows.some(row => ['variant', 'object', 'array'].includes(_.toLower(row.type)));
+		if (!hasJsonFields) {
+			return {
+				jsonSchema: { properties: {} },
+				documents: [],
+			}
+		}
+
+		const documents = await getDocuments(tableName, limit).catch(err => {
+			logger.log('error', err.message, 'Connection');
+			return [];
+		});
+		
 		return {
-			properties: getJsonSchemaFromRows(documents, rows)
+			documents,
+			jsonSchema: {
+				properties: getJsonSchemaFromRows(documents, rows)
+			}
 		};
 	} catch (err) {
-		return { properties: {} };
+		const documents = await getDocuments(tableName, limit).catch(err => {
+			logger.log('error', err.message, 'Connection');
+			return [];
+		});
+
+		return {
+			documents,
+			jsonSchema: {
+				properties: {}
+			}
+		};
 	}
 };
 
@@ -721,7 +753,7 @@ const getEntityData = async fullName => {
 			external,
 			clusteringKey,
 			formatTypeOptions: getFileFormatOptions(stageData),
-			transient: _.get(data, 'IS_TRANSIENT', false) && _.get(data, 'IS_TRANSIENT') !== 'NO',
+			transient: Boolean(_.get(data, 'IS_TRANSIENT', false) && _.get(data, 'IS_TRANSIENT') !== 'NO'),
 			description: _.get(data, 'COMMENT') || ''
 		};
 	} catch (err) {
@@ -843,15 +875,15 @@ const getFunctions = async (dbName, schemaName) => {
 	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.functions where FUNCTION_SCHEMA='${schemaName}'`);
 
 	return rows.map(row => {
-		const storedProcArgument = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'];
+		const functionLanguage = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'];
 
 		return {
 			name: row['FUNCTION_NAME'],
-			storedProcLanguage: _.toLower(row['FUNCTION_LANGUAGE']),
-			storedProcArgument,
-			storedProcDataType: row['DATA_TYPE'],
-			storedProcFunction: row['FUNCTION_DEFINITION'],
-			storedProcDescription: row['COMMENT'] || ''
+			functionLanguage: _.toLower(row['FUNCTION_LANGUAGE']),
+			functionArguments,
+			functionReturnType: row['DATA_TYPE'],
+			functionBody: row['FUNCTION_DEFINITION'],
+			functionDescription: row['COMMENT'] || ''
 		}
 	});
 };
@@ -941,9 +973,8 @@ const getContainerData = async schema => {
 		const fileFormats = await getFileFormats(dbName, schemaName);
 
 		const data = {
-			transient: _.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
+			transient: Boolean(_.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO'),
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
-			DATA_RETENTION_TIME_IN_DAYS: _.get(schemaData, 'RETENTION_TIME') || 0,
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
 			sequences,

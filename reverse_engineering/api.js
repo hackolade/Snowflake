@@ -86,11 +86,10 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 				logger.progress({ message: `Start getting data from table`, containerName: schema, entityName: table });
 				const ddl = await snowflakeHelper.getDDL(fullTableName);
 				const quantity = await snowflakeHelper.getRowsCount(fullTableName);
-				const documents = await snowflakeHelper.getDocuments(fullTableName, getCount(quantity, data.recordSamplingSettings));
 
 				logger.progress({ message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table });
 
-				const jsonSchema = await snowflakeHelper.getJsonSchema(documents, fullTableName);
+				const { documents, jsonSchema } = await snowflakeHelper.getJsonSchema(logger, getCount(quantity, data.recordSamplingSettings), fullTableName);
 				const entityData = await snowflakeHelper.getEntityData(fullTableName);
 
 				logger.progress({ message: `Schema inference`, containerName: schema, entityName: table });

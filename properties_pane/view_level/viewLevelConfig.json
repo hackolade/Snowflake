@@ -12,6 +12,11 @@
 		"lowerTab": "Details",
 		"structure": [
 			{
+				"propertyName": "Case sensitive",
+				"propertyKeyword": "isCaseSensitive",
+				"propertyType": "checkbox"
+			},
+			{
 				"propertyName": "Comments",
 				"propertyKeyword": "description",
 				"propertyTooltip": "comments",

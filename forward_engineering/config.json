@@ -6,9 +6,14 @@
 	"namePrefix": "Snowflake",
 	"hasUpdateScript": true,
 	"resolvedDefinitions": true,
+	"combinedContainers": true,
 	"level": {
 		"container": true,
 		"entity": true,
 		"view": true
+	},
+	"feLevelSelector": {
+		"container": true,
+		"model": true
 	}
 }
