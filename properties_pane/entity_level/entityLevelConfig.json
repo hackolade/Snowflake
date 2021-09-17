@@ -178,7 +178,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Partition by",
 				"propertyKeyword": "partitioningKey",
 				"propertyType": "primaryKeySetter",
-				"abbr": "CK",
+				"abbr": "PK",
 				"dependency": {
 					"key": "external",
 					"value": true
