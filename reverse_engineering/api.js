@@ -26,10 +26,10 @@ const disconnect = async (connectionInfo, logger, cb) => {
 	}
 };
 
-const testConnection = async (connectionInfo, logger, cb) => {
+const testConnection = async (connectionInfo, logger, cb, app) => {
 	try {
 		if (connectionInfo.authType === 'externalbrowser') {
-			await getExternalBrowserUrl(connectionInfo, logger, cb);
+			await getExternalBrowserUrl(connectionInfo, logger, cb, app);
 		} else {
 			await snowflakeHelper.testConnection(logger, connectionInfo);
 		}
