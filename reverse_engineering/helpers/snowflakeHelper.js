@@ -9,7 +9,8 @@ let containers = {};
 
 const noConnectionError = { message: 'Connection error' };
 const oktaAuthenticatorError = { message: 'Can\'t get SSO URL. Please, check the authenticator' };
-const oktaCredentialsError = { message: 'Incorrect Okta username/password' };
+const oktaCredentialsError = { message: 'Incorrect Okta username/password or MFA is enabled. Please, check credentials or use the "Identity Provider SSO (via external browser)" for MFA auth' };
+const oktaMFAError = { message: 'Native Okta auth doesn\'t support MFA. Please, use the "Identity Provider SSO (via external browser)" auth instead' };
 
 const DEFAULT_CLIENT_APP_ID = 'JavaScript';
 const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
@@ -46,6 +47,7 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 
 	logger.log('info', `Starting Okta connection...`, 'Connection');
 	const tokenUrl = _.get(ssoUrlsData, 'data.data.tokenUrl', '');
+	const authNUrl = tokenUrl.replace(/api\/v1\/.*/, 'api/v1/authn');
 	const ssoUrl = _.get(ssoUrlsData, 'data.data.ssoUrl', '');
 	logger.log('info', `Token URL: ${tokenUrl}\nSSO URL: ${ssoUrl}`, 'Connection');
 
@@ -53,11 +55,22 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 		return Promise.reject(oktaAuthenticatorError);
 	}
 
+	const authNData = await axios.post(authNUrl, { username, password, options: {
+		multiOptionalFactorEnroll: false,
+		warnBeforePasswordExpired: false,
+	}}).catch(err => ({}));
+	const status =  _.get(authNData, 'data.status', 'SUCCESS');
+	const authToken = _.get(authNData, 'data.sessionToken', '');
+	if (status.startsWith('MFA')) {
+		return Promise.reject(oktaMFAError);
+	}
+
 	const identityProviderTokenData = await axios.post(tokenUrl, { username, password }).catch(err => {
-		return Promise.reject({ ...err, ...oktaCredentialsError });
+		return authToken ? {} : Promise.reject(oktaCredentialsError);
 	});
+
 	logger.log('info', `Successfully connected to Okta`, 'Connection');
-	const identityProviderToken = _.get(identityProviderTokenData, 'data.cookieToken', '');
+	const identityProviderToken = _.get(identityProviderTokenData, 'data.cookieToken', '') || authToken;
 	if (!identityProviderToken) {
 		return Promise.reject(oktaCredentialsError);
 	}
