@@ -36,7 +36,8 @@
             "relationships": {
                 "compositeRelationships": true
             },
-            "FEScriptCommentsSupported": true
+            "FEScriptCommentsSupported": true,
+            "disableJsonDataMaxLength": true
         }
     },
     "description": "Hackolade plugin for Snowflake",
