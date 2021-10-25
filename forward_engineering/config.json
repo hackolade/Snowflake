@@ -2,6 +2,7 @@
 	"extension": "sql",
 	"filterName": "SQL",
 	"type": "ddl",
+	"mode": "pgsql",
 	"ddlType": "snowflake",
 	"namePrefix": "Snowflake",
 	"hasUpdateScript": true,
