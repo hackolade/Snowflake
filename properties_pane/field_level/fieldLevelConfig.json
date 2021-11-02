@@ -1721,7 +1721,6 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}
 			},
-			"required",
 			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
