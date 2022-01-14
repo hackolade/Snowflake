@@ -1,0 +1,47 @@
+{
+	"name": "geography",
+	"erdAbbreviation": "<geog>",
+	"dtdAbbreviation": "{...}",
+	"parentType": "document",
+	"hiddenOnEntity": "view",
+	"jsonType": {
+		"order": 1,
+		"name": "geography",
+		"jsonRoot": true
+	},
+	"defaultValues": {
+		"relationshipType": "",
+		"properties": [],
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignCollection": "",
+		"foreignField": [],
+		"dependencies": [],
+		"minProperties": "",
+		"maxProperties": "",
+		"additionalProperties": false,
+		"enum": [],
+		"subtype": ""
+	},
+	"subtypes": {
+		"object": {
+			"parentType": "jsonObject",
+			"childValueType": [
+				"jsonString",
+				"jsonObject",
+				"jsonArray"
+			]
+		},
+		"array": {
+			"parentType": "jsonArray",
+			"childValueType": [
+				"jsonString",
+				"jsonObject",
+				"jsonArray"
+			]
+		},
+		"string": {
+			"parentType": "jsonString"
+		}
+	}
+}
