@@ -1,6 +1,7 @@
 const snowflake = require('../custom_modules/snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
+const BSON = require('bson');
 
 const ALREADY_CONNECTED_STATUS = 405502;
 
@@ -446,7 +447,7 @@ const getDocuments = async (tableName, limit) => {
 	try {
 		const rows = await execute(`SELECT * FROM ${tableName} LIMIT ${limit};`);
 		
-		return rows.map(filterNull);
+		return filterDocuments(rows.map(filterNull));
 	} catch (err) {
 		return [];
 	}
@@ -1002,6 +1003,24 @@ const getContainerData = async schema => {
 }
 
 const setDependencies = ({ lodash }) => _ = lodash;
+
+const getObjSize = (obj) => {
+	if (!obj) {
+		return 0;
+	}
+
+	return BSON.calculateObjectSize(obj) / (1024 * 1024);
+};
+
+const filterDocuments = (rows) => {
+	const size = getObjSize(rows);
+
+	if (size < 200) {
+		return rows;
+	}
+
+	return filterDocuments(rows.slice(0, rows.length / 2));
+};
 
 module.exports = {
 	connect,
