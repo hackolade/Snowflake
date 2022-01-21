@@ -45,7 +45,8 @@
 				"timestamp_ltz",
 				"timestamp_ntz",
 				"timestamp_tz",
-				"variant"
+				"variant",
+				"geography"
 			]
 		}
 	}
