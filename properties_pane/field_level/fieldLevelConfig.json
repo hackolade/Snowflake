@@ -3085,6 +3085,39 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "relationshipType",
 				"hidden": true
 			}
+		],
+		"geography": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "description",
+				"propertyTooltip": "comments",
+				"addTimestampButton": false,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Remarks",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "remarks",
+				"addTimestampButton": true,
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			"minProperties",
+			"maxProperties"
 		]
 	}
 } 

@@ -501,7 +501,7 @@ const handleComplexTypesDocuments = (jsonSchema, documents) => {
 };
 
 const getJsonSchemaFromRows = (documents, rows) => {
-	const complexTypes = ['variant', 'object', 'array'];
+	const complexTypes = ['variant', 'object', 'array', 'geography'];
 	const properties = rows
 		.filter(row => complexTypes.includes(_.toLower(row.type)))
 		.reduce((properties, row) => {
@@ -519,7 +519,12 @@ const getJsonSchemaFromRows = (documents, rows) => {
 				return {
 					...properties,
 					[row.name]: handleObject(documents, row.name)
-				};
+				} 
+			} else if (_.toLower(row.type) === 'geography') {
+				return {
+					...properties,
+					[row.name]: handleGeography(documents, row.name)
+				}
 			}
 
 			return properties;
@@ -527,6 +532,29 @@ const getJsonSchemaFromRows = (documents, rows) => {
 
 	return properties;
 };
+
+const handleGeography = (documents, rowName) => {
+	const types = documents.reduce((types, document) => {
+		if (types.includes('object')) {
+			return types;
+		}
+		const property = document[rowName];
+		const type = getVariantPropertyType(property);
+		if (types.includes(type)) {	
+			return types;	
+		}	
+
+		return [ ...types, type ];
+	}, []);
+
+	let type = _.first(types);
+	let variantProperties = {};
+	if (types.includes('object')) {
+		type = 'object';
+		variantProperties = { properties: {} } ;
+	}
+	return {type: 'geography', variantType: 'JSON', subtype: type, ...variantProperties}
+}
 
 const handleVariant = (documents, name) => {
 	const types = documents.reduce((types, document) => {
@@ -618,7 +646,7 @@ const handleObject = ( documents, rowName ) => {
 const getJsonSchema = async (logger, limit, tableName) => {
 	try {
 		const rows = await execute(`DESC TABLE ${tableName};`);
-		const hasJsonFields = rows.some(row => ['variant', 'object', 'array'].includes(_.toLower(row.type)));
+		const hasJsonFields = rows.some(row => ['variant', 'object', 'array', 'geography'].includes(_.toLower(row.type)));
 		if (!hasJsonFields) {
 			return {
 				jsonSchema: { properties: {} },
