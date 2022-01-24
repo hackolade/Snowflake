@@ -21,8 +21,6 @@ const HACKOLADE_APPLICATION = 'Hackolade';
 let _;
 
 const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform }) => {
-	warehouse = warehouse || DEFAULT_WAREHOUSE;
-
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 
@@ -37,7 +35,7 @@ const connect = async (logger, { host, username, password, authType, authenticat
 	}
 };
 
-const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, warehouse }) => {
+const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, warehouse = DEFAULT_WAREHOUSE }) => {
 	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request?Application=${HACKOLADE_APPLICATION}`, { data: {
@@ -133,7 +131,7 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	});
 };
 
-const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, warehouse }) => {
+const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, warehouse = DEFAULT_WAREHOUSE }) => {
 	const accountName = getAccountName(account);
 	warehouse = _.trim(warehouse);
 	role = _.trim(role);
@@ -240,9 +238,9 @@ const getOktaAuthenticatorUrl = (authenticator = '') => {
 	return `https://${authenticator}.okta.com`;
 };
 
-const authByCredentials = ({ account, username, password, role }) => {
+const authByCredentials = ({ account, username, password, role, warehouse }) => {
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ account, username, password, role, application: HACKOLADE_APPLICATION });
+		connection = snowflake.createConnection({ account, username, password, role, warehouse, application: HACKOLADE_APPLICATION });
 		connection.connect(err => {
 			if (err) {
 				connection = null;
