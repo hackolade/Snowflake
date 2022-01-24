@@ -1,0 +1,207 @@
+{
+  "name": "geography-multipolygon",
+  "parentType": "document",
+  "properties": [
+    {
+      "name": "type",
+      "type": "jsonString",
+      "sample": "multipolygon"
+    },
+    {
+      "name": "coordinates",
+      "type": "array",
+      "properties": [
+        {
+          "type": "array",
+          "properties": [
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "array",
+          "properties": [
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                },
+                {
+                  "type": "array",
+                  "properties": [
+                    {
+                      "type": "jsonNumber"
+                    },
+                    {
+                      "type": "jsonNumber"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

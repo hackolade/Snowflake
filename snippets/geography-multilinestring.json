@@ -1,0 +1,164 @@
+{
+  "name": "geography-multilinestring",
+  "parentType": "document",
+  "properties": [
+    {
+      "name": "type",
+      "type": "jsonString",
+      "sample": "multilinestring"
+    },
+    {
+      "name": "coordinates",
+      "type": "array",
+      "properties": [
+        {
+          "type": "array",
+          "properties": [
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "array",
+          "properties": [
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "array",
+          "properties": [
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            },
+            {
+              "type": "array",
+              "properties": [
+                {
+                  "type": "jsonNumber"
+                },
+                {
+                  "type": "jsonNumber"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
