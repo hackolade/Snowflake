@@ -3093,6 +3093,7 @@ making sure that you maintain a proper JSON format.
 			"schemaId",
 			"refPath",
 			"type",
+			"subtype",
 			{
 				"propertyName": "Comments",
 				"propertyKeyword": "description",
