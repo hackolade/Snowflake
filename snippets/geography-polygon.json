@@ -1,142 +1,89 @@
 {
-  "name": "geography-polygon",
-  "parentType": "document",
-  "properties": [
-    {
-      "name": "type",
-      "type": "jsonString",
-      "sample": "polygon"
-    },
-    {
-      "name": "orientation",
-      "type": "jsonString",
-      "sample": "clockwise"
-    },
-    {
-      "name": "coordinates",
-      "type": "array",
-      "properties": [
-        {
-          "type": "array",
-          "properties": [
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            },
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            },
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            },
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            },
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "array",
-          "properties": [
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            },
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            },
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            },
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            },
-            {
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
+	"name": "geography-polygon",
+	"parentType": "document",
+	"properties": [{
+		"name": "type",
+		"type": "jsonString",
+		"sample": "polygon"
+	}, {
+		"name": "coordinates",
+		"type": "jsonArray",
+		"properties": [{
+			"type": "jsonArray",
+			"properties": [{
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}]
+		}, {
+			"type": "jsonArray",
+			"properties": [{
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}]
+		}]
+	}]
 }

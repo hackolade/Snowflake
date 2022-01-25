@@ -9,7 +9,7 @@
     },
     {
       "name": "geometry",
-      "type": "object",
+      "type": "jsonObject",
       "properties": [
         {
           "name": "type",
