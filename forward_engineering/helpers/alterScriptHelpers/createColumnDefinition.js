@@ -80,7 +80,7 @@ module.exports = _ => {
 		return jsonSchema.mode || jsonSchema.childType || jsonSchema.type;
 	};
 
-	const createColumnDefinitionBySchema = ({ name, jsonSchema, parentJsonSchema, ddlProvider, schemaData }) => {
+	const createColumnDefinitionBySchema = ({ name, jsonSchema, parentJsonSchema, ddlProvider }) => {
 		const columnDefinition = createColumnDefinition({
 			name: name,
 			type: getType(jsonSchema),
@@ -97,7 +97,6 @@ module.exports = _ => {
 		return ddlProvider.hydrateColumn({
 			columnDefinition,
 			jsonSchema,
-			schemaData,
 		});
 	};
 

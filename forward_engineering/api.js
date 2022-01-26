@@ -11,15 +11,15 @@ module.exports = {
 		const ddlProvider = require('./ddlProvider')(_);
 
 		const collection = JSON.parse(data.jsonSchema);
+		
 		if (!collection) {
 			throw new Error(
 				'"comparisonModelCollection" is not found. Alter script can be generated only from Delta model',
 			);
 		}
 
-		const dbVersion = data.modelData[0]?.dbVersion;
 		const containersScripts = getAlterContainersScripts(collection);
-		const collectionsScripts = getAlterCollectionsScripts(collection, _, ddlProvider, dbVersion);
+		const collectionsScripts = getAlterCollectionsScripts(collection, _, ddlProvider);
 
 		callback(
 			null,
