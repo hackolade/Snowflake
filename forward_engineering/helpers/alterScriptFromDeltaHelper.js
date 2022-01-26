@@ -62,7 +62,7 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider) => {
 		...addedColumnScripts,
 		...deletedColumnScripts,
 		...modifiedColumnScripts,
-	];
+	].map(script => script.trim());;
 };
 
 module.exports = {
