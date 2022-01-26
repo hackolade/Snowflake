@@ -22,8 +22,6 @@ const HACKOLADE_APPLICATION = 'Hackolade';
 let _;
 
 const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform, queryRequestTimeout }) => {
-	warehouse = warehouse || DEFAULT_WAREHOUSE;
-
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 	const timeout = _.toNumber(queryRequestTimeout);
@@ -39,7 +37,7 @@ const connect = async (logger, { host, username, password, authType, authenticat
 	}
 };
 
-const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, warehouse, timeout }) => {
+const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, timeout, warehouse = DEFAULT_WAREHOUSE }) => {
 	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request?Application=${HACKOLADE_APPLICATION}`, { data: {
@@ -135,7 +133,7 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	}, (error) => error.code === ALREADY_CONNECTED_STATUS)
 };
 
-const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, warehouse, timeout }) => {
+const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, timeout, warehouse = DEFAULT_WAREHOUSE }) => {
 	const accountName = getAccountName(account);
 	warehouse = _.trim(warehouse);
 	role = _.trim(role);
@@ -246,8 +244,8 @@ const getOktaAuthenticatorUrl = (authenticator = '') => {
 	return `https://${authenticator}.okta.com`;
 };
 
-const authByCredentials = ({ account, username, password, role, timeout }) => {
-	return connectWithTimeout({ account, username, password, role, timeout })
+const authByCredentials = ({ account, username, password, role, timeout, warehouse }) => {
+	return connectWithTimeout({ account, username, password, role, timeout, warehouse })
 };
 
 const connectWithTimeout = ({timeout, ...options}, isErrorAllowed = () => false) => {
