@@ -24,7 +24,7 @@ let _;
 const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform, queryRequestTimeout }) => {
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
-	const timeout = _.toNumber(queryRequestTimeout);
+	const timeout = _.toNumber(queryRequestTimeout) || 2 * 60 * 1000;
 
 	logger.log('info', `Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`, 'Connection');
 
