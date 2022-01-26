@@ -27,6 +27,9 @@ const disconnect = async (connectionInfo, logger, cb) => {
 };
 
 const testConnection = async (connectionInfo, logger, cb, app) => {
+	initDependencies(app);
+	logger.clear();
+	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 	try {
 		if (connectionInfo.authType === 'externalbrowser') {
 			await getExternalBrowserUrl(connectionInfo, logger, cb, app);
