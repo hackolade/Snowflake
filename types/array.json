@@ -23,12 +23,7 @@
   "subtypes": {
     "json": {
       "childValueType": [
-        "variant",
-        "jsonArray",
-        "jsonNumber",
-        "jsonObject",
-        "array",
-        "object"
+        "variant"
       ]
     }
   }

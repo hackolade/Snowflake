@@ -1,99 +1,67 @@
 {
-  "name": "geography-geometrycollection",
-  "parentType": "document",
-  "properties": [
-    {
-      "name": "type",
-      "type": "jsonString",
-      "sample": "geometrycollection"
-    },
-    {
-      "name": "geometries",
-      "type": "array",
-      "properties": [
-        {
-          "type": "object",
-          "properties": [
-            {
-              "name": "type",
-              "type": "jsonString",
-              "sample": "point"
-            },
-            {
-              "name": "coordinates",
-              "type": "array",
-              "properties": [
-                {
-                  "type": "jsonNumber"
-                },
-                {
-                  "type": "jsonNumber"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "object",
-          "properties": [
-            {
-              "name": "type",
-              "type": "jsonString",
-              "sample": "linestring"
-            },
-            {
-              "name": "coordinates",
-              "type": "array",
-              "properties": [
-                {
-                  "type": "array",
-                  "properties": [
-                    {
-                      "type": "jsonNumber"
-                    },
-                    {
-                      "type": "jsonNumber"
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "properties": [
-                    {
-                      "type": "jsonNumber"
-                    },
-                    {
-                      "type": "jsonNumber"
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "properties": [
-                    {
-                      "type": "jsonNumber"
-                    },
-                    {
-                      "type": "jsonNumber"
-                    }
-                  ]
-                },
-                {
-                  "type": "array",
-                  "properties": [
-                    {
-                      "type": "jsonNumber"
-                    },
-                    {
-                      "type": "jsonNumber"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
-  ]
+	"name": "geography-geometrycollection",
+	"parentType": "document",
+	"properties": [{
+		"name": "type",
+		"type": "jsonString",
+		"sample": "geometrycollection"
+	}, {
+		"name": "geometries",
+		"type": "jsonArray",
+		"properties": [{
+			"type": "jsonObject",
+			"properties": [{
+				"name": "type",
+				"type": "jsonString",
+				"sample": "point"
+			}, {
+				"name": "coordinates",
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}]
+		}, {
+			"type": "jsonObject",
+			"properties": [{
+				"name": "type",
+				"type": "jsonString",
+				"sample": "linestring"
+			}, {
+				"name": "coordinates",
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonArray",
+					"properties": [{
+						"type": "jsonNumber"
+					}, {
+						"type": "jsonNumber"
+					}]
+				}, {
+					"type": "jsonArray",
+					"properties": [{
+						"type": "jsonNumber"
+					}, {
+						"type": "jsonNumber"
+					}]
+				}, {
+					"type": "jsonArray",
+					"properties": [{
+						"type": "jsonNumber"
+					}, {
+						"type": "jsonNumber"
+					}]
+				}, {
+					"type": "jsonArray",
+					"properties": [{
+						"type": "jsonNumber"
+					}, {
+						"type": "jsonNumber"
+					}]
+				}]
+			}]
+		}]
+	}]
 }

@@ -24,7 +24,7 @@ let _;
 const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform, queryRequestTimeout }) => {
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
-	const timeout = _.toNumber(queryRequestTimeout);
+	const timeout = _.toNumber(queryRequestTimeout) || 2 * 60 * 1000;
 
 	logger.log('info', `Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`, 'Connection');
 
@@ -1075,6 +1075,10 @@ const filterDocuments = (rows) => {
 	return filterDocuments(rows.slice(0, rows.length / 2));
 };
 
+const applyScript = async script => {
+	return await execute(script);
+}
+
 module.exports = {
 	connect,
 	disconnect,
@@ -1094,5 +1098,6 @@ module.exports = {
 	getContainerData,
 	getAccount,
 	getAccessUrl,
-	setDependencies
+	setDependencies,
+	applyScript,
 };

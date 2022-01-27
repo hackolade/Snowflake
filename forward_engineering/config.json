@@ -16,5 +16,10 @@
 	"feLevelSelector": {
 		"container": true,
 		"model": true
-	}
+	},
+	"compMode": {
+		"entity": true,
+		"container": false
+	},
+	"applyScriptToInstance": true
 }

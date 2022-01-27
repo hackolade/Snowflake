@@ -9,7 +9,7 @@
     },
     {
       "name": "coordinates",
-      "type": "array",
+      "type": "jsonArray",
       "properties": [
         {
           "type": "jsonNumber"
