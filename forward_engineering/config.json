@@ -20,5 +20,6 @@
 	"compMode": {
 		"entity": true,
 		"container": false
-	}
+	},
+	"applyScriptToInstance": true
 }
