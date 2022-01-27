@@ -12,6 +12,16 @@ module.exports = {
 
 	applyToInstance(connectionInfo, logger, callback, app) {
 		const { applyToInstance } = require('./helpers/applyToInstanceHelper');
+		const { getSystemInfo } = require('../reverse_engineering/helpers/loggerHelper');
+
+		logger.clear();
+		logger.log('info', getSystemInfo(connectionInfo.appVersion), 'Apply to instance');
+		logger.log(
+			'info',
+			app.require('lodash').omit(connectionInfo, 'script', 'containerData'),
+			'connectionInfo',
+			connectionInfo.hiddenKeys,
+		);
 
 		applyToInstance(connectionInfo, logger, app)
 			.then(result => {

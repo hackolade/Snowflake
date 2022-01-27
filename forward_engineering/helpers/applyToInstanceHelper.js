@@ -7,19 +7,14 @@ const {
 const applyToInstance = async (connectionInfo, logger, app) => {
 	const async = app.require('async');
 	initDependencies(app);
+	await snowflakeHelper.connect(logger, connectionInfo);
 
-	try {
-		await snowflakeHelper.connect(logger, connectionInfo);
+	const queries = createQueries(connectionInfo.script);
 
-		const queries = createQueries(connectionInfo.script);
-
-		await async.mapSeries(queries, async query => {
-			logger.progress({ message: createMessage(query) });
-			await snowflakeHelper.applyScript(query);
-		});
-	} catch (error) {
-		throw error;
-	}
+	await async.mapSeries(queries, async query => {
+		logger.progress({ message: createMessage(query) });
+		await snowflakeHelper.applyScript(query);
+	});
 };
 
 const createQueries = script =>
@@ -33,7 +28,6 @@ const createMessage = query =>
 
 const initDependencies = app => {
 	setDependencies(app);
-	_ = dependencies.lodash;
 	snowflakeHelper.setDependencies(dependencies);
 };
 
