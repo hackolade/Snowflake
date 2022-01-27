@@ -16,5 +16,6 @@
 	"feLevelSelector": {
 		"container": true,
 		"model": true
-	}
+	},
+	"applyScriptToInstance": true
 }
