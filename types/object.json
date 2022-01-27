@@ -1,53 +1,53 @@
 {
-	"name": "object",
-	"erdAbbreviation": "<obj>",
-	"dtdAbbreviation": "{...}",
-	"parentType": "document",
-	"sample": {},
-	"hiddenOnEntity": "view",
-	"useSample": true,
-	"default": true,
-	"defaultValues": {
-		"primaryKey": false,
-		"relationshipType": "",
-		"parentRelationship": "",
-		"childRelationships": [],
-		"foreignCollection": "",
-		"foreignField": [],
-		"enabled": true,
-		"properties": [],
-		"dependencies": [],
-		"subtype": "allTypes",
-		"minProperties": "",
-		"maxProperties": "",
-		"additionalProperties": false,
-		"enum": []
-	},
-	"subtypes": {
-		"json": {
-			"childValueType": [
-				"variant"
-			]
-		},
-		"allTypes": {
-			"childValueType": [
-				"varchar",
-				"array",
-				"object",
-				"time",
-				"binary",
-				"boolean",
-				"number",
-				"integer",
-				"float",
-				"date",
-				"double",
-				"timestamp_ltz",
-				"timestamp_ntz",
-				"timestamp_tz",
-				"variant",
-				"geography"
-			]
-		}
-	}
+  "name": "object",
+  "erdAbbreviation": "<obj>",
+  "dtdAbbreviation": "{...}",
+  "parentType": "document",
+  "sample": {},
+  "hiddenOnEntity": "view",
+  "useSample": true,
+  "default": true,
+  "defaultValues": {
+    "primaryKey": false,
+    "relationshipType": "",
+    "parentRelationship": "",
+    "childRelationships": [],
+    "foreignCollection": "",
+    "foreignField": [],
+    "enabled": true,
+    "properties": [],
+    "dependencies": [],
+    "subtype": "allTypes",
+    "minProperties": "",
+    "maxProperties": "",
+    "additionalProperties": false,
+    "enum": []
+  },
+  "subtypes": {
+    "json": {
+      "childValueType": [
+        "variant"
+      ]
+    },
+    "allTypes": {
+      "childValueType": [
+        "varchar",
+        "array",
+        "object",
+        "time",
+        "binary",
+        "boolean",
+        "number",
+        "integer",
+        "float",
+        "date",
+        "double",
+        "timestamp_ltz",
+        "timestamp_ntz",
+        "timestamp_tz",
+        "variant",
+        "geography"
+      ]
+    }
+  }
 }

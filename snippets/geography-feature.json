@@ -1,0 +1,30 @@
+{
+  "name": "geography-feature",
+  "parentType": "document",
+  "properties": [
+    {
+      "name": "type",
+      "type": "jsonString",
+      "sample": "feature"
+    },
+    {
+      "name": "geometry",
+      "type": "jsonObject",
+      "properties": [
+        {
+          "name": "type",
+          "type": "jsonString",
+          "sample": "point"
+        },
+        {
+          "name": "coordinates",
+          "type": "jsonArray"
+        }
+      ]
+    },
+    {
+      "name": "properties",
+      "type": "jsonObject"
+    }
+  ]
+}

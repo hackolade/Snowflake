@@ -1,0 +1,89 @@
+{
+	"name": "geography-polygon",
+	"parentType": "document",
+	"properties": [{
+		"name": "type",
+		"type": "jsonString",
+		"sample": "polygon"
+	}, {
+		"name": "coordinates",
+		"type": "jsonArray",
+		"properties": [{
+			"type": "jsonArray",
+			"properties": [{
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}]
+		}, {
+			"type": "jsonArray",
+			"properties": [{
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}, {
+				"type": "jsonArray",
+				"properties": [{
+					"type": "jsonNumber"
+				}, {
+					"type": "jsonNumber"
+				}]
+			}]
+		}]
+	}]
+}
