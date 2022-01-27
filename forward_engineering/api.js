@@ -10,20 +10,20 @@ module.exports = {
 		callback(null, '');
 	},
 
-  applyToInstance(connectionInfo, logger, callback, app) {
-    const { applyToInstance } = require('./helpers/applyToInstanceHelper');
+	applyToInstance(connectionInfo, logger, callback, app) {
+		const { applyToInstance } = require('./helpers/applyToInstanceHelper');
 
-    applyToInstance(connectionInfo, logger, app)
-      .then(result => {
-        callback(null, result);
-      })
-      .catch(error => {
-        const err = {
-          message: error.message,
-          stack: error.stack,
-        };
-        logger.log('error', err, 'Error when applying to instance');
-        callback(err);
-      });
-  },
+		applyToInstance(connectionInfo, logger, app)
+			.then(result => {
+				callback(null, result);
+			})
+			.catch(error => {
+				const err = {
+					message: error.message,
+					stack: error.stack,
+				};
+				logger.log('error', err, 'Error when applying to instance');
+				callback(err);
+			});
+	},
 };
