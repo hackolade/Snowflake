@@ -59,8 +59,8 @@ module.exports = {
 	},
 
 	testConnection(connectionInfo, logger, callback, app) {
-    const reApi = require('../reverse_engineering/api');
-    
+		const reApi = require('../reverse_engineering/api');
+		
 		reApi.testConnection(connectionInfo, logger, callback, app).then(callback, callback);
 	},
 };
