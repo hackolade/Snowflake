@@ -57,4 +57,10 @@ module.exports = {
 				callback(err);
 			});
 	},
+
+	testConnection(connectionInfo, logger, callback, app) {
+    const reApi = require('../reverse_engineering/api');
+    
+		reApi.testConnection(connectionInfo, logger, callback, app).then(callback, callback);
+	},
 };
