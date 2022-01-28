@@ -12,6 +12,14 @@
 		"lowerTab": "Details",
 		"structure": [
 			{
+				"propertyName": "Select Statement",
+				"propertyKeyword": "selectStatement",
+				"propertyType": "details",
+				"propertyTooltip": "select statement",
+				"template": "textarea",
+				"markdown": false
+			},
+			{
 				"propertyName": "Case sensitive",
 				"propertyKeyword": "isCaseSensitive",
 				"propertyType": "checkbox"
