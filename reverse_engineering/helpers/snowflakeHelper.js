@@ -91,7 +91,7 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}&Application=${HACKOLADE_APPLICATION}`;
 	role = role || DEFAULT_ROLE;
 
-	authUrl += `&roleName=${encodeURIComponent(role)}`;
+	authUrl += `&roleName=${encodeURIComponent(getRole(role))}`;
 	authUrl += `&warehouse=${encodeURIComponent(warehouse)}`;
 
 	const authData = await axios.post(authUrl, {
@@ -140,7 +140,7 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 	const requestId = uuid.v4();
 	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}&Application=${HACKOLADE_APPLICATION}`;
 	role = role || DEFAULT_ROLE;
-	authUrl += `&roleName=${encodeURIComponent(role)}`;
+	authUrl += `&roleName=${encodeURIComponent(getRole(role))}`;
 
 	const authData = await axios.post(authUrl, {
 		data: {
@@ -257,6 +257,22 @@ const getAccount = hostUrl => (hostUrl || '')
 	.trim()
 	.replace(/\.snowflakecomputing\.com.*$/gi,'')
 	.replace(/^http(s)?:\/\//gi, '');
+
+const getRole = role => {
+	if (!_.isString(role)) {
+		return role;
+	}
+
+	if (_.first(role) === '"' && _.last(role) === '"') {
+		return role;
+	}
+
+	if (/^[a-z][a-z\d]*$/i.test(role)) {
+		return role;
+	}
+
+	return `"${role}"`;
+};
 	
 const getAccessUrl = account => `https://${account}.snowflakecomputing.com`;
 
