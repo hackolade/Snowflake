@@ -1,8 +1,10 @@
 const snowflake = require('../custom_modules/snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
+const BSON = require('bson');
 
 const ALREADY_CONNECTED_STATUS = 405502;
+const CONNECTION_TIMED_OUT_CODE  = 'CONNECTION_TIMED_OUT'
 
 let connection;
 let containers = {};
@@ -19,24 +21,23 @@ const DEFAULT_ROLE = 'PUBLIC';
 const HACKOLADE_APPLICATION = 'Hackolade';
 let _;
 
-const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform }) => {
-	warehouse = warehouse || DEFAULT_WAREHOUSE;
-
+const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform, queryRequestTimeout }) => {
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
+	const timeout = _.toNumber(queryRequestTimeout) || 2 * 60 * 1000;
 
 	logger.log('info', `Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`, 'Connection');
 
 	if (authType === 'okta') {
-		return authByOkta(logger, { account, accessUrl, username, password, authenticator, role, warehouse });
+		return authByOkta(logger, { account, accessUrl, username, password, authenticator, role, warehouse, timeout });
 	} if (authType === 'externalbrowser') {
-		return authByExternalBrowser(logger, { account, accessUrl, token, proofKey, username, password, role, warehouse })
+		return authByExternalBrowser(logger, { account, accessUrl, token, proofKey, username, password, role, warehouse, timeout })
 	} else {
-		return authByCredentials({ account, username, password, role, warehouse });
+		return authByCredentials({ account, username, password, role, warehouse, timeout });
 	}
 };
 
-const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, warehouse }) => {
+const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, timeout, warehouse = DEFAULT_WAREHOUSE }) => {
 	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request?Application=${HACKOLADE_APPLICATION}`, { data: {
@@ -119,20 +120,20 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	const sessionToken = _.get(tokensData, 'data.token', '');
 	logger.log('info', `Tokens have been provided`, 'Connection');
 
-	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password, role, warehouse });
-		connection.connect(err => {
-			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
-				connection = null;
-				return reject(err); 
-			}
-
-			resolve();
-		});
-	});
+	return connectWithTimeout({
+		accessUrl,
+		masterToken,
+		sessionToken,
+		account,
+		username,
+		password,
+		role,
+		warehouse,
+		timeout
+	}, (error) => error.code === ALREADY_CONNECTED_STATUS)
 };
 
-const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, warehouse }) => {
+const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, timeout, warehouse = DEFAULT_WAREHOUSE }) => {
 	const accountName = getAccountName(account);
 	warehouse = _.trim(warehouse);
 	role = _.trim(role);
@@ -173,57 +174,61 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 	const sessionToken = _.get(tokensData, 'data.token', '');
 	logger.log('info', `Tokens have been provided`, 'Connection');
 
+	await connectWithTimeout({
+		accessUrl,
+		masterToken,
+		sessionToken,
+		account,
+		username,
+		role,
+		warehouse,
+		password: 'password',
+		timeout
+	}, (error) => error.code === ALREADY_CONNECTED_STATUS)
+
 	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ accessUrl, masterToken, sessionToken,	account, username, password: 'password', role, warehouse });
-		connection.connect(err => {
-			if (err && err.code !== ALREADY_CONNECTED_STATUS ) {
-				connection = null;
-				return reject(err); 
-			}
-
-			execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`)
-				.then(resolve, async err => {
-					logger.log('error', err.message, 'Connection');
-					await execute(`USE ROLE "${role}"`).catch(err => {});
-					let userData = await execute(`DESC USER "${username}"`).catch(err => []);
-					userData = userData.filter(data => data.property !== 'PASSWORD');
-					logger.log('info', `User info: ${JSON.stringify(userData)}`, 'Connection');
-					let warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {logger.log('error', err.message, 'Connection'); return []});
-					const roles = await execute(`SHOW ROLES;`).catch(err => {logger.log('error', err.message, 'Connection'); return []});
-					const roleNames = roles.map(role => role.name);
-					const defaultRoleData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_ROLE');
-					if (_.isEmpty(warehouses)) {
-						const userRole = _.get(defaultRoleData, 'value', '');
-						if (userRole !== 'null') {
-							await execute(`USE ROLE "${userRole}"`).catch(err => {});
-						}
-						warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {logger.log('error', err.message, 'Connection'); return []});
-						if (_.isEmpty(warehouses)) {
-							reject('Warehouse is not available. Please check your role and warehouse');
-						}
+		execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`)
+			.then(resolve, async err => {
+				logger.log('error', err.message, 'Connection');
+				await execute(`USE ROLE "${role}"`).catch(err => { });
+				let userData = await execute(`DESC USER "${username}"`).catch(err => []);
+				userData = userData.filter(data => data.property !== 'PASSWORD');
+				logger.log('info', `User info: ${JSON.stringify(userData)}`, 'Connection');
+				let warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => { logger.log('error', err.message, 'Connection'); return [] });
+				const roles = await execute(`SHOW ROLES;`).catch(err => { logger.log('error', err.message, 'Connection'); return [] });
+				const roleNames = roles.map(role => role.name);
+				const defaultRoleData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_ROLE');
+				if (_.isEmpty(warehouses)) {
+					const userRole = _.get(defaultRoleData, 'value', '');
+					if (userRole !== 'null') {
+						await execute(`USE ROLE "${userRole}"`).catch(err => { });
 					}
-					const names = warehouses.map(wh => wh.name);
-	
-					const defaultWarehouseData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_WAREHOUSE');
-					const defaultUserWarehouse = _.get(defaultWarehouseData, 'value', '');
-					const defaultWarehouse = names.includes(defaultUserWarehouse) ? defaultUserWarehouse : _.first(names);
+					warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => { logger.log('error', err.message, 'Connection'); return [] });
+					if (_.isEmpty(warehouses)) {
+						reject('Warehouse is not available. Please check your role and warehouse');
+					}
+				}
+				const names = warehouses.map(wh => wh.name);
 
-					logger.log('info', `Available warehouses: ${names.join()}; Available roles: ${roleNames.join()}`, 'Connection');
-					logger.log('info', `Fallback to ${defaultWarehouse} warehouse`, 'Connection');
+				const defaultWarehouseData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_WAREHOUSE');
+				const defaultUserWarehouse = _.get(defaultWarehouseData, 'value', '');
+				const defaultWarehouse = names.includes(defaultUserWarehouse) ? defaultUserWarehouse : _.first(names);
 
-					execute(`USE WAREHOUSE "${removeQuotes(defaultWarehouse)}";`).then(
-						resolve,
-						async err => {
-							const currentInfo = await execute(`select current_warehouse() as warehouse, current_role() as role;`).catch(err => []);
-							const infoRow = _.first(currentInfo);
-							const currentWarehouse = _.get(infoRow, 'WAREHOUSE', '');
-							const currentRole = _.get(infoRow, 'ROLE', '');
-							logger.log('info', `Current warehouse: ${currentWarehouse}\n Current role: ${currentRole}`, 'Connection');
-							resolve();
-						}
-					);
-				});
-		});
+				logger.log('info', `Available warehouses: ${names.join()}; Available roles: ${roleNames.join()}`, 'Connection');
+				logger.log('info', `Fallback to ${defaultWarehouse} warehouse`, 'Connection');
+
+				execute(`USE WAREHOUSE "${removeQuotes(defaultWarehouse)}";`).then(
+					resolve,
+					async err => {
+						const currentInfo = await execute(`select current_warehouse() as warehouse, current_role() as role;`).catch(err => []);
+						const infoRow = _.first(currentInfo);
+						const currentWarehouse = _.get(infoRow, 'WAREHOUSE', '');
+						const currentRole = _.get(infoRow, 'ROLE', '');
+						logger.log('info', `Current warehouse: ${currentWarehouse}\n Current role: ${currentRole}`, 'Connection');
+						resolve();
+					}
+				);
+			});
 	});
 };
 
@@ -239,11 +244,15 @@ const getOktaAuthenticatorUrl = (authenticator = '') => {
 	return `https://${authenticator}.okta.com`;
 };
 
-const authByCredentials = ({ account, username, password, role }) => {
-	return new Promise((resolve, reject) => {
-		connection = snowflake.createConnection({ account, username, password, role, application: HACKOLADE_APPLICATION });
+const authByCredentials = ({ account, username, password, role, timeout, warehouse }) => {
+	return connectWithTimeout({ account, username, password, role, timeout, warehouse })
+};
+
+const connectWithTimeout = ({timeout, ...options}, isErrorAllowed = () => false) => {
+	const connectPromise = new Promise((resolve, reject) => {
+		connection = snowflake.createConnection(options);
 		connection.connect(err => {
-			if (err) {
+			if (err && !isErrorAllowed(err)) {
 				connection = null;
 				return reject(err); 
 			}
@@ -251,7 +260,24 @@ const authByCredentials = ({ account, username, password, role }) => {
 			resolve();
 		});
 	});
-};
+
+	const timeoutPromise = new Promise((resolve, reject) => setTimeout(() => reject(getConnectionTimeoutError(timeout)), timeout));
+
+	return Promise.race([connectPromise, timeoutPromise]).catch(error => {
+		if (error.code === CONNECTION_TIMED_OUT_CODE) {
+			disconnect();
+		}
+
+		throw error;
+	})
+}
+
+const getConnectionTimeoutError = (timeout) => {
+	const error = new Error(`Connection timeout ${timeout} ms exceeded!`);
+	error.code = CONNECTION_TIMED_OUT_CODE;
+
+	return error
+}
 
 const getAccount = hostUrl => (hostUrl || '')
 	.trim()
@@ -462,7 +488,7 @@ const getDocuments = async (tableName, limit) => {
 	try {
 		const rows = await execute(`SELECT * FROM ${tableName} LIMIT ${limit};`);
 		
-		return rows.map(filterNull);
+		return filterDocuments(rows.map(filterNull));
 	} catch (err) {
 		return [];
 	}
@@ -516,7 +542,7 @@ const handleComplexTypesDocuments = (jsonSchema, documents) => {
 };
 
 const getJsonSchemaFromRows = (documents, rows) => {
-	const complexTypes = ['variant', 'object', 'array'];
+	const complexTypes = ['variant', 'object', 'array', 'geography'];
 	const properties = rows
 		.filter(row => complexTypes.includes(_.toLower(row.type)))
 		.reduce((properties, row) => {
@@ -534,7 +560,12 @@ const getJsonSchemaFromRows = (documents, rows) => {
 				return {
 					...properties,
 					[row.name]: handleObject(documents, row.name)
-				};
+				} 
+			} else if (_.toLower(row.type) === 'geography') {
+				return {
+					...properties,
+					[row.name]: handleGeography(documents, row.name)
+				}
 			}
 
 			return properties;
@@ -542,6 +573,29 @@ const getJsonSchemaFromRows = (documents, rows) => {
 
 	return properties;
 };
+
+const handleGeography = (documents, rowName) => {
+	const types = documents.reduce((types, document) => {
+		if (types.includes('object')) {
+			return types;
+		}
+		const property = document[rowName];
+		const type = getVariantPropertyType(property);
+		if (types.includes(type)) {	
+			return types;	
+		}	
+
+		return [ ...types, type ];
+	}, []);
+
+	let type = _.first(types);
+	let variantProperties = {};
+	if (types.includes('object')) {
+		type = 'object';
+		variantProperties = { properties: {} } ;
+	}
+	return {type: 'geography', variantType: 'JSON', subtype: type, ...variantProperties}
+}
 
 const handleVariant = (documents, name) => {
 	const types = documents.reduce((types, document) => {
@@ -633,7 +687,7 @@ const handleObject = ( documents, rowName ) => {
 const getJsonSchema = async (logger, limit, tableName) => {
 	try {
 		const rows = await execute(`DESC TABLE ${tableName};`);
-		const hasJsonFields = rows.some(row => ['variant', 'object', 'array'].includes(_.toLower(row.type)));
+		const hasJsonFields = rows.some(row => ['variant', 'object', 'array', 'geography'].includes(_.toLower(row.type)));
 		if (!hasJsonFields) {
 			return {
 				jsonSchema: { properties: {} },
@@ -1019,6 +1073,28 @@ const getContainerData = async schema => {
 
 const setDependencies = ({ lodash }) => _ = lodash;
 
+const getObjSize = (obj) => {
+	if (!obj) {
+		return 0;
+	}
+
+	return BSON.calculateObjectSize(obj) / (1024 * 1024);
+};
+
+const filterDocuments = (rows) => {
+	const size = getObjSize(rows);
+
+	if (size < 200) {
+		return rows;
+	}
+
+	return filterDocuments(rows.slice(0, rows.length / 2));
+};
+
+const applyScript = async script => {
+	return await execute(script);
+}
+
 module.exports = {
 	connect,
 	disconnect,
@@ -1038,5 +1114,6 @@ module.exports = {
 	getContainerData,
 	getAccount,
 	getAccessUrl,
-	setDependencies
+	setDependencies,
+	applyScript,
 };

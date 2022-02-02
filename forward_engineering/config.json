@@ -2,6 +2,7 @@
 	"extension": "sql",
 	"filterName": "SQL",
 	"type": "ddl",
+	"mode": "pgsql",
 	"ddlType": "snowflake",
 	"namePrefix": "Snowflake",
 	"hasUpdateScript": true,
@@ -15,5 +16,10 @@
 	"feLevelSelector": {
 		"container": true,
 		"model": true
-	}
+	},
+	"compMode": {
+		"entity": true,
+		"container": false
+	},
+	"applyScriptToInstance": true
 }

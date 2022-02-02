@@ -1,0 +1,35 @@
+{
+	"name": "geography-featurecollection",
+	"parentType": "document",
+	"properties": [{
+		"name": "type",
+		"type": "jsonString",
+		"sample": "featurecollection"
+	}, {
+		"name": "feature",
+		"type": "jsonArray",
+		"properties": [{
+			"name": "feature",
+			"type": "jsonObject",
+			"properties": [{
+				"name": "type",
+				"type": "jsonString",
+				"sample": "feature"
+			}, {
+				"name": "geometry",
+				"type": "jsonObject",
+				"properties": [{
+					"name": "type",
+					"type": "jsonString",
+					"sample": "point"
+				}, {
+					"name": "coordinates",
+					"type": "jsonArray"
+				}]
+			}, {
+				"name": "properties",
+				"type": "jsonObject"
+			}]
+		}]
+	}]
+}

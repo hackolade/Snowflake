@@ -1,0 +1,49 @@
+{
+  "name": "geography",
+  "erdAbbreviation": "<geog>",
+  "dtdAbbreviation": "{...}",
+  "parentType": "document",
+  "hiddenOnEntity": "view",
+  "jsonType": {
+    "order": 1,
+    "name": "geography",
+    "jsonRoot": true
+  },
+  "defaultValues": {
+    "relationshipType": "",
+    "properties": [],
+    "parentRelationship": "",
+    "childRelationships": [],
+    "foreignCollection": "",
+    "foreignField": [],
+    "dependencies": [],
+    "minProperties": "",
+    "maxProperties": "",
+    "additionalProperties": false,
+    "enum": [],
+    "subTypes": [
+      { "name": "point", "snippet": "geography-point" },
+      { "name": "multipoint", "snippet": "geography-multipoint" },
+      { "name": "linestring", "snippet": "geography-linestring" },
+      { "name": "polygon", "snippet": "geography-polygon" },
+      { "name": "multilinestring", "snippet": "geography-multilinestring" },
+      { "name": "multipolygon", "snippet": "geography-multipolygon" },
+      {
+        "name": "geometrycollection",
+        "snippet": "geography-geometrycollection"
+      },
+      { "name": "feature", "snippet": "geography-feature" },
+      { "name": "featurecollection", "snippet": "geography-featurecollection" }
+    ]
+  },
+  "subtypes": {
+    "object": {
+      "parentType": "jsonObject",
+      "childValueType": [
+        "jsonString",
+        "jsonObject",
+        "jsonArray"
+      ]
+    }
+  }
+}

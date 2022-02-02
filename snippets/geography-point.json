@@ -1,0 +1,23 @@
+{
+  "name": "geography-point",
+  "parentType": "document",
+  "properties": [
+    {
+      "name": "type",
+      "type": "jsonString",
+      "sample": "point"
+    },
+    {
+      "name": "coordinates",
+      "type": "jsonArray",
+      "properties": [
+        {
+          "type": "jsonNumber"
+        },
+        {
+          "type": "jsonNumber"
+        }
+      ]
+    }
+  ]
+}

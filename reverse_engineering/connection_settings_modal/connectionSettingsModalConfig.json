@@ -64,6 +64,29 @@
 	},
 	{
 		"tab": "Authentication",
+		"helpUrl": [
+			{
+				"value": "https://hackolade.com/help/Snowflakeauthentication.html",
+				"dependency": {
+					"key": "authType",
+					"value": "credentials"
+				}
+			},
+			{
+				"value": "https://hackolade.com/help/NativeSSOOktaonly.html",
+				"dependency": {
+					"key": "authType",
+					"value": "okta"
+				}
+			},
+			{
+				"value": "https://hackolade.com/help/IdentityProviderSSOexternalbrows.html",
+				"dependency": {
+					"key": "authType",
+					"value": "externalbrowser"
+				}
+			}
+		],
 		"structure": [
 			{
 				"inputLabel": "Auth type",

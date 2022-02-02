@@ -1,10 +1,10 @@
 {
     "name": "Snowflake",
-    "version": "0.1.37",
-    "versionDate": "2021-09-23",
+    "version": "0.1.47",
+    "versionDate": "2022-01-31",
     "author": "hackolade",
     "engines": {
-        "hackolade": "5.2.0",
+        "hackolade": "5.4.1",
         "hackoladePlugin": "1.2.0"
     },
     "contributes": {
@@ -36,7 +36,8 @@
             "relationships": {
                 "compositeRelationships": true
             },
-            "FEScriptCommentsSupported": true
+            "FEScriptCommentsSupported": true,
+            "disableJsonDataMaxLength": true
         }
     },
     "description": "Hackolade plugin for Snowflake",
