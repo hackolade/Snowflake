@@ -62,6 +62,7 @@ const getDocumentKinds = (connectionInfo, logger, cb) => {
 
 const getDbCollectionsNames = async (connectionInfo, logger, cb, app) => {
 	try {
+		logger.clear();
 		initDependencies(app);
 		await snowflakeHelper.connect(logger, connectionInfo);
 		const namesBySchemas = await snowflakeHelper.getEntitiesNames();
