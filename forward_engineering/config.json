@@ -19,7 +19,16 @@
 	},
 	"compMode": {
 		"entity": true,
-		"container": false
+		"container": true
 	},
-	"applyScriptToInstance": true
+	"applyScriptToInstance": true,
+	"additionalOptions": [
+		{
+			"id": "applyDropStatements",
+			"value": false,
+			"forUpdate": true,
+			"name": "Apply Drop Statements",
+			"isDropInStatements": true
+		}
+	]
 }
