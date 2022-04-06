@@ -1050,6 +1050,7 @@ const getContainerData = async schema => {
 		const dbRows = await execute(`select * from "${dbNameWithoutQuotes}".information_schema.databases where DATABASE_NAME='${dbNameWithoutQuotes}'`);
 		const dbData = _.first(dbRows);
 		const schemaRows = await execute(`select * from "${dbNameWithoutQuotes}".information_schema.schemata where SCHEMA_NAME='${removeQuotes(schemaName)}'`);
+		const isCaseSensitive = _.toUpper(schemaName) !== schemaName;
 		const schemaData = _.first(schemaRows);
 		const functions = await getFunctions(dbName, schemaName);
 		const sequences = await getSequences(dbName, schemaName);
@@ -1061,7 +1062,8 @@ const getContainerData = async schema => {
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
 			sequences,
-			fileFormats
+			fileFormats,
+			isCaseSensitive,
 		};
 		containers[schema] = data;
 
