@@ -163,6 +163,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -461,6 +462,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -704,6 +706,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -944,6 +947,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -1184,6 +1188,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -1413,6 +1418,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -1593,6 +1599,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -1756,6 +1763,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -1932,6 +1940,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -2122,6 +2131,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -2310,6 +2320,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -2498,6 +2509,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -2756,6 +2768,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
@@ -2933,6 +2946,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Primary key",
 				"propertyNameFull":"Composite Primary Key",
 				"propertyKeyword": "compositePrimaryKey",
+				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
 					"key": "compositePrimaryKey",
