@@ -110,7 +110,8 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 					views: [],
 					ddl: {
 						script: ddl,
-						type: 'snowflake'
+						type: 'snowflake',
+						takeAllDdlProperties: true,
 					},
 					emptyBucket: false,
 					validation: {
