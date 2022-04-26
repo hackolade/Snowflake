@@ -109,7 +109,7 @@ module.exports = (_) => {
 							spaceTrimming: jsonSchema.spaceTrimming,
 						})
 					: {},
-				comment: jsonSchema.description,
+				comment: jsonSchema.refDescription || jsonSchema.description,
 				unique: jsonSchema.uniqueKeyConstraintName ? false : jsonSchema.unique,
 				primaryKeyConstraintName: jsonSchema.primaryKeyConstraintName,
 				compositePrimaryKey:
