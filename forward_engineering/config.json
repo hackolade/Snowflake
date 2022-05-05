@@ -5,7 +5,6 @@
 	"mode": "pgsql",
 	"ddlType": "snowflake",
 	"namePrefix": "Snowflake",
-	"hasUpdateScript": true,
 	"resolvedDefinitions": true,
 	"combinedContainers": true,
 	"level": {
