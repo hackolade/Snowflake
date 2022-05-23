@@ -602,6 +602,7 @@ making sure that you maintain a proper JSON format.
 				"options": [
 					"",
 					"Default",
+					"Identity",
 					"Autoincrement",
 					"Sequence"
 				]
@@ -648,6 +649,32 @@ making sure that you maintain a proper JSON format.
 				"dependency": {
 					"key": "defaultOption",
 					"value": "Autoincrement"
+				}
+			},
+			{
+				"propertyName": "Identity",
+				"propertyType": "block",
+				"propertyKeyword": "identity",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Start num",
+						"propertyKeyword": "start_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					},
+					{
+						"propertyName": "Step num",
+						"propertyKeyword": "step_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				],
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Identity"
 				}
 			},
 			"unit",
@@ -846,6 +873,7 @@ making sure that you maintain a proper JSON format.
 				"options": [
 					"",
 					"Default",
+					"Identity",
 					"Autoincrement",
 					"Sequence"
 				]
@@ -892,6 +920,32 @@ making sure that you maintain a proper JSON format.
 				"dependency": {
 					"key": "defaultOption",
 					"value": "Autoincrement"
+				}
+			},
+			{
+				"propertyName": "Identity",
+				"propertyType": "block",
+				"propertyKeyword": "identity",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Start num",
+						"propertyKeyword": "start_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					},
+					{
+						"propertyName": "Step num",
+						"propertyKeyword": "step_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				],
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Identity"
 				}
 			},
 			"unit",
@@ -1087,6 +1141,7 @@ making sure that you maintain a proper JSON format.
 				"options": [
 					"",
 					"Default",
+					"Identity",
 					"Autoincrement",
 					"Sequence"
 				]
@@ -1133,6 +1188,32 @@ making sure that you maintain a proper JSON format.
 				"dependency": {
 					"key": "defaultOption",
 					"value": "Autoincrement"
+				}
+			},
+			{
+				"propertyName": "Identity",
+				"propertyType": "block",
+				"propertyKeyword": "identity",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Start num",
+						"propertyKeyword": "start_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					},
+					{
+						"propertyName": "Step num",
+						"propertyKeyword": "step_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				],
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Identity"
 				}
 			},
 			"unit",
@@ -1328,6 +1409,7 @@ making sure that you maintain a proper JSON format.
 				"options": [
 					"",
 					"Default",
+					"Identity",
 					"Autoincrement",
 					"Sequence"
 				]
@@ -1374,6 +1456,32 @@ making sure that you maintain a proper JSON format.
 				"dependency": {
 					"key": "defaultOption",
 					"value": "Autoincrement"
+				}
+			},
+			{
+				"propertyName": "Identity",
+				"propertyType": "block",
+				"propertyKeyword": "identity",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Start num",
+						"propertyKeyword": "start_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					},
+					{
+						"propertyName": "Step num",
+						"propertyKeyword": "step_num",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				],
+				"dependency": {
+					"key": "defaultOption",
+					"value": "Identity"
 				}
 			},
 			"unit",
