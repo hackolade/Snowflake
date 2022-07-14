@@ -6,10 +6,7 @@ const { DROP_STATEMENTS } = require('./helpers/constants');
 module.exports = {
 	generateScript(data, logger, callback, app) {
 		try {
-			const {
-				getAlterContainersScripts,
-				getAlterCollectionsScripts,
-			} = require('./helpers/alterScriptFromDeltaHelper');
+			const { getAlterScript } = require('./helpers/alterScriptFromDeltaHelper');
 			const _ = app.require('lodash');
 			const ddlProvider = require('./ddlProvider')(_);
 
@@ -21,9 +18,7 @@ module.exports = {
 				);
 			}
 
-			const containersScripts = getAlterContainersScripts(collection);
-			const collectionsScripts = getAlterCollectionsScripts(collection, _, ddlProvider);
-			const script = [...containersScripts, ...collectionsScripts].join('\n\n');
+			const script = getAlterScript(collection, _, ddlProvider);
 
 			const applyDropStatements = data.options?.additionalOptions?.some(
 				option => option.id === 'applyDropStatements' && option.value,

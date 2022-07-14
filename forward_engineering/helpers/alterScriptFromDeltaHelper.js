@@ -16,14 +16,14 @@ const getItems = (collection, nameProperty, modify, objectMethod) =>
 		.filter(Boolean)
 		.map(items => Object[objectMethod](items.properties)[0]);
 
-const getAlterContainersScripts = collection => {
-	const addedContainerScripts = getItems(collection, 'containers', 'added', 'keys').map(
-		getAddContainerScript
+const getAlterContainersScripts = (collection, _, ddlProvider) => {
+	const addedContainerScripts = getItems(collection, 'containers', 'added', 'values').map(
+		getAddContainerScript(_, ddlProvider)
 	);
-	const deletedContainerScripts = getItems(collection, 'containers', 'deleted', 'keys').map(
-		getDeleteContainerScript
+	const deletedContainerScripts = getItems(collection, 'containers', 'deleted', 'values').map(
+		getDeleteContainerScript(ddlProvider)
 	);
-	return [...addedContainerScripts, ...deletedContainerScripts];
+	return { addedContainerScripts, deletedContainerScripts };
 };
 
 const getAlterCollectionsScripts = (collection, _, ddlProvider) => {
@@ -56,16 +56,34 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider) => {
 		getModifyColumnScript(_, ddlProvider)
 	);
 
+	return {
+		addedCollectionScripts,
+		deletedCollectionScripts,
+		addedColumnScripts,
+		deletedColumnScripts,
+		modifiedColumnScripts,
+	};
+};
+
+
+const getAlterScript = (collection, _, ddlProvider) => {
+	const script = {
+		...getAlterCollectionsScripts(collection, _, ddlProvider),
+		...getAlterContainersScripts(collection, _, ddlProvider),
+	}
 	return [
-		...addedCollectionScripts,
-		...deletedCollectionScripts,
-		...addedColumnScripts,
-		...deletedColumnScripts,
-		...modifiedColumnScripts,
-	].map(script => script.trim());;
+		'addedContainerScripts',
+		'deletedCollectionScripts',
+		'deletedColumnScripts',
+		'addedCollectionScripts',
+		'addedColumnScripts',
+		'modifiedColumnScripts',
+		'deletedContainerScripts'
+	].flatMap(name => script[name] || []).map(script => script.trim()).filter(Boolean).join('\n\n');
 };
 
 module.exports = {
 	getAlterContainersScripts,
 	getAlterCollectionsScripts,
+	getAlterScript,
 };

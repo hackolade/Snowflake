@@ -1,10 +1,10 @@
-const { checkFieldPropertiesChanged } = require('./common');
+const { checkFieldPropertiesChanged, getNames, getBaseAndContaienrNames} = require('./common');
 
 const getAddCollectionScript = (_, ddlProvider) => collection => {
-	const { getEntityName } = require('../general')(_);
+	const { getEntityName, getName } = require('../general')(_);
 	const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(_);
 
-	const schemaName = collection.compMod.keyspaceName;
+	const { schemaName, databaseName } = getBaseAndContaienrNames(collection, getName);
 	const jsonSchema = {
 		...collection,
 		...(_.omit(collection?.role, 'properties') || {}),
@@ -22,7 +22,7 @@ const getAddCollectionScript = (_, ddlProvider) => collection => {
 		name: getEntityName(jsonSchema),
 		columns: columnDefinitions.map(ddlProvider.convertColumnDefinition),
 		foreignKeyConstraints: [],
-		schemaData: { schemaName },
+		schemaData: { schemaName, databaseName },
 		columnDefinitions,
 	};
 	const hydratedTable = ddlProvider.hydrateTable({
@@ -35,31 +35,29 @@ const getAddCollectionScript = (_, ddlProvider) => collection => {
 };
 
 const getDeleteCollectionScript = _ => collection => {
-	const { getEntityName, getFullName } = require('../general')(_);
+	const { getEntityName, getFullName, getName } = require('../general')(_);
 
 	const jsonData = {
 		...collection,
 		...(_.omit(collection?.role, 'properties') || {}),
 	};
-	const tableName = getEntityName(jsonData);
-	const schemaName = collection.compMod.keyspaceName;
-	const fullName = getFullName(schemaName, tableName);
+	const { schemaName, databaseName, tableName } = getNames(jsonData, getName, getEntityName);
+	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 
 	return `DROP TABLE IF EXISTS ${fullName};`;
 };
 
 const getAddColumnScript = (_, ddlProvider) => collection => {
-	const { getEntityName, getFullName } = require('../general')(_);
+	const { getEntityName, getFullName, getName } = require('../general')(_);
 	const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(_);
-	const commentIfDeactivated = require('../commentDeactivatedHelper')(_);
+	const { commentIfDeactivated } = require('../commentDeactivatedHelper')(_);
 
 	const collectionSchema = {
 		...collection,
 		...(_.omit(collection?.role, 'properties') || {}),
 	};
-	const tableName = getEntityName(collectionSchema);
-	const schemaName = collectionSchema.compMod?.keyspaceName;
-	const fullName = getFullName(tableName, schemaName);
+	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
+	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 
 	return _.toPairs(collection.properties)
 		.filter(([_, jsonSchema]) => !jsonSchema.compMod)
@@ -82,31 +80,29 @@ const getAddColumnScript = (_, ddlProvider) => collection => {
 };
 
 const getDeleteColumnScript = _ => collection => {
-	const { getEntityName, getFullName } = require('../general')(_);
+	const { getEntityName, getFullName, getName } = require('../general')(_);
 
 	const collectionSchema = {
 		...collection,
 		...(_.omit(collection?.role, 'properties') || {}),
 	};
-	const tableName = getEntityName(collectionSchema);
-	const schemaName = collectionSchema.compMod?.keyspaceName;
-	const fullName = getFullName(schemaName, tableName);
+	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
+	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 
 	return _.toPairs(collection.properties)
 		.filter(([_, jsonSchema]) => !jsonSchema.compMod)
-		.map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN "${name}";`);
+		.map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN ${name};`);
 };
 
 const getModifyColumnScript = _ => collection => {
-	const { getEntityName, getFullName } = require('../general')(_);
+	const { getEntityName, getFullName, getName } = require('../general')(_);
 
 	const collectionSchema = {
 		...collection,
 		...(_.omit(collection?.role, 'properties') || {}),
 	};
-	const tableName = getEntityName(collectionSchema);
-	const schemaName = collectionSchema.compMod?.keyspaceName;
-	const fullName = getFullName(schemaName, tableName);
+	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
+	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 
 	const renameColumnScripts = _.values(collection.properties)
 		.filter(jsonSchema => checkFieldPropertiesChanged(jsonSchema.compMod, ['name']))
