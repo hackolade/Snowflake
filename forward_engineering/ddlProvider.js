@@ -14,18 +14,20 @@ module.exports = (_) => {
 		foreignActiveKeysToString,
 		addOptions,
 		getFullName,
+		getDbName,
+		toOptions,
 	} = require('./helpers/general')(_);
 
 	const keyHelper = require('./helpers/keyHelper')(_, clean);
 
 	const { mergeKeys, tab, getFileFormat, getCopyOptions, getAtOrBefore } =
-		require('./helpers/tableHelper')(_);
+		require('./helpers/tableHelper')(_, toOptions);
 
 	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(_);
 
 	const generateConstraint = require('./helpers/constraintHelper')(_);
 
-	const commentIfDeactivated = require('./helpers/commentDeactivatedHelper')(_);
+	const { commentIfDeactivated } = require('./helpers/commentDeactivatedHelper')(_);
 
 	const {
 		decorateType,
@@ -86,6 +88,130 @@ module.exports = (_) => {
 			};
 		},
 
+		createSchema({
+			schemaName,
+			databaseName,
+			transient,
+			managedAccess,
+			dataRetention,
+			comment,
+			udfs,
+			sequences,
+			fileFormats,
+			isCaseSensitive,
+		}) {
+			const transientStatement = transient ? ' TRANSIENT' : '';
+			const dataRetentionStatement =
+				!isNaN(dataRetention) && dataRetention ? `\n\tDATA_RETENTION_TIME_IN_DAYS=${dataRetention}` : '';
+			const managedAccessStatement = managedAccess ? '\n\tWITH MANAGED ACCESS' : '';
+			const commentStatement = comment ? `\n\tCOMMENT=$$${comment}$$` : '';
+			const currentSchemaName = getName(isCaseSensitive, schemaName);
+			const currentDatabaseName = getName(isCaseSensitive, databaseName);
+			const fullName = getFullName(currentDatabaseName, currentSchemaName);
+			const schemaStatement = assignTemplates(templates.createSchema, {
+				name: fullName,
+				transient: transientStatement,
+				managed_access: managedAccessStatement,
+				data_retention: dataRetentionStatement,
+				comment: commentStatement,
+			});
+			const userDefinedFunctions = udfs.map(udf =>
+				assignTemplates(templates.createUDF, {
+					name: getFullName(currentSchemaName, getName(isCaseSensitive, udf.name)),
+					arguments: (udf.arguments || '').replace(/^\(([\s\S]+)\)$/, '$1'),
+					return_type: udf.return_type,
+					language: udf.language,
+					function: udf.function,
+					comment: udf.comment,
+				}),
+			);
+	
+			const sequencesStatements = sequences.map(sequence =>
+				assignTemplates(templates.createSequence, {
+					name: getFullName(currentSchemaName, getName(isCaseSensitive, sequence.name)),
+					start: sequence.start,
+					increment: sequence.increment,
+					comment: sequence.comment,
+				}),
+			);
+	
+			const fileFormatsStatements = fileFormats.map(fileFormat =>
+				assignTemplates(templates.createFileFormat, {
+					name: getFullName(currentSchemaName, getName(isCaseSensitive, fileFormat.name)),
+					options: getFileFormat(fileFormat.type, fileFormat.formatTypeOptions).slice(1, -1),
+					comment: fileFormat.comment,
+				}),
+			);
+	
+			const statements = [];
+	
+			statements.push(schemaStatement);
+	
+			return [...statements, ...userDefinedFunctions, ...sequencesStatements, ...fileFormatsStatements].join('\n');
+		},
+
+		hydrateSchema(containerData, { udfs, sequences, fileFormats } = {}) {
+			return {
+				schemaName: getName(containerData.isCaseSensitive, containerData.name),
+				isCaseSensitive: containerData.isCaseSensitive,
+				databaseName: containerData.database,
+				comment: containerData.description,
+				transient: containerData.transient,
+				managedAccess: containerData.managedAccess,
+				dataRetention: containerData.DATA_RETENTION_TIME_IN_DAYS,
+				udfs: Array.isArray(udfs)
+					? udfs
+							.map(udf =>
+								clean({
+									name: udf.name || undefined,
+									language: udf.functionLanguage || udf.storedProcLanguage || undefined,
+									arguments: udf.functionArguments || udf.storedProcArgument || undefined,
+									return_type: udf.functionReturnType || udf.storedProcDataType || undefined,
+									function:
+										udf.functionBody || udf.storedProcFunction
+											? tab(_.trim(udf.functionBody || udf.storedProcFunction))
+											: undefined,
+									comment:
+										udf.functionDescription || udf.storedProcDescription
+											? ` COMMENT=$$${udf.functionDescription || udf.storedProcDescription}$$`
+											: '',
+								}),
+							)
+							.filter(udf => udf.name && udf.language && udf.return_type && udf.function)
+					: [],
+				sequences: Array.isArray(sequences)
+					? sequences
+							.map(sequence =>
+								clean({
+									name: sequence.name || undefined,
+									start: sequence.sequenceStart || DEFAULT_SNOWFLAKE_SEQUENCE_START,
+									increment: sequence.sequenceIncrement || DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT,
+									comment: sequence.sequenceComments
+										? ` COMMENT=$$${sequence.sequenceComments}$$`
+										: '',
+								}),
+							)
+							.filter(sequence => sequence.name)
+					: [],
+				fileFormats: Array.isArray(fileFormats)
+					? fileFormats
+							.map(fileFormat =>
+								clean({
+									name: fileFormat.name || undefined,
+									type: fileFormat.fileFormat,
+									formatTypeOptions: clean(
+										getFormatTypeOptions(fileFormat.fileFormat, fileFormat.formatTypeOptions),
+									),
+									comment: fileFormat.fileFormatComments
+										? ` COMMENT=$$${fileFormat.fileFormatComments}$$`
+										: '',
+								}),
+							)
+							.filter(fileFormat => fileFormat.name)
+					: [],
+			};
+		},
+
 		hydrateColumn({ columnDefinition, jsonSchema }) {
 			return Object.assign({}, columnDefinition, {
 				name: getName(jsonSchema.isCaseSensitive, columnDefinition.name),
@@ -124,6 +250,10 @@ module.exports = (_) => {
 		hydrateTable({ tableData, entityData, jsonSchema }) {
 			const keyConstraints = keyHelper.getTableKeyConstraints({ jsonSchema });
 			const firstTab = _.get(entityData, '[0]', {});
+			const schemaName = getName(firstTab.isCaseSensitive, _.get(tableData, 'schemaData.schemaName'));
+			const databaseName = getName(firstTab.isCaseSensitive, _.get(tableData, 'schemaData.databaseName'));
+			const tableName = getName(firstTab.isCaseSensitive, tableData.name);
+			const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 			const getLocation = location => {
 				return location.namespace
 					? location.namespace + location.path
@@ -202,6 +332,7 @@ module.exports = (_) => {
 
 			return {
 				...tableData,
+				fullName,
 				name: getName(firstTab.isCaseSensitive, tableData.name),
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
@@ -347,19 +478,19 @@ module.exports = (_) => {
 
 			if (tableData.selectStatement) {
 				return assignTemplates(templates.createAsSelect, {
-					name: getFullName(schemaName, tableData.name),
+					name: tableData.fullName,
 					selectStatement: tableData.selectStatement,
 					tableOptions: addOptions([clusterKeys, copyGrants]),
 				});
 			} else if (tableData.cloneTableName) {
 				return assignTemplates(templates.createCloneTable, {
-					name: getFullName(schemaName, tableData.name),
+					name: tableData.fullName,
 					source_table: getFullName(schemaName, tableData.cloneTableName),
 					tableOptions: addOptions([atOrBefore, copyGrants]),
 				});
 			} else if (tableData.likeTableName) {
 				return assignTemplates(templates.createLikeTable, {
-					name: getFullName(schemaName, tableData.name),
+					name: tableData.fullName,
 					source_table: getFullName(schemaName, tableData.likeTableName),
 					tableOptions: addOptions([clusterKeys, copyGrants]),
 				});
@@ -378,7 +509,7 @@ module.exports = (_) => {
 					: '';
 
 				return assignTemplates(templates.createExternalTable, {
-					name: getFullName(schemaName, tableData.name),
+					name: tableData.fullName,
 					tableOptions: addOptions(
 						[
 							partitionKeys,
@@ -402,7 +533,7 @@ module.exports = (_) => {
 				});
 			} else {
 				return assignTemplates(templates.createTable, {
-					name: getFullName(schemaName, tableData.name),
+					name: tableData.fullName,
 					temporary: temporary,
 					transient: transient,
 					tableOptions: addOptions(
@@ -425,6 +556,14 @@ module.exports = (_) => {
 					),
 				});
 			}
+		},
+
+		hydrateForDeleteSchema(containerData) {
+			const containerName = getName(containerData.isCaseSensitive,  getDbName(containerData));
+			const databaseName = getName(containerData.isCaseSensitive, containerData.database);
+			const name = getFullName(databaseName, containerName);
+
+			return { name };
 		},
 	};
 };

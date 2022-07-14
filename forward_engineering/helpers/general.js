@@ -1,7 +1,7 @@
 const assignTemplates = require('../utils/assignTemplates');
 
 module.exports = _ => {
-	const commentIfDeactivated = require('./commentDeactivatedHelper')(_);
+	const { commentIfDeactivated } = require('./commentDeactivatedHelper')(_);
 	const { tab } = require('./tableHelper')(_);
 
 	const escape = value =>
@@ -17,6 +17,18 @@ module.exports = _ => {
 	const isAuto = value => _.toLower(value) === 'auto';
 	const toStringIfNotNone = value => (isNone(value) ? value : toString(value));
 	const toStringIfNotAuto = value => (isAuto(value) ? value : toString(value));
+	const toOptions = options => {
+		return Object.entries(options)
+			.filter(([optionName, value]) => !_.isEmpty(value) || value !== false)
+			.map(([optionName, value]) => {
+				if (Array.isArray(value)) {
+					value = '(' + value.filter(value => !_.isEmpty(value)).join(', ') + ')';
+				}
+	
+				return `${optionName}=${value}`;
+			})
+			.join('\n');
+	};
 
 	const getEntityName = entityData => {
 		return (entityData && (entityData.code || entityData.collectionName)) || '';
@@ -217,6 +229,10 @@ module.exports = _ => {
 		return allOptions;
 	};
 
+	const getDbName = containerData => {
+		return _.get(containerData, 'code') || _.get(containerData, 'name', '');
+	};
+
 	return {
 		escape,
 		getEntityName,
@@ -232,5 +248,7 @@ module.exports = _ => {
 		foreignActiveKeysToString,
 		getFullName,
 		addOptions,
+		toOptions,
+		getDbName,
 	};
 };
