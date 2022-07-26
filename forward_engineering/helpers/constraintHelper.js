@@ -21,10 +21,10 @@ module.exports = _ => {
 			finalStringOfKeys = foreignKeysToString(isCaseSensitive, keysAsStrings);
 		}
 		return {
-			statement: `CONSTRAINT ${getName(
+			statement: (name !== 'undefined' ? `CONSTRAINT ${getName(
 				isCaseSensitive,
 				name
-			)} ${keyType} (${finalStringOfKeys})`,
+			)} ` : '') + `${keyType} (${finalStringOfKeys})`,
 			isActivated: atLeastOneActive,
 		};
 	};
