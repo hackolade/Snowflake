@@ -971,6 +971,17 @@ const getFunctions = async (dbName, schemaName) => {
 	});
 };
 
+const getStages = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.stages where STAGE_SCHEMA='${schemaName}'`);
+
+	return rows.map(row => {
+		return {
+			name: row['STAGE_NAME'],
+			url: row['STAGE_URL'],
+		};
+	});
+};
+
 const getSequences = async (dbName, schemaName) => {
 	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.sequences where SEQUENCE_SCHEMA='${schemaName}'`);
 
@@ -1053,6 +1064,7 @@ const getContainerData = async schema => {
 		const isCaseSensitive = _.toUpper(schemaName) !== schemaName;
 		const schemaData = _.first(schemaRows);
 		const functions = await getFunctions(dbName, schemaName);
+		const stages = await getStages(dbName, schemaName);
 		const sequences = await getSequences(dbName, schemaName);
 		const fileFormats = await getFileFormats(dbName, schemaName);
 
@@ -1061,6 +1073,7 @@ const getContainerData = async schema => {
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
+			stages,
 			sequences,
 			fileFormats,
 			isCaseSensitive,

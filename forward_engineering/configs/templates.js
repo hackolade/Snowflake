@@ -5,6 +5,8 @@ module.exports = {
 		"CREATE OR REPLACE FUNCTION ${name}(${arguments})\n\tRETURNS ${return_type}\n\tLANGUAGE ${language}\n\tAS '\n${function}\n'${comment};\n",
 	createSequence: 'CREATE SEQUENCE IF NOT EXISTS ${name} START ${start} INCREMENT ${increment}${comment};\n',
 	createFileFormat: 'CREATE FILE FORMAT IF NOT EXISTS ${name}${options}${comment};\n',
+	createStage:
+		'CREATE${temporary} STAGE IF NOT EXISTS ${name} ${url}${storageIntegration}${credentials}${encryption};\n',
 
 	columnDefinition: '${name} ${type}${collation}${default}${autoincrement}${not_nul}${inline_constraint}${comment}',
 	externalColumnDefinition: '${name} ${type} as ${expression}',

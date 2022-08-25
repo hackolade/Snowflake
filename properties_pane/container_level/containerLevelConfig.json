@@ -706,6 +706,53 @@ making sure that you maintain a proper JSON format.
 				}
 			]
 		}]
+	},
+	{
+		"lowerTab": "Stages",
+		"structure": [{
+			"propertyName": "Stage",
+			"propertyType": "group",
+			"propertyKeyword": "stages",
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Stage URL",
+					"propertyKeyword": "url",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Temporary",
+					"propertyKeyword": "temporary",
+					"propertyTooltip": "",
+					"propertyType": "checkbox"
+				},
+				{
+					"propertyName": "StorageIntegration",
+					"propertyKeyword": "storageIntegration",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Credentials",
+					"propertyKeyword": "credentials",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Encryption",
+					"propertyKeyword": "encryption",
+					"propertyTooltip": "",
+					"propertyType": "text"
+				}
+			]
+		}]
 	}
 ]
 

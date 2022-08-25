@@ -11,6 +11,7 @@ module.exports = _ => {
 				scale: '',
 				precision: '',
 				hasMaxLength: false,
+				expression: '',
 			},
 			data,
 		);
@@ -92,6 +93,7 @@ module.exports = _ => {
 			precision: getPrecision(jsonSchema),
 			hasMaxLength: hasMaxLength(jsonSchema),
 			isActivated: jsonSchema.isActivated,
+			expression: jsonSchema.expression,
 		});
 
 		return ddlProvider.hydrateColumn({

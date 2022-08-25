@@ -98,6 +98,7 @@ module.exports = (_) => {
 			udfs,
 			sequences,
 			fileFormats,
+			stages,
 			isCaseSensitive,
 		}) {
 			const transientStatement = transient ? ' TRANSIENT' : '';
@@ -142,15 +143,28 @@ module.exports = (_) => {
 					comment: fileFormat.comment,
 				}),
 			);
+
+			const stagesStatements = stages.map(stage =>
+				assignTemplates(templates.createStage, {
+					name: getFullName(currentSchemaName, getName(isCaseSensitive, stage.name)),
+					temporary: stage.temporary ? ' TEMPORARY' : '',
+					url: stage.url ? `\n\tURL=${stage.url}` : '',
+					storageIntegration: stage.storageIntegration
+						? `\n\tSTORAGE_INTEGRATION=${stage.storageIntegration}`
+						: '',
+					credentials: stage.credentials ? `\n\tCREDENTIALS=(${stage.credentials})` : '',
+					encryption: stage.encryption ? `\n\tENCRYPTION=(${stage.encryption})` : '',
+				}),
+			);
 	
 			const statements = [];
 	
 			statements.push(schemaStatement);
 	
-			return [...statements, ...userDefinedFunctions, ...sequencesStatements, ...fileFormatsStatements].join('\n');
+			return [...statements, ...userDefinedFunctions, ...sequencesStatements, ...fileFormatsStatements, ...stagesStatements,].join('\n');
 		},
 
-		hydrateSchema(containerData, { udfs, sequences, fileFormats } = {}) {
+		hydrateSchema(containerData, { udfs, sequences, fileFormats, stages } = {}) {
 			return {
 				schemaName: getName(containerData.isCaseSensitive, containerData.name),
 				isCaseSensitive: containerData.isCaseSensitive,
@@ -209,6 +223,20 @@ module.exports = (_) => {
 							)
 							.filter(fileFormat => fileFormat.name)
 					: [],
+				stages: Array.isArray(stages)
+					? stages
+							.map(stage =>
+								clean({
+									name: stage.name || undefined,
+									temporary: stage.temporary,
+									url: stage.url,
+									storageIntegration: stage.storageIntegration,
+									credentials: stage.credentials,
+									encryption: stage.encryption,
+								}),
+							)
+							.filter(stage => stage.name)
+					: [],
 			};
 		},
 
@@ -244,6 +272,7 @@ module.exports = (_) => {
 					jsonSchema.compositeUniqueKey || (jsonSchema.uniqueKeyConstraintName && jsonSchema.unique),
 				uniqueKeyConstraintName: jsonSchema.uniqueKeyConstraintName,
 				primaryKey: jsonSchema.primaryKeyConstraintName ? false : columnDefinition.primaryKey,
+				expression: jsonSchema.expression,
 			});
 		},
 
@@ -262,6 +291,7 @@ module.exports = (_) => {
 			const fileFormat = firstTab.external
 				? firstTab.externalFileFormat
 				: firstTab.fileFormat;
+			debugger;
 			const entityLevelCompositePrimaryKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'PRIMARY KEY')
 				.reduce((keys, data) => {
