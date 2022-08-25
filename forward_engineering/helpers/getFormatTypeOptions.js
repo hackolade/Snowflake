@@ -5,7 +5,7 @@ module.exports = _ => {
 	const getNullIf = nullIfOptions =>
 		Array.isArray(nullIfOptions) ? nullIfOptions.filter(item => item && item['NULL_IF_item']) : [];
 	
-	const getFormatTypeOptions = (fileFormat, formatOptions) => {
+	const getFormatTypeOptions = (fileFormat, formatOptions = {}) => {
 		switch (fileFormat) {
 			case 'CSV':
 				return {

@@ -1,4 +1,4 @@
-module.exports = (_) => {
+module.exports = (_, toOptions) => {
 	const tab = (text, tab = '\t') => {
 		return text
 			.split('\n')
