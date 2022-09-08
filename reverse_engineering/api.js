@@ -67,6 +67,8 @@ const getDbCollectionsNames = async (connectionInfo, logger, cb, app) => {
 		await snowflakeHelper.connect(logger, connectionInfo);
 		const namesBySchemas = await snowflakeHelper.getEntitiesNames();
 
+		logger.log('info', { entities: namesBySchemas }, 'Found entities');
+
 		cb(null, namesBySchemas);
 	} catch (err) {
 		handleError(logger, err, cb);
@@ -76,6 +78,7 @@ const getDbCollectionsNames = async (connectionInfo, logger, cb, app) => {
 const getDbCollectionsData = async (data, logger, cb, app) => {
 	try {
 		initDependencies(app);
+		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
 		const collections = data.collectionData.collections;
 		const dataBaseNames = data.collectionData.dataBaseNames;
 		const entitiesPromises = await dataBaseNames.reduce(async (packagesPromise, schema) => {
@@ -88,19 +91,23 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 			const tablesPackages = entities.tables.map(async table => {
 				const fullTableName = snowflakeHelper.getFullEntityName(schema, table);
 				logger.progress({ message: `Start getting data from table`, containerName: schema, entityName: table });
-				const ddl = await snowflakeHelper.getDDL(fullTableName);
+				logger.log('info', { message: `Start getting data from table`, containerName: schema, entityName: table }, 'Getting schema');
+				const ddl = await snowflakeHelper.getDDL(fullTableName, logger);
 				const quantity = await snowflakeHelper.getRowsCount(fullTableName);
 
 				logger.progress({ message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table });
+				logger.log('info', { message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table }, 'Getting schema');
 
 				const { documents, jsonSchema } = await snowflakeHelper.getJsonSchema(logger, getCount(quantity, data.recordSamplingSettings), fullTableName);
 				const entityData = await snowflakeHelper.getEntityData(fullTableName);
 
 				logger.progress({ message: `Schema inference`, containerName: schema, entityName: table });
+				logger.log('info', { message: `Schema inference`, containerName: schema, entityName: table }, 'Getting schema');
 
 				const handledDocuments = snowflakeHelper.handleComplexTypesDocuments(jsonSchema, documents);
 
 				logger.progress({ message: `Data retrieved successfully`, containerName: schema, entityName: table });
+				logger.log('info', { message: `Data retrieved successfully`, containerName: schema, entityName: table }, 'Getting schema');
 
 				return {
 					dbName: schemaName,
@@ -128,10 +135,13 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 			const views = await Promise.all(entities.views.map(async view => {
 				const fullViewName = snowflakeHelper.getFullEntityName(schema, view);
 				logger.progress({ message: `Start getting data from view`, containerName: schema, entityName: view });
-				const ddl = await snowflakeHelper.getViewDDL(fullViewName);
-				const viewData = await snowflakeHelper.getViewData(fullViewName);
+				logger.log('info', { message: `Start getting data from view`, containerName: schema, entityName: view }, 'Getting schema');
+				
+				const ddl = await snowflakeHelper.getViewDDL(fullViewName, logger);
+				const viewData = await snowflakeHelper.getViewData(fullViewName, logger);
 
 				logger.progress({ message: `Data retrieved successfully`, containerName: schema, entityName: view });
+				logger.log('info', { message: `Data retrieved successfully`, containerName: schema, entityName: view }, 'Getting schema');
 
 				return {
 					name: view,
@@ -162,7 +172,7 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 			return [ ...packages, ...tablesPackages, viewPackage ];
 		}, Promise.resolve([]));
 
-		const packages = await Promise.all(entitiesPromises).catch(err => cb(err));
+		const packages = await Promise.all(entitiesPromises);
 
 		cb(null, packages.filter(Boolean));
 	} catch (err) {
@@ -182,7 +192,7 @@ const handleError = (logger, error, cb) => {
 	const message = _.isString(error) ? error : _.get(error, 'message', 'Reverse Engineering error')
 	logger.log('error', { error }, 'Reverse Engineering error');
 
-	cb(message);
+	return cb({ message });
 };
 
 const initDependencies = app => {
