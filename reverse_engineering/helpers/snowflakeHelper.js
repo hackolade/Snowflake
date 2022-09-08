@@ -431,23 +431,25 @@ const getSchemaDDL = async schemaName => {
 	}
 };
 
-const getDDL = async tableName => {
+const getDDL = async (tableName, logger) => {
 	try {
 		const queryResult = await execute(`SELECT get_ddl('table', '${tableName}');`);
 
 		return getFirstObjectItem(_.first(queryResult));
 	} catch (err) {
-		return '';
+		logger.log('error', { tableName, message: err.message, stack: err.stack }, 'Getting table DDL')
+		throw err;
 	}
 };
 
-const getViewDDL = async viewName => {
+const getViewDDL = async (viewName, logger) => {
 	try {
 		const queryResult = await execute(`SELECT get_ddl('view', '${viewName}');`);
 
 		return getFirstObjectItem(_.first(queryResult));
 	} catch (err) {
-		return '';
+		logger.log('error', { viewName, message: err.message, stack: err.stack }, 'Getting view DDL')
+		throw err;
 	}
 };
 
@@ -899,7 +901,7 @@ const getOptions = optionsData => {
 	}, {});
 };
 
-const getViewData = async fullName => {
+const getViewData = async (fullName, logger) => {
 	const [dbName, schemaName, tableName] = fullName.split('.');
 
 	try {
@@ -915,6 +917,7 @@ const getViewData = async fullName => {
 
 		return materializedViewData;
 	} catch (err) {
+		logger.log('error', { viewName: fullName, message: err.message, stack: err.stack }, 'Getting view data');
 		return {};
 	}
 };
