@@ -122,7 +122,7 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 					},
 					emptyBucket: false,
 					validation: {
-						jsonSchema
+						jsonSchema: filterMetaProperties(entityData, jsonSchema)
 					},
 					bucketInfo: {
 						indexes: [],
@@ -178,6 +178,17 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 	} catch (err) {
 		handleError(logger, err, cb);
 	}
+};
+
+const filterMetaProperties = (entityData, jsonSchema) => {
+	if (!entityData.external) {
+		return jsonSchema;
+	}
+
+	return {
+		...jsonSchema,
+		properties: _.omit(jsonSchema.properties, ['VALUE', 'METADATA$FILENAME', 'METADATA$FILE_ROW_NUMBER']),
+	};
 };
 
 const getCount = (count, recordSamplingSettings) => {
