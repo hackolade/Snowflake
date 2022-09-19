@@ -78,7 +78,7 @@ const setName = (compMod = {}) => {
 };
 
 const prepareName = ({ collection, data }) => {
-	const { compMod, isCaseSensitive, name, code } = collection?.role || {};
+	const { compMod, isCaseSensitive, name, code, materialized } = collection?.role || {};
 	const compName = setName(compMod);
 	const nameIsChanged = compName?.newName !== compName?.oldName;
 
@@ -88,6 +88,7 @@ const prepareName = ({ collection, data }) => {
 				...(data.nameData || {}),
 				isCaseSensitive,
 				nameIsChanged,
+				isMaterialized: materialized,
 				newName: compName?.newName || code || name,
 				oldName: compName?.oldName,
 			}

@@ -766,9 +766,11 @@ module.exports = (_) => {
 		},
 
 		alterView(data) {
-			const alterTableScript = getAlterEntityScript(data, templates.alterViewScript);
+			const { nameData } = data;
+			const alterTableTemplateName = nameData.isMaterialized ? 'alterMaterializedViewScript' : 'alterViewScript';
+			const alterTableScript = getAlterEntityScript(data, templates[alterTableTemplateName]);
 			const { script } = _.flow(
-				getAlterEntityRename(templates.alterViewScript, templates.alterEntityRename),
+				getAlterEntityRename(templates[alterTableTemplateName], templates.alterEntityRename),
 				getSetCollectionProperty(alterTableScript),
 				getUnsetCollectionProperty(alterTableScript),
 			)({ data, script: [] });

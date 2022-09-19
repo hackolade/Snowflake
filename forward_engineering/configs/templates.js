@@ -36,4 +36,5 @@ module.exports = {
 	manageAccessSchema: '${access} MANAGED ACCESS;\n',
 	setPropertyTable: 'SET ${property};\n',
 	alterViewScript: 'ALTER VIEW IF EXISTS ${name} ',
+	alterMaterializedViewScript: 'ALTER MATERIALIZED VIEW ${name} ',
 };

@@ -40,8 +40,9 @@ const getDeleteViewScript = _ => view => {
 	};
 	const { schemaName, databaseName, tableName } = getNames(jsonData, getName, getViewName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
+	const isMaterialized = jsonData.role?.materialized;
 
-	return `DROP VIEW IF EXISTS ${fullName};`;
+	return `DROP ${isMaterialized ? 'MATERIALIZED ' : ''}VIEW IF EXISTS ${fullName};`;
 };
 
 const getModifyViewScript = ddlProvider => view => {
