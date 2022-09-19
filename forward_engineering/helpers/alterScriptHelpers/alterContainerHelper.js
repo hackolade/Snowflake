@@ -1,4 +1,6 @@
-const { prepareContainerLevelData } = require('./common');
+const { 
+	prepareContainerLevelData, 
+} = require('./common');
 
 const getAddContainerScript = (_, ddlProvider) => container => {
 	const { getDbName } = require('../general')(_);
@@ -14,7 +16,14 @@ const getDeleteContainerScript = ddlProvider => container => {
 	return `DROP SCHEMA IF EXISTS ${name};`;
 };
 
+const getModifyContainerScript = (_, ddlProvider) => container => {
+	const preparedData = ddlProvider.hydrateAlterSchema(container);
+
+	return ddlProvider.alterSchema(preparedData);
+};
+
 module.exports = {
 	getAddContainerScript,
 	getDeleteContainerScript,
+	getModifyContainerScript
 };

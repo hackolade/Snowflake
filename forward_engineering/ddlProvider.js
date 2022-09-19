@@ -16,6 +16,7 @@ module.exports = (_) => {
 		getFullName,
 		getDbName,
 		toOptions,
+		viewColumnsToString
 	} = require('./helpers/general')(_);
 
 	const keyHelper = require('./helpers/keyHelper')(_, clean);
@@ -37,6 +38,29 @@ module.exports = (_) => {
 		getInlineConstraint,
 		createExternalColumn,
 	} = require('./helpers/columnDefinitionHelper')(_);
+
+	const {
+		prepareAlterSetUnsetData,
+		prepareContainerName,
+		prepareMenageContainerData,
+		prepareName,
+		prepareTableName,
+		prepareCollectionFileFormat,
+		prepareCollectionFormatTypeOptions,
+		prepareCollectionStageCopyOptions,
+	} = require('./helpers/alterScriptHelpers/common')
+
+	const {
+		getAlterSchemaName,
+		getSetCollectionProperty,
+		getUnsetCollectionProperty,
+		getSchemaMenageAccess,
+		getAlterSchemaScript,
+		getAlterEntityScript,
+		getAlterTableFormat,
+		getAlterEntityRename,
+		getAlterTableStageCopyOptions
+	} = require('./helpers/alterScriptHelpers/commonScript')({ getName, getFullName, templates, assignTemplates, tab, _ });
 
 	const getOutOfLineConstraints = (
 		foreignKeyConstraints,
@@ -291,7 +315,7 @@ module.exports = (_) => {
 			const fileFormat = firstTab.external
 				? firstTab.externalFileFormat
 				: firstTab.fileFormat;
-			debugger;
+			
 			const entityLevelCompositePrimaryKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'PRIMARY KEY')
 				.reduce((keys, data) => {
@@ -588,12 +612,168 @@ module.exports = (_) => {
 			}
 		},
 
+		hydrateView({ viewData, entityData }) {
+			const firstTab = entityData[0];
+			const { databaseName, schemaName } = viewData.schemaData;
+			const viewName = getName(firstTab.isCaseSensitive, viewData.name);
+			const fullName = getFullName(databaseName, getFullName(schemaName, viewName));
+
+			return {
+				...viewData,
+				selectStatement: firstTab.selectStatement,
+				isCaseSensitive: firstTab.isCaseSensitive,
+				copyGrants: firstTab.copyGrants,
+				comment: firstTab.description,
+				secure: firstTab.secure,
+				materialized: firstTab.materialized,
+				fullName,
+			};
+		},
+
+		hydrateViewColumn(data) {
+			if (!data.entityName) {
+				return data;
+			}
+
+			return {
+				...data,
+				name: getName(data.definition?.isCaseSensitive, data.name),
+				dbName: getName(_.first(data.containerData)?.isCaseSensitive, data.dbName),
+				entityName: getName(_.first(data.entityData)?.isCaseSensitive, data.entityName),
+			};
+		},
+
+		createView(viewData, dbData, isActivated) {
+			const { columnList, tableColumns, tables } = viewData.keys.reduce(
+				(result, key) => {
+					result.columnList.push({
+						name: `${getName(viewData.isCaseSensitive, key.alias || key.name)}`,
+						isActivated: key.isActivated,
+					});
+					result.tableColumns.push({
+						name: `${getName(viewData.isCaseSensitive, key.entityName)}.${getName(
+							viewData.isCaseSensitive,
+							key.name,
+						)}`,
+						isActivated: key.isActivated,
+					});
+	
+					if (key.entityName && !result.tables.includes(key.entityName)) {
+						result.tables.push(getFullName(key.dbName, key.entityName));
+					}
+	
+					return result;
+				},
+				{
+					columnList: [],
+					tableColumns: [],
+					tables: [],
+				},
+			);
+	
+			if (_.isEmpty(tables) && !viewData.selectStatement) {
+				return '';
+			}
+	
+			const selectStatement =
+				viewData.selectStatement ||
+				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')};\n`;
+	
+			return assignTemplates(templates.createView, {
+				secure: viewData.secure ? ' SECURE' : '',
+				materialized: viewData.materialized ? ' MATERIALIZED' : '',
+				name: viewData.fullName,
+				column_list: viewColumnsToString(columnList, isActivated),
+				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
+				comment: viewData.comment ? 'COMMENT=$$' + viewData.comment + '$$\n' : '',
+				select_statement: selectStatement,
+			});
+		},
+
 		hydrateForDeleteSchema(containerData) {
 			const containerName = getName(containerData.isCaseSensitive,  getDbName(containerData));
 			const databaseName = getName(containerData.isCaseSensitive, containerData.database);
 			const name = getFullName(databaseName, containerName);
 
 			return { name };
+		},
+
+		hydrateAlterSchema(schema) {
+			const preparedData = _.flow(
+				prepareName,
+				prepareContainerName,
+				prepareAlterSetUnsetData,
+				prepareMenageContainerData,
+			)({ collection: schema, data: {} });
+
+			return preparedData.data
+		},
+
+		alterSchema(data) {
+			const alterSchemaScript = getAlterSchemaScript(data);
+			const { script } = _.flow(
+				getAlterSchemaName,
+				getSetCollectionProperty(alterSchemaScript),
+				getUnsetCollectionProperty(alterSchemaScript),
+				getSchemaMenageAccess(alterSchemaScript),
+			)({ data, script: [] });
+			
+			return script.join('\n')
+		},
+
+		hydrateAlertTable(collection) {
+			const { data } = _.flow(
+				prepareName,
+				prepareTableName,
+				prepareCollectionFileFormat,
+				prepareCollectionFormatTypeOptions(_),
+				prepareAlterSetUnsetData,
+				prepareCollectionStageCopyOptions(clean, getStageCopyOptions, _),
+			)({ collection, data: {} });
+
+			const formatTypeOptions = clean(getFormatTypeOptions(data.formatData.fileFormat, data.formatTypeOptions.typeOptions))
+
+			return {
+				...data,
+				formatTypeOptions: {
+					...data.formatTypeOptions,
+					typeOptions: formatTypeOptions
+				}
+			};
+		},
+
+		alterTable(data) {
+			const alterTableScript = getAlterEntityScript(data, templates.alterTableScript);
+			const { script } = _.flow(
+				getAlterEntityRename(templates.alterTableScript, templates.alterEntityRename),
+				getSetCollectionProperty(alterTableScript),
+				getUnsetCollectionProperty(alterTableScript),
+				getAlterTableFormat(alterTableScript, getFileFormat),
+				getAlterTableStageCopyOptions(alterTableScript, getCopyOptions, _),
+			)({ data, script: [] });
+			
+			return script.join('\n');
+		},
+
+		hydrateAlterView(collection) {
+			const { data } = _.flow(
+				prepareName,
+				prepareTableName,
+				prepareAlterSetUnsetData,
+			)({ collection, data: {} });
+
+			return data;
+		},
+
+		alterView(data) {
+			const alterTableScript = getAlterEntityScript(data, templates.alterViewScript);
+			const { script } = _.flow(
+				getAlterEntityRename(templates.alterViewScript, templates.alterEntityRename),
+				getSetCollectionProperty(alterTableScript),
+				getUnsetCollectionProperty(alterTableScript),
+			)({ data, script: [] });
+			
+			return script.join('\n');
 		},
 	};
 };
