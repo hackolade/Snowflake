@@ -710,7 +710,7 @@ module.exports = (_) => {
 		},
 
 		alterSchema(data) {
-			const alterSchemaScript = getAlterSchemaScript(data);
+			const alterSchemaScript = getAlterSchemaScript(data?.nameData);
 			const { script } = _.flow(
 				getAlterSchemaName,
 				getSetCollectionProperty(alterSchemaScript),
@@ -743,7 +743,7 @@ module.exports = (_) => {
 		},
 
 		alterTable(data) {
-			const alterTableScript = getAlterEntityScript(data, templates.alterTableScript);
+			const alterTableScript = getAlterEntityScript(data?.nameData, templates.alterTableScript);
 			const { script } = _.flow(
 				getAlterEntityRename(templates.alterTableScript, templates.alterEntityRename),
 				getSetCollectionProperty(alterTableScript),
@@ -768,7 +768,7 @@ module.exports = (_) => {
 		alterView(data) {
 			const { nameData } = data;
 			const alterTableTemplateName = nameData.isMaterialized ? 'alterMaterializedViewScript' : 'alterViewScript';
-			const alterTableScript = getAlterEntityScript(data, templates[alterTableTemplateName]);
+			const alterTableScript = getAlterEntityScript(nameData, templates[alterTableTemplateName]);
 			const { script } = _.flow(
 				getAlterEntityRename(templates[alterTableTemplateName], templates.alterEntityRename),
 				getSetCollectionProperty(alterTableScript),
