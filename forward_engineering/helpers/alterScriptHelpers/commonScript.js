@@ -7,14 +7,12 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab, _ }) 
 		return getFullName(databaseName, setSchemaName);
 	};
 
-	const getAlterSchemaScript = (nameData = {}) => {
-		const { database, isCaseSensitive, newName } = nameData;
+	const getAlterSchemaScript = ({ database, isCaseSensitive, newName } = {}) => {
 		const schemaFullName = getSchemaFullName(database, newName, isCaseSensitive);
 		return assignTemplates(templates.alterSchemaScript, { name: schemaFullName });
 	};
 
-	const getAlterEntityScript = (nameData, template) => {
-		const { database, isCaseSensitive, newName, schemaName } = nameData || {};
+	const getAlterEntityScript = (template, { database, isCaseSensitive, newName, schemaName } = {}) => {
 		const schemaFullName = getSchemaFullName(database, schemaName, isCaseSensitive);
 		const tableName = getName(isCaseSensitive, newName);
 		const tableFullName = getFullName(schemaFullName, tableName);

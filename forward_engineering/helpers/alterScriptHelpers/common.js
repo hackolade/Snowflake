@@ -154,7 +154,7 @@ const prepareMenageContainerData = ({ collection, data }) => {
 const prepareCollectionFileFormat = ({ collection, data }) => {
 	const role = collection?.role || {};
 	const compMod = role.compMod || {};
-	const { new: newType, old: oldType} = compMod.fileFormat || {};
+	const { new: newType, old: oldType } = compMod.fileFormat || {};
 	const { new: newCustomFileFormat, old: oldCustomFileFormat} = compMod.customFileFormatName || {};
 	const isChangeType = (newType || oldType) && newType !== oldType;
 	const isChangeCustomFileFormat = (newCustomFileFormat || oldCustomFileFormat) && newCustomFileFormat !== oldCustomFileFormat;
