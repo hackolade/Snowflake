@@ -431,23 +431,25 @@ const getSchemaDDL = async schemaName => {
 	}
 };
 
-const getDDL = async tableName => {
+const getDDL = async (tableName, logger) => {
 	try {
 		const queryResult = await execute(`SELECT get_ddl('table', '${tableName}');`);
 
 		return getFirstObjectItem(_.first(queryResult));
 	} catch (err) {
-		return '';
+		logger.log('error', { tableName, message: err.message, stack: err.stack }, 'Getting table DDL')
+		throw err;
 	}
 };
 
-const getViewDDL = async viewName => {
+const getViewDDL = async (viewName, logger) => {
 	try {
 		const queryResult = await execute(`SELECT get_ddl('view', '${viewName}');`);
 
 		return getFirstObjectItem(_.first(queryResult));
 	} catch (err) {
-		return '';
+		logger.log('error', { viewName, message: err.message, stack: err.stack }, 'Getting view DDL')
+		throw err;
 	}
 };
 
@@ -899,7 +901,7 @@ const getOptions = optionsData => {
 	}, {});
 };
 
-const getViewData = async fullName => {
+const getViewData = async (fullName, logger) => {
 	const [dbName, schemaName, tableName] = fullName.split('.');
 
 	try {
@@ -915,6 +917,7 @@ const getViewData = async fullName => {
 
 		return materializedViewData;
 	} catch (err) {
+		logger.log('error', { viewName: fullName, message: err.message, stack: err.stack }, 'Getting view data');
 		return {};
 	}
 };
@@ -968,6 +971,17 @@ const getFunctions = async (dbName, schemaName) => {
 			functionBody: row['FUNCTION_DEFINITION'],
 			functionDescription: row['COMMENT'] || ''
 		}
+	});
+};
+
+const getStages = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.stages where STAGE_SCHEMA='${schemaName}'`);
+
+	return rows.map(row => {
+		return {
+			name: row['STAGE_NAME'],
+			url: row['STAGE_URL'],
+		};
 	});
 };
 
@@ -1053,6 +1067,7 @@ const getContainerData = async schema => {
 		const isCaseSensitive = _.toUpper(schemaName) !== schemaName;
 		const schemaData = _.first(schemaRows);
 		const functions = await getFunctions(dbName, schemaName);
+		const stages = await getStages(dbName, schemaName);
 		const sequences = await getSequences(dbName, schemaName);
 		const fileFormats = await getFileFormats(dbName, schemaName);
 
@@ -1061,6 +1076,7 @@ const getContainerData = async schema => {
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
+			stages,
 			sequences,
 			fileFormats,
 			isCaseSensitive,

@@ -233,6 +233,28 @@ module.exports = _ => {
 		return _.get(containerData, 'code') || _.get(containerData, 'name', '');
 	};
 
+	const viewColumnsToString = (keys, isParentActivated) => {
+		if (!isParentActivated) {
+			return keys.map(key => key.name).join(',\n\t');
+		}
+	
+		let activatedKeys = keys.filter(key => key.isActivated).map(key => key.name);
+		let deactivatedKeys = keys.filter(key => !key.isActivated).map(key => key.name);
+	
+		if (activatedKeys.length === 0) {
+			return commentIfDeactivated(deactivatedKeys.join(',\n\t'), { isActivated: false }, true);
+		}
+		if (deactivatedKeys.length === 0) {
+			return activatedKeys.join(',\n\t');
+		}
+	
+		return (
+			activatedKeys.join(',\n\t') +
+			'\n\t' +
+			commentIfDeactivated(deactivatedKeys.join(',\n\t'), { isActivated: false }, true)
+		);
+	};
+
 	return {
 		escape,
 		getEntityName,
@@ -250,5 +272,6 @@ module.exports = _ => {
 		addOptions,
 		toOptions,
 		getDbName,
+		viewColumnsToString,
 	};
 };

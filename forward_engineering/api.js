@@ -18,7 +18,7 @@ module.exports = {
 				);
 			}
 
-			const script = getAlterScript(collection, _, ddlProvider);
+			const script = getAlterScript({ collection, _, ddlProvider, app });
 
 			const applyDropStatements = data.options?.additionalOptions?.some(
 				option => option.id === 'applyDropStatements' && option.value,

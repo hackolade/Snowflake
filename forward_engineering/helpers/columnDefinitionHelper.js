@@ -131,7 +131,9 @@ module.exports = (_) => {
 		const externalColumnStatement = assignTemplates(templates.externalColumnDefinition, {
 			name: columnDefinition.name,
 			type: decorateType(columnDefinition.type, columnDefinition),
-			expression: `(value:${columnDefinition.name}::${columnDefinition.type})`,
+			expression: columnDefinition.expression
+				? `(${columnDefinition.expression})`
+				: `(value:${columnDefinition.name}::${columnDefinition.type})`,
 		});
 		return { statement: externalColumnStatement, isActivated: columnDefinition.isActivated };
 	};

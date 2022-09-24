@@ -10,7 +10,8 @@ module.exports = (_, toOptions) => {
 
 	const getFileFormat = (fileFormat, formatTypeOptions, formatName = '') => {
 		if (fileFormat !== 'custom') {
-			return '(\n' + tab(`TYPE=${fileFormat}\n${toOptions(formatTypeOptions)}`) + '\n)';
+			const options = toOptions(formatTypeOptions);
+			return '(\n' + tab(`TYPE=${fileFormat}${options && `\n${options}`}`) + '\n)';
 		}
 	
 		return '(\n' + tab(`FORMAT_NAME='${formatName}'`) + '\n)';

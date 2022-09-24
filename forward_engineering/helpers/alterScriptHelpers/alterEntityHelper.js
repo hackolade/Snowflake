@@ -1,4 +1,8 @@
-const { checkFieldPropertiesChanged, getNames, getBaseAndContaienrNames} = require('./common');
+const { 
+	checkFieldPropertiesChanged, 
+	getNames, 
+	getBaseAndContaienrNames,
+} = require('./common');
 
 const getAddCollectionScript = (_, ddlProvider) => collection => {
 	const { getEntityName, getName } = require('../general')(_);
@@ -45,6 +49,12 @@ const getDeleteCollectionScript = _ => collection => {
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 
 	return `DROP TABLE IF EXISTS ${fullName};`;
+};
+
+const getModifyCollectionScript = ddlProvider => collection => {
+	const data = ddlProvider.hydrateAlertTable(collection);
+
+	return ddlProvider.alterTable(data);
 };
 
 const getAddColumnScript = (_, ddlProvider) => collection => {
@@ -131,4 +141,5 @@ module.exports = {
 	getAddColumnScript,
 	getDeleteColumnScript,
 	getModifyColumnScript,
+	getModifyCollectionScript,
 };
