@@ -122,7 +122,7 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 					},
 					emptyBucket: false,
 					validation: {
-						jsonSchema: filterMetaProperties(entityData, jsonSchema)
+						jsonSchema: filterMetaProperties(entityData, jsonSchema, logger)
 					},
 					bucketInfo: {
 						indexes: [],
@@ -180,10 +180,12 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 	}
 };
 
-const filterMetaProperties = (entityData, jsonSchema) => {
+const filterMetaProperties = (entityData, jsonSchema, logger) => {
 	if (!entityData.external) {
 		return jsonSchema;
 	}
+	const columnList = Object.keys(jsonSchema.properties || {}).join();
+	logger.log('info', { message: `External table columns from DESC TABLE: ${columnList}`, containerName: entityData.containerName, entityName: entityData.entityName }, 'Filtering meta properties');
 
 	return {
 		...jsonSchema,
