@@ -806,7 +806,7 @@ const handleClusteringKey = (fieldsNames, keysExpression) => {
 	}, []);
 };
 
-const getEntityData = async fullName => {
+const getEntityData = async (fullName, logger) => {
 	const [dbName, schemaName, tableName] = fullName.split('.');
 
 	try {
@@ -818,7 +818,18 @@ const getEntityData = async fullName => {
 		const clusteringKey = handleClusteringKey(fieldsNames, _.get(data, 'CLUSTERING_KEY', ''));
 		const stageData = await execute(`DESCRIBE TABLE ${fullName} type = stage;`);
 		const fileFormat = _.toUpper(_.get(stageData.find(item => item.property === 'TYPE'), 'property_value', ''));
-		const external = _.get(data, 'TABLE_TYPE') === 'EXTERNAL TABLE';
+		let external = _.toUpper(_.get(data, 'TABLE_TYPE', '')) === 'EXTERNAL TABLE';
+		if (!external && checkExternalMetaFields(fields)) {
+			logger.log(
+				'info',
+				{
+					message: `External table was detected by meta properties. Table type: ${_.get(data, 'TABLE_TYPE', '')}`,
+					containerName: schemaName, entityName: tableName
+				},
+				'Getting external table data'
+			);
+			external = true;
+		};
 		if (external) {
 			const externalTableData = await getExternalTableData(fullName);
 			entityLevelData = { ...data, ...externalTableData };
@@ -846,6 +857,15 @@ const getEntityData = async fullName => {
 	}
 };
 
+const checkExternalMetaFields = fields => {
+	const metaField = _.first(fields) || {};
+
+	if (metaField.name === 'VALUE' && metaField.type === 'VARIANT') {
+		return true;
+	}
+
+	return false;
+};
 
 const getFileFormatOptions = stageData => {
 	return getOptions(stageData.filter(item => item.parent_property === 'STAGE_FILE_FORMAT'));
