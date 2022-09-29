@@ -99,7 +99,7 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 				logger.log('info', { message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table }, 'Getting schema');
 
 				const { documents, jsonSchema } = await snowflakeHelper.getJsonSchema(logger, getCount(quantity, data.recordSamplingSettings), fullTableName);
-				const entityData = await snowflakeHelper.getEntityData(fullTableName);
+				const entityData = await snowflakeHelper.getEntityData(fullTableName, logger);
 
 				logger.progress({ message: `Schema inference`, containerName: schema, entityName: table });
 				logger.log('info', { message: `Schema inference`, containerName: schema, entityName: table }, 'Getting schema');
@@ -182,6 +182,12 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 
 const filterMetaProperties = (entityData, jsonSchema, logger) => {
 	if (!entityData.external) {
+		const valueMetaColumn = jsonSchema?.properties?.VALUE;
+		if (valueMetaColumn && valueMetaColumn.type === 'variant') {
+			logger.log('info', { message: `The VALUE meta property was found`, containerName: entityData.containerName, entityName: entityData.entityName }, 'Filtering meta properties');
+
+			return _.omit(jsonSchema.properties, 'VALUE');
+		}
 		return jsonSchema;
 	}
 	const columnList = Object.keys(jsonSchema.properties || {}).join();
