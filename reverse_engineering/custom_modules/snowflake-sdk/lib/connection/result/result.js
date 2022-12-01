@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowflake Computing Inc. All rights reserved.
+ * Copyright (c) 2015-2021 Snowflake Computing Inc. All rights reserved.
  */
 
 var EventEmitter = require('events').EventEmitter;
@@ -30,6 +30,7 @@ function Result(options)
   var mapColumnNameToIndices;
   var columns;
   var column;
+  var version;
 
   // assert that options is a valid object that contains a response, statement,
   // services and connection config
@@ -119,12 +120,15 @@ function Result(options)
     this._statement,
     this._services);
 
-  // create a chunk cache and save a reference to it in case we need to
-  // TODO: should we be clearing the cache at some point, e.g. when the result
-  // is destroyed?
-  this._chunkCache = createChunkCache(
-    this._chunks,
-    this._connectionConfig.getResultChunkCacheSize());
+  /* Disable the ChunkCache until the implementation is complete.
+   * 
+   *   // create a chunk cache and save a reference to it in case we need to
+   *   // TODO: should we be clearing the cache at some point, e.g. when the result
+   *   // is destroyed?
+   *   this._chunkCache = createChunkCache(
+   *   this._chunks,
+   *   this._connectionConfig.getResultChunkCacheSize());
+    */
 }
 
 Util.inherits(Result, EventEmitter);
@@ -259,7 +263,6 @@ function createChunks(chunkCfgs,
   // if we don't have any chunks, or if some records were returned inline,
   // fabricate a config object for the first chunk
   chunkCfgs = chunkCfgs || [];
-  rowset = rowset || '';
   if (!chunkCfgs || rowset.length > 0)
   {
     chunkCfgs.unshift(

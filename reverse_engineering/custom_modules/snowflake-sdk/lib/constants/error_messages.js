@@ -47,6 +47,17 @@ exports[404022] = 'Invalid region. The specified value must be a string.';
 exports[404023] = 'Invalid clientSessionKeepAlive. The specified value must be a boolean.';
 exports[404024] = 'Invalid clientSessionKeepAliveHeartbeatFrequency. The specified value must be a number.';
 exports[404025] = 'Invalid jsTreatIntegerAsBigInt. The specified value must be a boolean';
+exports[404026] = 'Invalid private key. The specified value must be a string in pem format of type pkcs8'
+exports[404027] = 'Invalid private key file location. The specified value must be a string';
+exports[404028] = 'Invalid private key passphrase. The specified value must be a string';
+exports[404029] = 'Invalid oauth token. The specified value must be a string';
+exports[404030] = 'Invalid validate default parameters value. The specified value must be a boolean';
+exports[404031] = 'Invalid application value. The specified value must be a string that starts with a letter and a length between 1-50';
+exports[404032] = 'A proxyUser must be specified';
+exports[404033] = 'Invalid proxyUser. The specified value must be a string.';
+exports[404034] = 'A proxyPassword must be specified.';
+exports[404035] = 'Invalid proxyPassword. The specified value must be a string.';
+exports[404036] = 'Invalid noProxy. The specified value must be a string.';
 
 // 405001
 exports[405001] = 'Invalid callback. The specified value must be a function.';
@@ -85,6 +96,7 @@ exports[409009] = 'Invalid complete callback. The specified value must be a func
 exports[409010] = 'Invalid streamResult flag. The specified value must be a boolean.';
 exports[409011] = 'Invalid fetchAsString value. The specified value must be an Array.';
 exports[409012] = 'Invalid fetchAsString type: %s. The supported types are: String, Boolean, Number, Date, and JSON.';
+exports[409013] = 'Invalid requestId. The specified value must be a string.';
 
 // 410001
 exports[410001] = 'Fetch-result options must be specified.';

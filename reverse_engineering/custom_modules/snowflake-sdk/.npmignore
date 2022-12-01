@@ -1,0 +1,17 @@
+.idea
+.travis.yml
+*.log
+*.xml
+*.enc
+*.gpg
+test/
+dist/
+ignore/
+env/
+parameters.json
+snowflake-sdk*.tgz
+coverage
+system_test/
+scripts/
+ci/
+.github/

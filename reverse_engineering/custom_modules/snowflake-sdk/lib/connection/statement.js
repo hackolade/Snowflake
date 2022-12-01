@@ -2,6 +2,7 @@
  * Copyright (c) 2015-2019 Snowflake Computing Inc. All rights reserved.
  */
 
+const async = require('async');
 const uuidv4 = require('uuid/v4');
 
 var Url = require('url');
@@ -15,6 +16,8 @@ var Errors = require('../errors');
 var ErrorCodes = Errors.codes;
 var Logger = require('../logger');
 var NativeTypes = require('./result/data_types').NativeTypes;
+var file_transfer_agent = require('.././file_transfer_agent/file_transfer_agent');
+var Bind = require('./bind_uploader');
 
 var states =
   {
@@ -26,26 +29,160 @@ var statementTypes =
   {
     ROW_PRE_EXEC: 'ROW_PRE_EXEC',
     ROW_POST_EXEC: 'ROW_POST_EXEC',
-    FILE_PRE_EXEC: 'FILE_PRE_EXEC'
+    FILE_PRE_EXEC: 'FILE_PRE_EXEC',
+    FILE_POST_EXEC: 'FILE_POST_EXEC'
   };
 
+exports.createContext = function (
+  options, services, connectionConfig)
+{
+  // create a statement context for a pre-exec statement
+  var context = createContextPreExec(
+    options, services, connectionConfig);
+
+  context.type = statementTypes.FILE_PRE_EXEC;
+
+  createStatement(options, context, services, connectionConfig);
+
+  // add the result request headers to the context
+  context.resultRequestHeaders = buildResultRequestHeadersFile();
+
+  return context;
+
+};
+
+function createStatement(
+  statementOptions, context, services, connectionConfig)
+{
+  // call super
+  BaseStatement.apply(this, arguments);
+}
+
 /**
- * Executes a statement and returns a statement object that can be used to fetch
- * its result.
+ * Check the type of command to execute.
  *
- * @param {Object} statementOptions
+ * @param {Object} options
  * @param {Object} services
  * @param {Object} connectionConfig
  *
  * @returns {Object}
  */
-exports.createRowStatementPreExec = function (
-  statementOptions, services, connectionConfig)
+exports.createStatementPreExec = function (
+  options, services, connectionConfig)
 {
+  Logger.getInstance().debug('--createStatementPreExec');
   // create a statement context for a pre-exec statement
-  var statementContext = createContextPreExec(
-    statementOptions, services, connectionConfig);
+  var context = createContextPreExec(
+    options, services, connectionConfig);
 
+  if (options.sqlText && (Util.isPutCommand(options.sqlText) || Util.isGetCommand(options.sqlText)))
+  {
+    return createFileStatementPreExec(
+      options, context, services, connectionConfig);
+  }
+
+  var numBinds = countBinding(context.binds)
+  Logger.getInstance().debug('numBinds = %d', numBinds);
+  // check array binding,
+  if(numBinds > Bind.GetThreshold())
+  {
+    var bindUploaderRequestId = uuidv4();
+    
+    var bind = new Bind.BindUploader(options, services, connectionConfig, bindUploaderRequestId);
+    var bindData = bind.Upload(context.binds);
+    var isBinding = false;
+    if(bindData != null)
+    {
+      isBinding = true;
+      context.bindStage = Bind.GetStageName(bindUploaderRequestId);
+      Logger.getInstance().debug('context.bindStage = %s', context.bindStage);
+      createStage(services, connectionConfig, bindData, options, context);
+    }
+  }
+
+  if(!isBinding)
+  {
+    return createRowStatementPreExec(
+      options, context, services, connectionConfig);
+  }
+};
+
+function createStage(services, connectionConfig, bindData, options, context)
+{
+  Logger.getInstance().debug('createStage');
+  var createStageOpt = {sqlText:Bind.GetCreateStageStmt(),
+    complete: function (err, stmt, rows)
+    {
+      Logger.getInstance().debug('stream');
+      Logger.getInstance().debug('err '+err);
+      var stream = stmt.streamRows();
+      stream.on('data', function (rows)
+      {
+        Logger.getInstance().debug('stream on data');
+        uploadFiles(services, connectionConfig, bindData, options, context);
+      });
+    }
+  }
+  Logger.getInstance().debug('CREATE_STAGE_STMT = %s', Bind.GetCreateStageStmt());
+  exports.createStatementPreExec(createStageOpt, services, connectionConfig);
+}
+
+function uploadFiles(services, connectionConfig, bindData, options, context)
+{
+  Logger.getInstance().debug('uploadFiles %s', context.bindStage);
+  var completed = 0;
+  for(var i=0; i<bindData.files.length; i++)
+  {
+    Logger.getInstance().debug('Put='+bindData.puts[i]);
+    var fileOpt = {sqlText:bindData.puts[i],
+      complete: function (err, stmt, rows)
+      {
+        Logger.getInstance().debug('uploadFiles done ');
+        var stream = stmt.streamRows();
+        stream.on('data', function (rows)
+        {
+          Logger.getInstance().debug('stream on data');
+        });
+        stream.on('end', function (rows)
+        {
+          Logger.getInstance().debug('stream on end ');
+          completed++;
+          if(completed >= bindData.files.length)
+          {
+            Logger.getInstance().debug('all completed');
+            cleanTempFiles(bindData);
+            return createRowStatementPreExec(
+              options, context, services, connectionConfig);
+          }
+        });
+      }
+    }
+    exports.createStatementPreExec(fileOpt, services, connectionConfig);
+  }
+}
+
+function cleanTempFiles(bindData)
+{
+  for(var i=0; i<bindData.files.length; i++)
+  {
+    Logger.getInstance().debug('Clean File='+bindData.files[i]);
+    Bind.CleanFile(bindData.files[i]);
+  }
+}
+/**
+ * Executes a statement and returns a statement object that can be used to fetch
+ * its result.
+ *
+ * @param {Object} statementOptions
+ * @param {Object} statementContext
+ * @param {Object} services
+ * @param {Object} connectionConfig
+ *
+ * @returns {Object}
+ */
+function createRowStatementPreExec (
+  statementOptions, statementContext, services, connectionConfig)
+{
   // set the statement type
   statementContext.type = statementTypes.ROW_PRE_EXEC;
 
@@ -63,7 +200,7 @@ exports.createRowStatementPreExec = function (
  *
  * @returns {Object}
  */
-exports.createRowStatementPostExec = function (
+exports.createStatementPostExec = function (
   statementOptions, services, connectionConfig)
 {
   // check for missing options
@@ -125,9 +262,9 @@ exports.createRowStatementPostExec = function (
   statementContext.fetchAsString = statementOptions.fetchAsString;
 
   // set the statement type
-  statementContext.type = statementTypes.ROW_POST_EXEC;
+  statementContext.type = (statementContext.type == statementTypes.ROW_PRE_EXEC) ? statementTypes.ROW_POST_EXEC : statementTypes.FILE_POST_EXEC;
 
-  return new RowStatementPostExec(
+  return new StatementPostExec(
     statementOptions, statementContext, services, connectionConfig);
 };
 
@@ -146,18 +283,15 @@ function createStatementContext()
  * operation.
  *
  * @param {Object} statementOptions
+ * @param {Object} statementContext
  * @param {Object} services
  * @param {Object} connectionConfig
  *
  * @returns {Object}
  */
-exports.createFileStatementPreExec = function (
-  statementOptions, services, connectionConfig)
+function createFileStatementPreExec (
+  statementOptions, statementContext, services, connectionConfig)
 {
-  // create a statement context for a pre-exec statement
-  var statementContext = createContextPreExec(
-    statementOptions, services, connectionConfig);
-
   // set the statement type
   statementContext.type = statementTypes.FILE_PRE_EXEC;
 
@@ -185,13 +319,16 @@ function createContextPreExec(
   Errors.checkArgumentValid(Util.isObject(statementOptions),
     ErrorCodes.ERR_CONN_EXEC_STMT_INVALID_OPTIONS);
 
-  // check for missing sql text
-  Errors.checkArgumentExists(Util.exists(statementOptions.sqlText),
-    ErrorCodes.ERR_CONN_EXEC_STMT_MISSING_SQL_TEXT);
+  if (!Util.exists(statementOptions.requestId))
+  {
+    // check for missing sql text
+    Errors.checkArgumentExists(Util.exists(statementOptions.sqlText),
+      ErrorCodes.ERR_CONN_EXEC_STMT_MISSING_SQL_TEXT);
 
-  // check for invalid sql text
-  Errors.checkArgumentValid(Util.isString(statementOptions.sqlText),
-    ErrorCodes.ERR_CONN_EXEC_STMT_INVALID_SQL_TEXT);
+    // check for invalid sql text
+    Errors.checkArgumentValid(Util.isString(statementOptions.sqlText),
+      ErrorCodes.ERR_CONN_EXEC_STMT_INVALID_SQL_TEXT);
+  }
 
   // check for invalid complete callback
   var complete = statementOptions.complete;
@@ -221,6 +358,13 @@ function createContextPreExec(
     Errors.checkArgumentValid(invalidValueIndex === -1,
       ErrorCodes.ERR_CONN_EXEC_STMT_INVALID_FETCH_AS_STRING_VALUES,
       JSON.stringify(fetchAsString[invalidValueIndex]));
+  }
+
+  // check for invalid requestId
+  if (Util.exists(statementOptions.requestId))
+  {
+    Errors.checkArgumentValid(Util.isString(statementOptions.requestId),
+      ErrorCodes.ERR_CONN_EXEC_STMT_INVALID_REQUEST_ID);
   }
 
   // if parameters are specified, make sure the specified value is an object
@@ -284,9 +428,18 @@ function createContextPreExec(
   Errors.assertInternal(Util.isObject(connectionConfig));
 
   // if we're not in qa mode, use a random uuid for the statement request id
+  // or use request id passed by user
   if (!connectionConfig.isQaMode())
   {
-    statementContext.requestId = uuidv4();
+    if (statementOptions.requestId)
+    {
+      statementContext.requestId = statementOptions.requestId;
+      statementContext.resubmitRequest = true;
+    }
+    else
+    {
+      statementContext.requestId = uuidv4();
+    }
   }
   else // we're in qa mode
   {
@@ -472,7 +625,7 @@ function BaseStatement(
    * @param err
    * @param body
    */
-  context.onStatementRequestComp = function (err, body)
+  context.onStatementRequestComp = async function (err, body)
   {
     // if we already have a result or a result error, we invoked the complete
     // callback once, so don't invoke it again
@@ -484,7 +637,7 @@ function BaseStatement(
     // if there was no error, call the success function
     if (!err)
     {
-      context.onStatementRequestSucc(body);
+      await context.onStatementRequestSucc(body);
     }
     else
     {
@@ -597,6 +750,7 @@ function RowStatementPreExec(
   services,
   connectionConfig)
 {
+  Logger.getInstance().debug('RowStatementPreExec');
   // call super
   BaseStatement.apply(this, arguments);
 
@@ -668,7 +822,7 @@ function createOnStatementRequestSuccRow(statement, context)
     }
 
     // only update the parameters if the statement isn't a post-exec statement
-    if (context.type !== statementTypes.ROW_POST_EXEC)
+    if (context.type !== statementTypes.ROW_POST_EXEC || context.type !== statementTypes.FILE_POST_EXEC)
     {
       Parameters.update(context.result.getParametersArray());
     }
@@ -698,10 +852,37 @@ function FileStatementPreExec(
    *
    * @param {Object} body
    */
-  context.onStatementRequestSucc = function (body)
+  context.onStatementRequestSucc = async function (body)
   {
     context.fileMetadata = body;
+
+    var fta = new file_transfer_agent(context);
+    await fta.execute();
+
+    // build a result from the response
+    var result = fta.result();
+
+    // init result and meta
+    body.data.rowset = result.rowset;
+    body.data.returned = body.data.rowset.length;
+    body.data.rowtype = result.rowtype;
+    body.data.parameters = [];
+
+    context.result = new Result({
+      response: body,
+      statement: this,
+      services: context.services,
+      connectionConfig: context.connectionConfig
+    });
   };
+
+  /**
+   * Streams the rows in this statement's result. If start and end values are
+   * specified, only rows in the specified range are streamed.
+   *
+   * @param {Object} options
+   */
+  this.streamRows = createFnStreamRows(this, context);
 
   /**
    * Returns the file metadata generated by the statement.
@@ -720,7 +901,7 @@ function FileStatementPreExec(
 Util.inherits(FileStatementPreExec, BaseStatement);
 
 /**
- * Creates a new RowStatementPostExec instance.
+ * Creates a new StatementPostExec instance.
  *
  * @param {Object} statementOptions
  * @param {Object} context
@@ -728,7 +909,7 @@ Util.inherits(FileStatementPreExec, BaseStatement);
  * @param {Object} connectionConfig
  * @constructor
  */
-function RowStatementPostExec(
+function StatementPostExec(
   statementOptions, context, services, connectionConfig)
 {
   // call super
@@ -769,7 +950,7 @@ function RowStatementPostExec(
   sendRequestPostExec(context, context.onStatementRequestComp);
 }
 
-Util.inherits(RowStatementPostExec, BaseStatement);
+Util.inherits(StatementPostExec, BaseStatement);
 
 /**
  * Creates a function that fetches the rows in a statement's result and
@@ -1025,13 +1206,25 @@ function sendRequestPreExec(statementContext, onResultAvailable)
 
   // build the basic json for the request
   var json =
-    {
-      disableOfflineChunks: false,
-      sqlText: statementContext.sqlText
-    };
+  {
+    disableOfflineChunks: false,
+  };
+  if (!statementContext.resubmitRequest)
+  {
+    json.sqlText = statementContext.sqlText;
+  }
+  else
+  {
+    json.sqlText = 'select 1;';
+  }
 
+  Logger.getInstance().debug('context.bindStage='+statementContext.bindStage);
+  if (Util.exists(statementContext.bindStage))
+  {
+    json.bindStage = statementContext.bindStage;
+  }
   // if binds are specified, build a binds map and include it in the request
-  if (Util.exists(statementContext.binds))
+  else if (Util.exists(statementContext.binds))
   {
     json.bindings = buildBindsMap(statementContext.binds);
   }
@@ -1040,6 +1233,7 @@ function sendRequestPreExec(statementContext, onResultAvailable)
   if (Util.exists(statementContext.parameters))
   {
     json.parameters = statementContext.parameters;
+    Logger.getInstance().debug('context.parameters='+statementContext.parameters);
   }
 
   // include the internal flag if a value was specified
@@ -1066,6 +1260,69 @@ function sendRequestPreExec(statementContext, onResultAvailable)
         statementContext, headers, onResultAvailable)
     },
     true);
+}
+
+this.sendRequest = function (statementContext, onResultAvailable)
+{
+  // get the request headers
+  var headers = statementContext.resultRequestHeaders;
+
+  // build the basic json for the request
+  var json =
+  {
+    disableOfflineChunks: false,
+    sqlText: statementContext.sqlText
+  };
+
+  Logger.getInstance().debug('context.bindStage='+statementContext.bindStage);
+  if (Util.exists(statementContext.bindStage))
+  {
+    json.bindStage = statementContext.bindStage;
+  }
+  // if binds are specified, build a binds map and include it in the request
+  else if (Util.exists(statementContext.binds))
+  {
+    json.bindings = buildBindsMap(statementContext.binds);
+  }
+
+  // include statement parameters if a value was specified
+  if (Util.exists(statementContext.parameters))
+  {
+    json.parameters = statementContext.parameters;
+  }
+
+  // include the internal flag if a value was specified
+  if (Util.exists(statementContext.internal))
+  {
+    json.isInternal = statementContext.internal;
+  }
+
+  var options =
+  {
+    method: 'POST',
+    headers: headers,
+    url: Url.format(
+      {
+        pathname: '/queries/v1/query-request',
+        search: QueryString.stringify(
+          {
+            requestId: statementContext.requestId
+          })
+      }),
+    json: json,
+    callback: buildResultRequestCallback(
+      statementContext, headers, onResultAvailable)
+  };
+
+  var sf = statementContext.services.sf;
+
+  // clone the options
+  options = Util.apply({}, options);
+
+  return new Promise((resolve, reject) =>
+  {
+    resolve(sf.postAsync(options));
+  });
 }
 
 /**
@@ -1228,7 +1485,7 @@ function sendSfRequest(statementContext, options, appendQueryParamOnRetry)
   };
 
   // replace the specified callback with a new one that retries
-  options.callback = function (err)
+  options.callback = async function (err)
   {
     // if we haven't exceeded the maximum number of retries yet and the server
     // came back with a retryable error code
@@ -1255,7 +1512,7 @@ function sendSfRequest(statementContext, options, appendQueryParamOnRetry)
     else
     {
       // invoke the original callback
-      callbackOrig.apply(this, arguments);
+      await callbackOrig.apply(this, arguments);
     }
   };
 
@@ -1275,28 +1532,35 @@ function sendSfRequest(statementContext, options, appendQueryParamOnRetry)
 function buildResultRequestCallback(
   statementContext, headers, onResultAvailable)
 {
-  var callback = function (err, body)
+  var callback = async function (err, body)
   {
-    // if the result is not ready yet, extract the result url from the response
-    // and issue a GET request to try to fetch the result again
-    if (!err && body && (body.code === '333333' || body.code === '333334'))
+    if (err)
+    {
+      await onResultAvailable.call(null, err, null);
+    }
+    else
     {
       // extract the statement id from the response and save it
       statementContext.statementId = body.data.queryId;
 
-      // extract the result url from the response and try to get the result
-      // again
-      sendSfRequest(statementContext,
-        {
-          method: 'GET',
-          headers: headers,
-          url: body.data.getResultUrl,
-          callback: callback
-        });
-    }
-    else
-    {
-      onResultAvailable.call(null, err, body);
+      // if the result is not ready yet, extract the result url from the response
+      // and issue a GET request to try to fetch the result again
+      if (body && (body.code === '333333' || body.code === '333334'))
+      {
+        // extract the result url from the response and try to get the result
+        // again
+        sendSfRequest(statementContext,
+          {
+            method: 'GET',
+            headers: headers,
+            url: body.data.getResultUrl,
+            callback: callback
+          });
+      }
+      else
+      {
+        await onResultAvailable.call(null, err, body);
+      }
     }
   };
 
@@ -1325,4 +1589,27 @@ function buildResultRequestHeadersFile()
   return {
     'Accept': 'application/json'
   };
+}
+
+/**
+ * Count number of bindings
+ * 
+ * @returns {int}
+ */
+function countBinding(binds)
+{
+  if(!Util.isArray(binds))
+  {
+    return 0;
+  }
+  Logger.getInstance().debug("-- binds.length= %d", binds.length);
+  var count = 0;
+  for(var index = 0; index < binds.length; index++)
+  {
+    if(binds[index] != null)
+    {
+      count += binds[index].length;
+    }
+  }
+  return count;
 }

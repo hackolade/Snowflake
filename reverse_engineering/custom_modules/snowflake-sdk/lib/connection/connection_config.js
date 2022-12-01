@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019 Snowflake Computing Inc. All rights reserved.
+ * Copyright (c) 2015-2021 Snowflake Computing Inc. All rights reserved.
  */
 
 const os = require('os');
@@ -9,18 +9,57 @@ const Errors = require('../errors');
 const ErrorCodes = Errors.codes;
 const NativeTypes = require('./result/data_types').NativeTypes;
 const GlobalConfig = require('../global_config');
+const authenticationTypes = require('../authentication/authentication').authenticationTypes;
+const stringSimilarity = require("string-similarity");
+
+const DEFAULT_PARAMS =
+[
+  'account',
+  'application',
+  'region',
+  'host',
+  'accessUrl',
+  'username',
+  'password',
+  'authenticator',
+  'proxyHost',
+  'proxyPort',
+  'serviceName',
+  'privateKey',
+  'privateKeyPath',
+  'privateKeyPass',
+  'token',
+  'warehouse',
+  'database',
+  'schema',
+  'role',
+  'streamResult',
+  'fetchAsString',
+  'clientSessionKeepAlive',
+  'clientSessionKeepAliveHeartbeatFrequency',
+  'jsTreatIntegerAsBigInt',
+  'sessionToken',
+  'masterToken',
+  'sessionTokenExpirationTime',
+  'masterTokenExpirationTime',
+  'agentClass',
+  'validateDefaultParameters'
+];
 
 function consolidateHostAndAccount(options)
 {
   let dotPos = -1;
   let realAccount = undefined;
+  let realRegion = undefined;
   if (Util.exists(options.account))
   {
     Errors.checkArgumentValid(Util.isString(options.account), ErrorCodes.ERR_CONN_CREATE_INVALID_ACCOUNT);
+    options.host = Util.construct_hostname(options.region, options.account);
     dotPos = options.account.indexOf('.');
     realAccount = options.account;
     if (dotPos > 0)
     {
+      realRegion = realAccount.substring(dotPos + 1);
       realAccount = realAccount.substring(0, dotPos);
     }
   }
@@ -68,6 +107,7 @@ function consolidateHostAndAccount(options)
     }
   }
   options.account = realAccount;
+  options.region = realRegion;
   // check for missing password
   Errors.checkArgumentExists(Util.exists(options.account), ErrorCodes.ERR_CONN_CREATE_MISSING_ACCOUNT);
 }
@@ -110,13 +150,18 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
     Errors.checkArgumentValid(Util.isString(options.username),
       ErrorCodes.ERR_CONN_CREATE_INVALID_USERNAME);
 
-    // check for missing password
-    Errors.checkArgumentExists(Util.exists(options.password),
-      ErrorCodes.ERR_CONN_CREATE_MISSING_PASSWORD);
+    // password is only required for default authenticator
+    if (!Util.exists(options.authenticator) ||
+      options.authenticator == authenticationTypes.DEFAULT_AUTHENTICATOR)
+    {
+      // check for missing password
+      Errors.checkArgumentExists(Util.exists(options.password),
+          ErrorCodes.ERR_CONN_CREATE_MISSING_PASSWORD);
 
-    // check for invalid password
-    Errors.checkArgumentValid(Util.isString(options.password),
-      ErrorCodes.ERR_CONN_CREATE_INVALID_PASSWORD);
+      // check for invalid password
+      Errors.checkArgumentValid(Util.isString(options.password),
+          ErrorCodes.ERR_CONN_CREATE_INVALID_PASSWORD);
+    }
 
     consolidateHostAndAccount(options);
   }
@@ -131,6 +176,10 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
 
   var proxyHost = options.proxyHost;
   var proxyPort = options.proxyPort;
+  var proxyUser = options.proxyUser;
+  var proxyPassword = options.proxyPassword;
+  var proxyProtocol = options.proxyProtocol;
+  var noProxy = options.noProxy;
 
   // if we're running in node and some proxy information is specified
   var proxy;
@@ -152,11 +201,91 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
     Errors.checkArgumentValid(Util.isNumber(proxyPort),
       ErrorCodes.ERR_CONN_CREATE_INVALID_PROXY_PORT);
 
-    proxy =
+      if (Util.exists(noProxy))
+      {
+        // check for invalid noProxy
+        Errors.checkArgumentValid(Util.isString(noProxy),
+          ErrorCodes.ERR_CONN_CREATE_INVALID_NO_PROXY);
+      }
+
+    if (Util.exists(proxyUser) || Util.exists(proxyPassword))
+    {
+      // check for missing proxyUser
+      Errors.checkArgumentExists(Util.exists(proxyUser),
+        ErrorCodes.ERR_CONN_CREATE_MISSING_PROXY_USER);
+
+      // check for invalid proxyUser
+      Errors.checkArgumentValid(Util.isString(proxyUser),
+        ErrorCodes.ERR_CONN_CREATE_INVALID_PROXY_USER);
+
+      // check for missing proxyPassword
+      Errors.checkArgumentExists(Util.exists(proxyPassword),
+        ErrorCodes.ERR_CONN_CREATE_MISSING_PROXY_PASS);
+
+      // check for invalid proxyPassword
+      Errors.checkArgumentValid(Util.isString(proxyPassword),
+        ErrorCodes.ERR_CONN_CREATE_INVALID_PROXY_PASS);
+
+      proxy =
       {
         host: proxyHost,
-        port: proxyPort
+        port: proxyPort,
+        user: proxyUser,
+        password: proxyPassword,
+        protocol: proxyProtocol,
+        noProxy: noProxy
       };
+    }
+    else
+    {
+      proxy =
+      {
+        host: proxyHost,
+        port: proxyPort,
+        noProxy: noProxy
+      };
+    }
+  }
+
+  var serviceName = options.serviceName;
+  var authenticator = options.authenticator;
+
+  // if no value is specified for authenticator, default to Snowflake
+  if (!Util.exists(authenticator))
+  {
+    authenticator = authenticationTypes.DEFAULT_AUTHENTICATOR;
+  }
+  else
+  {
+    authenticator = authenticator.toUpperCase();
+  }
+
+  var privateKey = options.privateKey;
+  if (Util.exists(options.privateKey))
+  {
+    Errors.checkArgumentValid((Util.isString(privateKey) && Util.isPrivateKey(privateKey)),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_PRIVATE_KEY);
+  }
+
+  var privateKeyPath = options.privateKeyPath;
+  if (Util.exists(options.privateKeyPath))
+  {
+    Errors.checkArgumentValid(Util.isString(privateKeyPath),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_PRIVATE_KEY_PATH);
+  }
+
+  var privateKeyPass = options.privateKeyPass;
+  if (Util.exists(options.privateKeyPass))
+  {
+    Errors.checkArgumentValid(Util.isString(privateKeyPass),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_PRIVATE_KEY_PASS);
+  }
+
+  var token = options.token;
+  if (Util.exists(options.token))
+  {
+    Errors.checkArgumentValid(Util.isString(token),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_OAUTH_TOKEN);
   }
 
   var warehouse = options.warehouse;
@@ -244,6 +373,7 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
   this._qaMode = qaMode;
 
   // if a client-info argument is specified, validate it
+  var clientName;
   var clientVersion;
   var clientEnvironment;
   if (Util.exists(clientInfo))
@@ -252,13 +382,51 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
     Errors.assertInternal(Util.isString(clientInfo.version));
     Errors.assertInternal(Util.isObject(clientInfo.environment));
 
+    clientName = clientInfo.name;
     clientVersion = clientInfo.version;
     clientEnvironment = clientInfo.environment;
     clientEnvironment.OS = os.platform();
     clientEnvironment.OS_VERSION = os.release();
     clientEnvironment.OCSP_MODE = GlobalConfig.getOcspMode();
-    if (options.application) {
-      clientEnvironment.APPLICATION = options.application;
+  }
+
+  var clientApplication = options.application;
+  if (Util.exists(clientApplication))
+  {
+    Errors.checkArgumentValid(Util.isString(clientApplication),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_APPLICATION);
+
+    const APPLICATION_PATTERN = new RegExp(String.raw`^[A-Za-z]([A-Za-z0-9.\-_]){1,50}$`,
+      'gi');
+
+    Errors.checkArgumentValid(APPLICATION_PATTERN.test(clientApplication),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_APPLICATION);
+  }
+
+
+  var validateDefaultParameters = false;
+  if (Util.exists(options.validateDefaultParameters))
+  {
+    // check for invalid validateDefaultParameters
+    Errors.checkArgumentValid(Util.isBoolean(options.validateDefaultParameters),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_VALIDATE_DEFAULT_PARAMETERS);
+
+    validateDefaultParameters = options.validateDefaultParameters;
+  }
+
+  if (validateDefaultParameters)
+  {
+    for (const [key] of Object.entries(options))
+    {
+      if (!DEFAULT_PARAMS.includes(key))
+      {
+        var matches = stringSimilarity.findBestMatch(key, DEFAULT_PARAMS);
+        console.error(`"${key}" is an unknown connection parameter`);
+        if (matches.bestMatchIndex > 0)
+        {
+          console.error(`Did you mean "${matches.bestMatch.target}"`);
+        }
+      }
     }
   }
 
@@ -318,6 +486,66 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
   };
 
   /**
+   * Returns the service name.
+   *
+   * @returns {String}
+   */
+  this.getServiceName = function ()
+  {
+    return serviceName;
+  };
+
+  /**
+   * Returns the authenticator to use for establishing a connection.
+   *
+   * @returns {String}
+   */
+  this.getAuthenticator = function ()
+  {
+    return authenticator;
+  };
+
+  /**
+   * Returns the private key string.
+   *
+   * @returns {String}
+   */
+  this.getPrivateKey = function ()
+  {
+    return privateKey;
+  };
+
+  /**
+   * Returns the private key file location.
+   *
+   * @returns {String}
+   */
+  this.getPrivateKeyPath = function ()
+  {
+    return privateKeyPath;
+  };
+
+  /**
+   * Returns the private key passphrase.
+   *
+   * @returns {String}
+   */
+  this.getPrivateKeyPass = function ()
+  {
+    return privateKeyPass;
+  };
+
+  /**
+   * Returns the OAuth token.
+   *
+   * @returns {String}
+   */
+  this.getToken = function ()
+  {
+    return token;
+  };
+
+  /**
    * Returns the streamResult flag.
    *
    * @returns {boolean}
@@ -348,6 +576,16 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
   };
 
   /**
+   * Returns the client name.
+   *
+   * @returns {String}
+   */
+  this.getClientName = function ()
+  {
+    return clientName;
+  };
+
+  /**
    * Returns the client version.
    *
    * @returns {String}
@@ -355,6 +593,16 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
   this.getClientVersion = function ()
   {
     return clientVersion;
+  };
+
+  /**
+   * Returns the client application.
+   *
+   * @returns {String}
+   */
+  this.getClientApplication = function ()
+  {
+    return clientApplication;
   };
 
   /**
@@ -402,7 +650,9 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
   this.username = options.username;
   this.password = options.password;
   this.accessUrl = options.accessUrl;
+  this.region = options.region;
   this.account = options.account;
+  this.host = options.host;
   this.sessionToken = options.sessionToken;
   this.masterToken = options.masterToken;
   this.masterTokenExpirationTime = options.masterTokenExpirationTime;
