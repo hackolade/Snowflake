@@ -1,4 +1,4 @@
-const snowflake = require('../custom_modules/snowflake-sdk');
+const snowflake = require('snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
 const BSON = require('bson');
