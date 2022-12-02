@@ -1,4 +1,4 @@
-const snowflake = require('../custom_modules/snowflake-sdk');
+const snowflake = require('snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
 const BSON = require('bson');
@@ -129,7 +129,8 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 		password,
 		role,
 		warehouse,
-		timeout
+		timeout,
+		host: '',
 	}, (error) => error.code === ALREADY_CONNECTED_STATUS)
 };
 
@@ -183,7 +184,8 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 		role,
 		warehouse,
 		password: 'password',
-		timeout
+		timeout,
+		host: '',
 	}, (error) => error.code === ALREADY_CONNECTED_STATUS)
 
 	return new Promise((resolve, reject) => {
