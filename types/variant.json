@@ -3,7 +3,7 @@
 	"erdAbbreviation": "<var>",
 	"dtdAbbreviation": "{...}",
 	"default": true,
-	"parentType": "document",
+	"parentType": "jsonObject",
 	"hiddenOnEntity": "view",
 	"jsonType": {
 		"order": 1,
