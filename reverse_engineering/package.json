@@ -6,7 +6,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "bson": "^4.6.1",
-    "uuid": "^7.0.3"
+    "uuid": "^7.0.3",
+    "snowflake-sdk": "^1.6.16"
   },
   "installed": true
 }
