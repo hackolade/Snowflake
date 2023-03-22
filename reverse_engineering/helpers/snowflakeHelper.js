@@ -4,6 +4,7 @@ const uuid = require('uuid');
 const BSON = require('bson');
 
 const ALREADY_CONNECTED_STATUS = 405502;
+const CANT_REACH_SNOWFLAKE_ERROR_STATUS = 401001;
 const CONNECTION_TIMED_OUT_CODE  = 'CONNECTION_TIMED_OUT'
 
 let connection;
@@ -19,6 +20,8 @@ const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
 const DEFAULT_WAREHOUSE = 'COMPUTE_WH';
 const DEFAULT_ROLE = 'PUBLIC';
 const HACKOLADE_APPLICATION = 'Hackolade';
+const CLOUD_PLATFORM_POSTFIXES = [ 'gcp', 'aws', 'azure' ];
+
 let _;
 
 const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform, queryRequestTimeout }) => {
@@ -28,13 +31,25 @@ const connect = async (logger, { host, username, password, authType, authenticat
 
 	logger.log('info', `Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`, 'Connection');
 
+	let authPromise;
 	if (authType === 'okta') {
-		return authByOkta(logger, { account, accessUrl, username, password, authenticator, role, warehouse, timeout });
+		authPromise = authByOkta(logger, { account, accessUrl, username, password, authenticator, role, warehouse, timeout });
 	} if (authType === 'externalbrowser') {
-		return authByExternalBrowser(logger, { account, accessUrl, token, proofKey, username, password, role, warehouse, timeout })
+		authPromise = authByExternalBrowser(logger, { account, accessUrl, token, proofKey, username, password, role, warehouse, timeout })
 	} else {
-		return authByCredentials({ account, username, password, role, warehouse, timeout });
+		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
 	}
+
+	return await authPromise.catch(err => {
+		if (err.code !== CANT_REACH_SNOWFLAKE_ERROR_STATUS || hasCloudPlatform(account)) {
+			throw err;
+		}
+
+		const message = _.isString(err) ? err : _.get(err, 'message', 'Reverse Engineering error')
+		logger.log('info', `Can't reach Snowflake server. Trying to add cloudPlatformName. \nInitial error: ${message}`, 'Connection');
+
+		return connect(logger, { host: `${host}.${_.toLower(cloudPlatform)}`, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform, queryRequestTimeout });
+	});
 };
 
 const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, timeout, warehouse = DEFAULT_WAREHOUSE }) => {
@@ -330,6 +345,8 @@ const testConnection = async (logger, info) => {
 
 const showTables = () => execute('SHOW TABLES;');
 
+const showSchemas = () => execute('SHOW SCHEMAS;');
+
 const showExternalTables = () => execute('SHOW EXTERNAL TABLES;');
 
 const showViews = () => execute('SHOW VIEWS;');
@@ -345,6 +362,16 @@ const splitEntityNames = names => {
 };
 
 const isView = name => name.slice(-4) === ' (v)';
+
+const getSchemasInfo = async () => {
+	const schemas = await showSchemas().catch(err => [{ status: 'error', message: err.message }]);
+
+	if (schemas[0]?.status === 'error') {
+		return schemas;
+	}
+
+	return schemas.map(schema => ({ name: schema.name, database: schema.database_name, isDefault: schema.is_default, isCurrent: schema.is_current }));
+}
 
 const getNamesBySchemas = entitiesRows => {
 	return entitiesRows.reduce((namesBySchemas, entityRow) => {
@@ -440,7 +467,7 @@ const getDDL = async (tableName, logger) => {
 		return getFirstObjectItem(_.first(queryResult));
 	} catch (err) {
 		logger.log('error', { tableName, message: err.message, stack: err.stack }, 'Getting table DDL')
-		throw err;
+		return ''
 	}
 };
 
@@ -451,7 +478,7 @@ const getViewDDL = async (viewName, logger) => {
 		return getFirstObjectItem(_.first(queryResult));
 	} catch (err) {
 		logger.log('error', { viewName, message: err.message, stack: err.stack }, 'Getting view DDL')
-		throw err;
+		return '';
 	}
 };
 
@@ -1109,7 +1136,11 @@ const getContainerData = async schema => {
 	} catch (err) {
 		return {};
 	}
-}
+};
+
+const hasCloudPlatform = accountName => {
+	return CLOUD_PLATFORM_POSTFIXES.some(postfix => accountName.endsWith(postfix));
+};
 
 const setDependencies = ({ lodash }) => _ = lodash;
 
@@ -1155,5 +1186,6 @@ module.exports = {
 	getAccount,
 	getAccessUrl,
 	setDependencies,
+	getSchemasInfo,
 	applyScript,
 };
