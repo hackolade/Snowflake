@@ -70,10 +70,16 @@ module.exports = {
 			});
 	},
 
+	async getExternalBrowserUrl(connectionInfo, logger, cb, app) {
+		const reApi = require('../reverse_engineering/api');
+
+		reApi.getExternalBrowserUrl(connectionInfo, logger, cb, app);
+	},
+
 	testConnection(connectionInfo, logger, callback, app) {
 		const reApi = require('../reverse_engineering/api');
 
-		reApi.testConnection(connectionInfo, logger, callback, app).then(callback, callback);
+		reApi.testConnection(connectionInfo, logger, callback, app);
 	},
 
 	isDropInStatements(data, logger, callback, app) {

@@ -21,6 +21,15 @@
 		"container": true
 	},
 	"applyScriptToInstance": true,
+	"applyToInstanceSettings": {
+		"scenario": [{
+			"dependency": {
+				"key": "authType",
+				"value": "externalbrowser"
+			},
+			"value": "connectByExternalBrowser"
+		}]
+	},
 	"additionalOptions": [
 		{
 			"id": "applyDropStatements",
