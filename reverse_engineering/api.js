@@ -17,7 +17,8 @@ const connect = async (connectionInfo, logger, cb, app) => {
 	}
 };
 
-const disconnect = async (connectionInfo, logger, cb) => {
+const disconnect = async (connectionInfo, logger, cb, app) => {
+	initDependencies(app);
 	try {
 		await snowflakeHelper.disconnect();
 		cb();
@@ -65,6 +66,8 @@ const getDbCollectionsNames = async (connectionInfo, logger, cb, app) => {
 		logger.clear();
 		initDependencies(app);
 		await snowflakeHelper.connect(logger, connectionInfo);
+		const schemasInfo = await snowflakeHelper.getSchemasInfo();
+		logger.log('info', { schemas: schemasInfo }, 'Found schemas');
 		const namesBySchemas = await snowflakeHelper.getEntitiesNames();
 
 		logger.log('info', { entities: namesBySchemas }, 'Found entities');
