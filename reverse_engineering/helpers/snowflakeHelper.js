@@ -345,6 +345,12 @@ const testConnection = async (logger, info) => {
 
 const showTables = () => execute('SHOW TABLES;');
 
+const showTablesByDatabases = async databases => _.isEmpty(databases) ?
+	showTables() :
+	Promise.allSettled(databases.map(database => execute(`SHOW TABLES IN DATABASE "${removeQuotes(database.name)}";`)));
+
+const showDatabases = () => execute('SHOW DATABASES;');
+
 const showSchemas = () => execute('SHOW SCHEMAS;');
 
 const showExternalTables = () => execute('SHOW EXTERNAL TABLES;');
@@ -405,13 +411,14 @@ const getRowsByDatabases = entitiesRows => {
 };
 
 const getEntitiesNames = async () => {
-	const tablesRows = await showTables().catch(e => []);
+	const databases = await showDatabases().catch(e => []);
+	const tablesRows = await showTablesByDatabases(databases).catch(e => []);
 	const externalTableRows = await showExternalTables().catch(e => []);
 	const viewsRows = await showViews().catch(e => []);
 	const materializedViewsRows = await showMaterializedViews().catch(e => []);
 
 	const entitiesRows = [
-		...tablesRows,
+		...tablesRows.flatMap(row => row.value).filter(Boolean),
 		...externalTableRows,
 		...viewsRows.map(annotateView),
 		...materializedViewsRows.map(annotateView)
