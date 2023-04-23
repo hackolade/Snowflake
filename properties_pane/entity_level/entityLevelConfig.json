@@ -131,6 +131,42 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			{
+				"propertyName": "Table role",
+				"propertyKeyword": "tableRole",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Dimension",
+					"Fact",
+					"Outrigger",
+					"Staging"
+				],
+				"dependency": {
+					"level": "model",
+					"key": "modelingMethodology",
+					"value": "Dimensional"
+				}
+			},
+			{
+				"propertyName": "Vault component",
+				"propertyKeyword": "vaultComponent",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Hub",
+					"Link",
+					"Satellite",
+					"Bridge",
+					"Point in Time",
+					"Reference"
+				],
+				"dependency": {
+					"level": "model",
+					"key": "modelingMethodology",
+					"value": "Vault"
+				}
+			},
+			{
 				"propertyName": "Temporary",
 				"propertyKeyword": "temporary",
 				"propertyType": "checkbox"

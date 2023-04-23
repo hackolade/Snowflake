@@ -129,6 +129,17 @@ making sure that you maintain a proper JSON format.
 				"disabledOption": true
 			},
 			{
+				"propertyName": "Modeling methodology",
+				"propertyKeyword": "modelingMethodology",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Relational",
+					"Dimensional",
+					"Vault"
+				]
+			},
+			{
 				"propertyName": "Comments",
 				"propertyKeyword": "comments",
 				"shouldValidate": false,
