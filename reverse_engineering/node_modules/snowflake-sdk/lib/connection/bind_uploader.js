@@ -6,11 +6,12 @@
 const Readable = require('stream').Readable;
 const fs = require('fs');
 const tmp = require('tmp');
+var os = require('os');
+var path = require('path');
 
 var Statement = require('./statement');
 var fileCompressionType = require('.././file_transfer_agent/file_compression_type');
 
-const ARRAY_BINDING_THRESHOLD = 100000;
 const STAGE_NAME = 'SYSTEM$BIND';
 const CREATE_STAGE_STMT = "CREATE OR REPLACE TEMPORARY STAGE "
 	+ STAGE_NAME
@@ -55,9 +56,13 @@ function BindUploader(options, services, connectionConfig, requestId)
 		var dataRows = new Array();
 		var startIndex = 0;
 		var rowNum = 0;
-		var curBytes = 0;
 		var fileCount = 0;
 		var strbuffer = "";
+		var tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tmp'));
+		if (tmpDir.indexOf('~') != -1 && process.platform === "win32") {
+			var tmpFolderName = tmpDir.substring(tmpDir.lastIndexOf('\\'));
+			tmpDir = process.env.USERPROFILE + '\\AppData\\Local\\Temp\\' + tmpFolderName;
+		}
 
 		for(var i=0; i<bindings.length; i++)
 		{
@@ -70,27 +75,14 @@ function BindUploader(options, services, connectionConfig, requestId)
 			}
 			strbuffer += '\n';
 
-			if(curBytes < MAX_BUFFER_SIZE)
+			if ((strbuffer.length >= MAX_BUFFER_SIZE) || (i == bindings.length -1))
 			{
-				var size = Buffer.byteLength(strbuffer, 'utf8');
-				curBytes += size;
-			}
-			else
-			{
-				var fileName = (++fileCount).toString();
-				Logger.getInstance().debug('fileName='+fileName);
+				var fileName = path.join(tmpDir,(++fileCount).toString());
+				Logger.getInstance().debug('fileName=' + fileName);
 				this.UploadStream(strbuffer, fileName);
 				strbuffer = "";
-				curBytes = 0;
 			}
 		}
-		if(curBytes > 0)
-		{
-			var fileName = (++fileCount).toString();
-			Logger.getInstance().debug('fileName='+fileName);
-			this.UploadStream(strbuffer, fileName);
-		}
-				
 		this.bindData = {files: this.files, datas: this.datas, puts:this.puts};
 		return this.bindData;
 	};
@@ -109,7 +101,15 @@ function BindUploader(options, services, connectionConfig, requestId)
 		}
 	
 		var putStmt = "PUT file://" + fileName + "'" + stageName + "' overwrite=true auto_compress=false source_compression=gzip";
-		fs.writeFileSync(fileName, data);
+		try
+		{
+			fs.writeFileSync(fileName, data);
+		}
+		catch(e)
+		{
+			Logger.getInstance().debug('Failed to write file: %s', fileName);
+			throw e;
+		}
 		this.files.push(fileName);
 		this.datas.push(data);
 		this.puts.push(putStmt);
@@ -117,24 +117,17 @@ function BindUploader(options, services, connectionConfig, requestId)
 
 	this.cvsData = function(data)
 	{
-		if(data == null)
-			return "";
-		if(data.toString() == "")
+		if(data == null || data.toString() == "")
 			return "\"\"";
 		if(data.toString().indexOf('"') >= 0
 			|| data.toString().indexOf(',') >= 0	
 			|| data.toString().indexOf('\\') >= 0
 			|| data.toString().indexOf('\n') >= 0
 			|| data.toString().indexOf('\t') >= 0)
-				return '"' + data.toString().replace("\"", "\"\"") + '"';
+				return '"' + data.toString().replaceAll("\"", "\"\"") + '"';
 		else 
 			return data;
 	}
-}
-
-function GetThreshold()
-{
-	return ARRAY_BINDING_THRESHOLD;
 }
 
 function GetCreateStageStmt()
@@ -162,4 +155,4 @@ function CleanFile(fileName)
 	}
 }
 
-module.exports = {BindUploader, GetCreateStageStmt, GetStageName, CleanFile, GetThreshold};
+module.exports = {BindUploader, GetCreateStageStmt, GetStageName, CleanFile};
