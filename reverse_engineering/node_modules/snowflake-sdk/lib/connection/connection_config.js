@@ -43,7 +43,9 @@ const DEFAULT_PARAMS =
   'sessionTokenExpirationTime',
   'masterTokenExpirationTime',
   'agentClass',
-  'validateDefaultParameters'
+  'validateDefaultParameters',
+  'arrayBindingThreshold',
+  'gcsUseDownscopedCredential'
 ];
 
 function consolidateHostAndAccount(options)
@@ -369,10 +371,18 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
       ErrorCodes.ERR_CONN_CREATE_INVALID_TREAT_INTEGER_AS_BIGINT);
   }
 
+  var gcsUseDownscopedCredential = options.gcsUseDownscopedCredential;
+  if (Util.exists(gcsUseDownscopedCredential))
+  {
+    Errors.checkArgumentValid(Util.isBoolean(gcsUseDownscopedCredential),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_GCS_USE_DOWNSCOPED_CREDENTIAL);
+  }
+
   // remember if we're in qa mode
   this._qaMode = qaMode;
 
   // if a client-info argument is specified, validate it
+  var clientType = 'JavaScript';
   var clientName;
   var clientVersion;
   var clientEnvironment;
@@ -411,6 +421,16 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
       ErrorCodes.ERR_CONN_CREATE_INVALID_VALIDATE_DEFAULT_PARAMETERS);
 
     validateDefaultParameters = options.validateDefaultParameters;
+  }
+
+  var bindThreshold = null;
+  if (Util.exists(options.arrayBindingThreshold))
+  {
+    // check for invalid arrayBindingThreshold
+    Errors.checkArgumentValid(Util.isNumber(options.arrayBindingThreshold),
+      ErrorCodes.ERR_CONN_CREATE_INVALID_VALIDATE_DEFAULT_PARAMETERS);
+
+      bindThreshold = options.arrayBindingThreshold;
   }
 
   if (validateDefaultParameters)
@@ -571,7 +591,7 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
    */
   this.getClientType = function ()
   {
-    return 'JavaScript';
+    return clientType;
   };
 
   /**
@@ -644,6 +664,27 @@ function ConnectionConfig(options, validateCredentials, qaMode, clientInfo)
   {
     return jsTreatIntegerAsBigInt;
   };
+
+  /**
+   * Returns the setting for the GCS_USE_DOWNSCOPED_CREDENTIAL session parameter
+   *
+   * @returns {String}
+   */
+  this.getGcsUseDownscopedCredential = function ()
+  {
+    return gcsUseDownscopedCredential;
+  };
+
+  /**
+   * Returns the bind threshold 
+   *
+   * @returns {string}
+   */
+  this.getbindThreshold = function ()
+  {
+    return bindThreshold;
+  };
+  
 
   // save config options
   this.username = options.username;
