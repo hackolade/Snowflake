@@ -753,6 +753,151 @@ making sure that you maintain a proper JSON format.
 				}
 			]
 		}]
+	},
+	{
+		"lowerTab": "Procedures",
+		"structure": [{
+			"propertyName": "Procedures",
+			"propertyType": "group",
+			"propertyKeyword": "Procedures",
+			"propertyTooltip": "Creates a new stored procedure or replaces an existing procedure for the current database.",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"propertyTooltip": "The name of the procedure.",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Or replace",
+					"propertyKeyword": "orReplace",
+					"propertyType": "checkbox",
+					"propertyTooltip": "Specifies that if a function with the same name and input argument data types, or signature, as this one already exists, the existing function is replaced. You can only replace a function with a new function that defines an identical set of data types."
+				},
+				{
+					"propertyName": "Parameters",
+					"propertyKeyword": "inputArgs",
+					"propertyTooltip": "A list of parameters' names, and their data types. ",
+					"propertyType": "details",
+					"template": "textarea",
+					"markdown": false
+				},
+				{
+					"propertyName": "Return type",
+					"propertyKeyword": "returnType",
+					"propertyType": "text",
+					"propertyTooltip": "Specifies procedure return type"
+				},
+				{
+					"propertyName": "Language",
+					"propertyKeyword": "language",
+					"propertyTooltip": "language",
+					"propertyType": "select",
+					"defaultValue": "SQL",
+					"options": [
+						"SQL",
+						"JavaScript",
+						"Java",
+						"Python",
+						"Scala"
+					]
+				},
+				{
+					"propertyName": "Runtime version",
+					"propertyKeyword": "runtimeVersion",
+					"propertyType": "text",
+					"dependency": {
+						"type": "or",
+						"values": [
+							{
+								"key": "language",
+								"value": "Java"
+							},
+							{
+								"key": "language",
+								"value": "Python"
+							},
+							{
+								"key": "language",
+								"value": "Scala"
+							}
+						]
+					},
+					"propertyTooltip": "Specifies procedure language runtime version"
+				},
+				{
+					"propertyName": "Packages",
+					"propertyKeyword": "packages",
+					"propertyType": "text",
+					"dependency": {
+						"type": "or",
+						"values": [
+							{
+								"key": "language",
+								"value": "Java"
+							},
+							{
+								"key": "language",
+								"value": "Python"
+							},
+							{
+								"key": "language",
+								"value": "Scala"
+							}
+						]
+					},
+					"propertyTooltip": "Specifies procedure language runtime version"
+				},
+				{
+					"propertyName": "Handler",
+					"propertyKeyword": "handler",
+					"propertyTooltip": "Name of a procedure handler method.",
+					"propertyType": "text",
+					"dependency": {
+						"type": "or",
+						"values": [
+							{
+								"key": "language",
+								"value": "Java"
+							},
+							{
+								"key": "language",
+								"value": "Python"
+							},
+							{
+								"key": "language",
+								"value": "Scala"
+							}
+						]
+					},
+					"template": "textarea",
+					"markdown": false
+				},
+				{
+					"propertyName": "Procedure body",
+					"propertyKeyword": "body",
+					"propertyTooltip": "Valid SQL procedure statement.",
+					"propertyType": "details",
+					"template": "textarea",
+					"markdown": false
+				},
+				{
+					"propertyName": "SQL environment",
+					"propertyKeyword": "sqlEnvironment",
+					"propertyTooltip": "SQL execution environment type.",
+					"propertyType": "select",
+					"defaultValue": "Classic Console",
+					"dependency": {
+						"key": "language",
+						"value": "SQL"
+					},
+					"options": [
+						"Snowsight",
+						"Classic Console"
+					]
+				}
+			]
+		}]
 	}
 ]
 
