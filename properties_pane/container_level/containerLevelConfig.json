@@ -757,9 +757,9 @@ making sure that you maintain a proper JSON format.
 	{
 		"lowerTab": "Procedures",
 		"structure": [{
-			"propertyName": "Procedures",
+			"propertyName": "Procedure",
 			"propertyType": "group",
-			"propertyKeyword": "Procedures",
+			"propertyKeyword": "procedures",
 			"propertyTooltip": "Creates a new stored procedure or replaces an existing procedure for the current database.",
 			"structure": [
 				{
@@ -775,9 +775,9 @@ making sure that you maintain a proper JSON format.
 					"propertyTooltip": "Specifies that if a function with the same name and input argument data types, or signature, as this one already exists, the existing function is replaced. You can only replace a function with a new function that defines an identical set of data types."
 				},
 				{
-					"propertyName": "Parameters",
-					"propertyKeyword": "inputArgs",
-					"propertyTooltip": "A list of parameters' names, and their data types. ",
+					"propertyName": "Arguments",
+					"propertyKeyword": "args",
+					"propertyTooltip": "A list of arguments' names and their data types. ",
 					"propertyType": "details",
 					"template": "textarea",
 					"markdown": false
@@ -793,13 +793,13 @@ making sure that you maintain a proper JSON format.
 					"propertyKeyword": "language",
 					"propertyTooltip": "language",
 					"propertyType": "select",
-					"defaultValue": "SQL",
+					"defaultValue": "sql",
 					"options": [
-						"SQL",
-						"JavaScript",
-						"Java",
-						"Python",
-						"Scala"
+						"sql",
+						"javascript",
+						"java",
+						"python",
+						"scala"
 					]
 				},
 				{
@@ -811,15 +811,15 @@ making sure that you maintain a proper JSON format.
 						"values": [
 							{
 								"key": "language",
-								"value": "Java"
+								"value": "java"
 							},
 							{
 								"key": "language",
-								"value": "Python"
+								"value": "python"
 							},
 							{
 								"key": "language",
-								"value": "Scala"
+								"value": "scala"
 							}
 						]
 					},
@@ -828,21 +828,28 @@ making sure that you maintain a proper JSON format.
 				{
 					"propertyName": "Packages",
 					"propertyKeyword": "packages",
-					"propertyType": "text",
+					"propertyType": "group",
+					"structure": [
+						{
+							"propertyName": "Name",
+							"propertyKeyword": "packageName",
+							"propertyType": "text"
+						}
+					],
 					"dependency": {
 						"type": "or",
 						"values": [
 							{
 								"key": "language",
-								"value": "Java"
+								"value": "java"
 							},
 							{
 								"key": "language",
-								"value": "Python"
+								"value": "python"
 							},
 							{
 								"key": "language",
-								"value": "Scala"
+								"value": "scala"
 							}
 						]
 					},
@@ -858,15 +865,15 @@ making sure that you maintain a proper JSON format.
 						"values": [
 							{
 								"key": "language",
-								"value": "Java"
+								"value": "java"
 							},
 							{
 								"key": "language",
-								"value": "Python"
+								"value": "python"
 							},
 							{
 								"key": "language",
-								"value": "Scala"
+								"value": "scala"
 							}
 						]
 					},
@@ -886,15 +893,21 @@ making sure that you maintain a proper JSON format.
 					"propertyKeyword": "sqlEnvironment",
 					"propertyTooltip": "SQL execution environment type.",
 					"propertyType": "select",
-					"defaultValue": "Classic Console",
+					"defaultValue": "Classic Console/SnowSQL",
 					"dependency": {
 						"key": "language",
-						"value": "SQL"
+						"value": "sql"
 					},
 					"options": [
 						"Snowsight",
-						"Classic Console"
+						"Classic Console/SnowSQL"
 					]
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "comments",
+					"propertyType": "details",
+					"template": "textarea"
 				}
 			]
 		}]
