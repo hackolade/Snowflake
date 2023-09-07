@@ -240,6 +240,158 @@ making sure that you maintain a proper JSON format.
 		}]
 	},
 	{
+		"lowerTab": "Procedures",
+		"structure": [{
+			"propertyName": "Procedure",
+			"propertyType": "group",
+			"propertyKeyword": "Procedures",
+			"propertyTooltip": "Creates a new stored procedure or replaces an existing procedure for the current database.",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"propertyTooltip": "The name of the procedure.",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Or replace",
+					"propertyKeyword": "orReplace",
+					"propertyType": "checkbox",
+					"propertyTooltip": "Specifies that if a procedure with the same name and input argument data types, or signature, as this one already exists, the existing procedure is replaced. You can only replace a procedure with a new procedure that defines an identical set of data types."
+				},
+				{
+					"propertyName": "Arguments",
+					"propertyKeyword": "inputArgs",
+					"propertyTooltip": "A list of arguments' names and their data types. ",
+					"propertyType": "details",
+					"template": "textarea",
+					"markdown": false
+				},
+				{
+					"propertyName": "Return type",
+					"propertyKeyword": "returnType",
+					"propertyType": "text",
+					"propertyTooltip": "Specifies procedure return type"
+				},
+				{
+					"propertyName": "Language",
+					"propertyKeyword": "language",
+					"propertyTooltip": "language",
+					"propertyType": "select",
+					"defaultValue": "sql",
+					"options": [
+						"sql",
+						"javascript",
+						"java",
+						"python",
+						"scala"
+					]
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Runtime version",
+					"propertyKeyword": "runtimeVersion",
+					"propertyType": "text",
+					"dependency": {
+						"type": "or",
+						"values": [
+							{
+								"key": "language",
+								"value": "java"
+							},
+							{
+								"key": "language",
+								"value": "python"
+							},
+							{
+								"key": "language",
+								"value": "scala"
+							}
+						]
+					},
+					"propertyTooltip": "Specifies procedure language runtime version"
+				},
+				{
+					"propertyName": "Packages",
+					"propertyKeyword": "packages",
+					"propertyType": "group",
+					"structure": [
+						{
+							"propertyName": "Name",
+							"propertyKeyword": "packageName",
+							"propertyType": "text"
+						}
+					],
+					"dependency": {
+						"type": "or",
+						"values": [
+							{
+								"key": "language",
+								"value": "java"
+							},
+							{
+								"key": "language",
+								"value": "python"
+							},
+							{
+								"key": "language",
+								"value": "scala"
+							}
+						]
+					},
+					"propertyTooltip": "Specifies procedure language runtime version"
+				},
+				{
+					"propertyName": "Handler",
+					"propertyKeyword": "handler",
+					"propertyTooltip": "Name of a procedure handler method.",
+					"propertyType": "text",
+					"dependency": {
+						"type": "or",
+						"values": [
+							{
+								"key": "language",
+								"value": "java"
+							},
+							{
+								"key": "language",
+								"value": "python"
+							},
+							{
+								"key": "language",
+								"value": "scala"
+							}
+						]
+					},
+					"template": "textarea",
+					"markdown": false
+				},
+				{
+					"propertyName": "Procedure body",
+					"propertyKeyword": "body",
+					"propertyTooltip": "Valid SQL procedure statement.",
+					"propertyType": "details",
+					"template": "textarea",
+					"markdown": false
+				},
+				{
+					"propertyName": "Remarks",
+					"propertyKeyword": "comments",
+					"shouldValidate": false,
+					"propertyTooltip": "comments",
+					"addTimestampButton": false,
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
+	},
+	{
 		"lowerTab": "Sequences",
 		"structure": [{
 			"propertyName": "Sequence",
