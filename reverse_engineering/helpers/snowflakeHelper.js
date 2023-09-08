@@ -1038,11 +1038,12 @@ const getProcedures = async (dbName, schemaName) => {
 
 		return {
 			name: row['PROCEDURE_NAME'],
+			orReplace: true,
 			language: _.toLower(row['PROCEDURE_LANGUAGE']),
-			args: procedureArguments,
+			inputArgs: procedureArguments,
 			returnType: row['DATA_TYPE'],
 			body: row['PROCEDURE_DEFINITION'],
-			comment: row['COMMENT'] || ''
+			description: row['COMMENT'] || '',
 		}
 	});
 };
@@ -1150,7 +1151,7 @@ const getContainerData = async schema => {
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
-			procedures,
+			Procedures: procedures,
 			stages,
 			sequences,
 			fileFormats,
