@@ -20,7 +20,7 @@
                 "disablePipelines": true
             },
             "nestedCollections": false,
-            "disablePatternField": false,
+            "disablePatternField": true,
             "enableForwardEngineering": {
                 "jsonDocument": true,
                 "jsonSchema": true,
