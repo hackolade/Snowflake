@@ -7,19 +7,15 @@
  * the agreement/contract under which the software has been supplied.
  */
 
-const { DROP_STATEMENTS } = require('./constants');
-const commentDropStatements = (script = '') =>
-	script
-		.split('\n')
-		.map(line => {
-			if (DROP_STATEMENTS.some(statement => line.includes(statement))) {
-				return `-- ${line}`;
-			} else {
-				return line;
-			}
-		})
-		.join('\n');
-
 module.exports = {
-	commentDropStatements,
+	number: 'NUMBER',
+	string: 'VARCHAR',
+	date: 'DATE',
+	timestamp: 'TIMESTAMP',
+	binary: 'BINARY',
+	boolean: 'BOOLEAN',
+	document: 'OBJECT',
+	array: 'ARRAY',
+	objectId: 'VARCHAR(24)',
+	default: 'CHAR',
 };

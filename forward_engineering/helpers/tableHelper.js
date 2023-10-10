@@ -1,22 +1,23 @@
-module.exports = (_, toOptions) => {
-	const tab = (text, tab = '\t') => {
-		return text
-			.split('\n')
-			.map(line => tab + line)
-			.join('\n');
-	};
+/*
+ * Copyright © 2016-2023 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+ *
+ * The copyright to the computer software herein is the property of IntegrIT S.A.
+ * The software may be used and/or copied only with the written permission of
+ * IntegrIT S.A. or in accordance with the terms and conditions stipulated in
+ * the agreement/contract under which the software has been supplied.
+ */
 
-	const mergeKeys = keys => keys.map(key => `"${key.name}"`).join(', ');
+module.exports = (_, app) => {
+	const { tab } = app.require('@hackolade/ddl-fe-utils').general;
+	const { toOptions } = require('./general')(_, app);
 
 	const getFileFormat = (fileFormat, formatTypeOptions, formatName = '') => {
 		if (fileFormat !== 'custom') {
-			const options = toOptions(formatTypeOptions);
-			return '(\n' + tab(`TYPE=${fileFormat}${options && `\n${options}`}`) + '\n)';
+			return '(\n' + tab(`TYPE=${fileFormat}\n${toOptions(formatTypeOptions)}`) + '\n)';
 		}
-	
+
 		return '(\n' + tab(`FORMAT_NAME='${formatName}'`) + '\n)';
 	};
-
 
 	const getCopyOptions = copyOptions => {
 		if (_.isEmpty(copyOptions)) {
@@ -24,6 +25,16 @@ module.exports = (_, toOptions) => {
 		}
 
 		return 'STAGE_COPY_OPTIONS = (\n' + tab(toOptions(copyOptions)) + '\n)';
+	};
+
+	const addOptions = (options, comment) => {
+		const allOptions = _.trim(tab(options.filter(statement => Boolean(_.trim(statement, '\t\n '))).join('\n')), '\t\n');
+
+		if (_.trim(comment)) {
+			return allOptions + '\n\t' + comment;
+		}
+
+		return allOptions;
 	};
 
 	const getAtOrBefore = cloneParams => {
@@ -37,14 +48,14 @@ module.exports = (_, toOptions) => {
 			return '';
 		}
 	};
-	
+
+	const mergeKeys = keys => keys.map(key => `"${key.name}"`).join(', ');
+
 	return {
-		mergeKeys,
 		getFileFormat,
-		tab,
 		getCopyOptions,
+		addOptions,
 		getAtOrBefore,
-	};
-
-}
-
+		mergeKeys,
+	}
+};
