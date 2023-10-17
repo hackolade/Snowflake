@@ -12,7 +12,7 @@ module.exports = (_, app) => {
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
 	const { getFileFormat, getCopyOptions } = require('./tableHelper')(_, app);
 	const { foreignKeysToString, getFullName } = require('./general')(_, app);
-	const commentIfDeactivated = require('./commentDeactivatedHelper');
+	const { commentIfDeactivated } = require('./commentDeactivatedHelper')(_);
 
 	const alterTableSetAction = tableData => {
 		const stageFileFormat = tableData.fileFormat
