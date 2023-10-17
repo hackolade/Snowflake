@@ -93,7 +93,7 @@ module.exports = (_, app) => {
 			};
 
 			const getOrReplaceStatement = (isEnabled) => isEnabled ? ' OR REPLACE' : '';
-			const getBodyStatement = (body) => body ? `$$\n\t${body}\n\t$$` : '';
+			const getBodyStatement = (body) => body ? `$$\n${body}\n\t$$` : '';
 			const getCommentsStatement = (text) => text ? `\n\tCOMMENT = '${text}'` : ''
 			const getNotNullStatement = (isEnabled) => isEnabled ? '\n\tNOT NULL' : '';
 
