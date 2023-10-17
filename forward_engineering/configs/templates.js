@@ -47,4 +47,14 @@ module.exports = {
 	alterSchema: 'ALTER SCHEMA IF EXISTS ${name} ${operation} ${options};',
 	alterTable: 'ALTER TABLE IF EXISTS ${name} ${action};',
 	alterView: 'ALTER${materialized} VIEW IF EXISTS ${name} ${action};',
+
+	alterSchemaScript: 'ALTER SCHEMA IF EXISTS ${name} ',
+	alterTableScript: 'ALTER TABLE IF EXISTS ${name} ',
+	alterEntityRename: 'RENAME TO ${name};\n',
+	setPropertySchema: 'SET ${property};\n',
+	unsetPropertySchema: 'UNSET ${property};\n',
+	manageAccessSchema: '${access} MANAGED ACCESS;\n',
+	setPropertyTable: 'SET ${property};\n',
+	alterViewScript: 'ALTER VIEW IF EXISTS ${name} ',
+	alterMaterializedViewScript: 'ALTER MATERIALIZED VIEW ${name} ',
 };

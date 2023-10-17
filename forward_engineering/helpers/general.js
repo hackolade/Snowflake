@@ -216,6 +216,10 @@ module.exports = (_, app) => {
 		return `"${string}"`;
 	};
 
+	const getDbName = containerData => {
+		return _.get(containerData, '[0].code') || _.get(containerData, '[0].name', '');
+	};
+
 	return {
 		escape,
 		toString,
@@ -234,5 +238,6 @@ module.exports = (_, app) => {
 		getName,
 		getEntityName,
 		getFullName,
+		getDbName,
 	}
 }

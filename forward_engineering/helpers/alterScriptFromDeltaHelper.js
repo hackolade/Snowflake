@@ -59,7 +59,7 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider, app) => {
 	const deletedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
 		'deleted',
-		getDeleteCollectionScript(_, ddlProvider, app)
+		getDeleteCollectionScript(_, app)
 	);
 
 	const modifiedCollectionScripts = getCollectionScripts(

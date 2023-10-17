@@ -11,6 +11,13 @@ const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
 
+const {
+	prepareAlterSetUnsetData,
+	prepareContainerName,
+	prepareMenageContainerData,
+	prepareName,
+} = require('./helpers/alterScriptHelpers/common')
+
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
 
@@ -30,6 +37,7 @@ const snowflakeProvider = (baseProvider, options, app) => {
 		foreignActiveKeysToString,
 		getName,
 		getFullName,
+		getDbName
 	} = require('./helpers/general')(_, app);
 
 	const {
@@ -48,6 +56,14 @@ const snowflakeProvider = (baseProvider, options, app) => {
 
 	const { tab, hasType, clean } = app.require('@hackolade/ddl-fe-utils').general;
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
+
+	const {
+		getAlterSchemaName,
+		getSetCollectionProperty,
+		getUnsetCollectionProperty,
+		getSchemaMenageAccess,
+		getAlterSchemaScript,
+	} = require('./helpers/alterScriptHelpers/commonScript')({ getName, getFullName, templates, assignTemplates, tab, _ });
 
 	let statementCreator = options.isUpdate || options.isUpdateScript ? alterStatements : createStatements;
 
@@ -150,7 +166,7 @@ const snowflakeProvider = (baseProvider, options, app) => {
 										: undefined,
 								comment:
 									udf.functionDescription || udf.storedProcDescription
-										? ` COMMENT=$$${udf.functionDescription || udf.storedProcDescription}$$`
+										? `${udf.functionDescription || udf.storedProcDescription}`
 										: '',
 							}),
 						)
@@ -448,6 +464,37 @@ const snowflakeProvider = (baseProvider, options, app) => {
 
 		commentIfDeactivated(statement, data, isPartOfLine) {
 			return commentIfDeactivated(statement, data, isPartOfLine);
+		},
+
+		hydrateForDeleteSchema(containerData) {
+			const containerName = getName(containerData.isCaseSensitive,  getDbName(containerData));
+			const databaseName = getName(containerData.isCaseSensitive, containerData.database);
+			const name = getFullName(databaseName, containerName);
+
+			return { name };
+		},
+
+		hydrateAlterSchema(schema) {
+			const preparedData = _.flow(
+				prepareName,
+				prepareContainerName,
+				prepareAlterSetUnsetData,
+				prepareMenageContainerData,
+			)({ collection: schema, data: {} });
+
+			return preparedData.data
+		},
+
+		alterSchema(data) {
+			const alterSchemaScript = getAlterSchemaScript(data?.nameData);
+			const { script } = _.flow(
+				getAlterSchemaName,
+				getSetCollectionProperty(alterSchemaScript),
+				getUnsetCollectionProperty(alterSchemaScript),
+				getSchemaMenageAccess(alterSchemaScript),
+			)({ data, script: [] });
+
+			return script.join('\n')
 		},
 	});
 };
