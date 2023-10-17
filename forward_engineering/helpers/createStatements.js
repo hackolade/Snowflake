@@ -8,6 +8,7 @@
  */
 
 const templates = require('../configs/templates');
+const { LANGUAGES } = require('../helpers/constants');
 
 module.exports = (_, app) => {
 	const { tab } = app.require('@hackolade/ddl-fe-utils').general;
@@ -60,7 +61,7 @@ module.exports = (_, app) => {
 			const dataRetentionStatement =
 				!isNaN(dataRetention) && dataRetention ? `\n\tDATA_RETENTION_TIME_IN_DAYS=${dataRetention}` : '';
 			const managedAccessStatement = managedAccess ? '\n\tWITH MANAGED ACCESS' : '';
-			const commentStatement = comment ? `\n\tCOMMENT=\n$$${comment}\t$$` : '';
+			const commentStatement = comment ? `\n\tCOMMENT=$$${comment}$$` : '';
 			const currentSchemaName = getName(isCaseSensitive, schemaName);
 			const schemaStatement = assignTemplates(templates.createSchema, {
 				name: currentSchemaName,
@@ -69,51 +70,72 @@ module.exports = (_, app) => {
 				data_retention: dataRetentionStatement,
 				comment: commentStatement,
 			});
+
+			const getParameters = (payload) => {
+				if (!payload) {
+					return;
+				}
+
+				const { language, runtimeVersion, handler, packages } = payload;
+				const languagesWithoutParams = [LANGUAGES.SQL, LANGUAGES.JAVASCRIPT];
+				if (languagesWithoutParams.includes(language)) {
+					return;
+				}
+
+				const runtimeVersionStatement = runtimeVersion ? `\n\tRUNTIME_VERSION = '${runtimeVersion}'` : '';
+
+				const handlerStatement = handler ? `\n\tHANDLER = '${handler}'` : '';
+
+				const joinPackages = () => packages.map(({ packageName }) => `'${packageName}'`).join(', ');
+				const packagesStatement = packages ? `\n\tPACKAGES = (${joinPackages()})` : '';
+
+				return `${runtimeVersionStatement}${handlerStatement}${packagesStatement}`;
+			};
+
+			const getOrReplaceStatement = (isEnabled) => isEnabled ? ' OR REPLACE' : '';
+			const getBodyStatement = (body) => body ? `$$\n\t${body}\n\t$$` : '';
+			const getCommentsStatement = (text) => text ? `\n\tCOMMENT = '${text}'` : ''
+			const getNotNullStatement = (isEnabled) => isEnabled ? '\n\tNOT NULL' : '';
+
 			const userDefinedFunctions = udfs.map(udf =>
-				assignTemplates(templates.createUDF, {
+				 assignTemplates(templates.createUDF, {
 					name: getFullName(currentSchemaName, getName(isCaseSensitive, udf.name)),
 					arguments: (udf.arguments || '').replace(/^\(([\s\S]+)\)$/, '$1'),
-					return_type: udf.return_type,
+					returnType: udf.returnType,
 					language: udf.language,
-					function: udf.function,
-					comment: udf.comment,
+					body: getBodyStatement(udf.function),
+					comment: getCommentsStatement(udf.comment),
+					orReplace: getOrReplaceStatement(udf.orReplace),
+					parameters: getParameters(udf),
+					notNull: getNotNullStatement(udf.notNull),
 				}),
 			);
+
 			const proceduresStatements = procedures.map(
-				({ name, orReplace, args, returnType, language, runtimeVersion, packages, handler, body, description }) => {
-					const procedureBody = `\n\t$$\n${body}\n\t$$`;
-					let parameters = '';
-					const languagesWithoutParameters = ['sql', 'javascript'];
-					if (!languagesWithoutParameters.includes(language)) {
-						const languagesWithRuntimeVersionAsString = ['python'];
-						const runtimeVersionToInsert = languagesWithRuntimeVersionAsString.includes(language)
-							? `'${runtimeVersion}'`
-							: runtimeVersion;
-						const runtimeVersionStatement = runtimeVersion
-							? `RUNTIME_VERSION = ${runtimeVersionToInsert}\n`
-							: '';
-
-						const handlerStatement = handler ? `\tHANDLER = '${handler}'\n` : '';
-						const packagesStatement = packages
-							? `\tPACKAGES = (${packages.map(({ packageName }) => `'${packageName}'`).join(', ')})\n`
-							: '';
-
-						parameters = `${runtimeVersionStatement}${handlerStatement}${packagesStatement}\t`;
-					}
-
-					const commentsStatement = description ? `COMMENT = '${description}'\n\t` : '';
-
-					return assignTemplates(templates.createProcedure, {
-						orReplace: orReplace ? ' OR REPLACE' : '',
+				({
+					 name,
+					 orReplace,
+					 args,
+					 returnType,
+					 language,
+					 runtimeVersion,
+					 packages,
+					 handler,
+					 body,
+					 description,
+					 notNull,
+				}) =>
+					assignTemplates(templates.createProcedure, {
+						orReplace: getOrReplaceStatement(orReplace),
 						name: getFullName(currentSchemaName, getName(isCaseSensitive, name)),
 						arguments: (args || '').replace(/^\(([\s\S]+)\)$/, '$1'),
-						returnType: returnType,
-						language: language,
-						parameters,
-						comment: commentsStatement,
-						body: procedureBody,
-					});
-				},
+						returnType,
+						language,
+						parameters: getParameters({ language, runtimeVersion, handler, packages }),
+						comment: getCommentsStatement(description),
+						body: getBodyStatement(body),
+						notNull: getNotNullStatement(notNull)
+					}),
 			);
 
 			const sequencesStatements = sequences.map(sequence =>

@@ -19,7 +19,7 @@ const snowflakeProvider = (baseProvider, options, app) => {
 
 	const keyHelper = require('./helpers/keyHelper')(_, app);
 	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(_, app);
-	const getStageCopyOptions = require('./helpers/getStageCopyOptions')(_, app);
+	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(_, app);
 
 	const {
 		toString,
@@ -137,9 +137,13 @@ const snowflakeProvider = (baseProvider, options, app) => {
 						.map(udf =>
 							clean({
 								name: udf.name || undefined,
+								orReplace: udf.orReplace || undefined,
 								language: udf.functionLanguage || udf.storedProcLanguage || undefined,
+								runtimeVersion: udf.runtimeVersion || undefined,
+								packages: udf.packages || undefined,
 								arguments: udf.functionArguments || udf.storedProcArgument || undefined,
-								return_type: udf.functionReturnType || udf.storedProcDataType || undefined,
+								returnType: udf.functionReturnType || udf.storedProcDataType || undefined,
+								notNull: udf.notNull || undefined,
 								function:
 									udf.functionBody || udf.storedProcFunction
 										? tab(_.trim(udf.functionBody || udf.storedProcFunction))
@@ -150,7 +154,7 @@ const snowflakeProvider = (baseProvider, options, app) => {
 										: '',
 							}),
 						)
-						.filter(udf => udf.name && udf.language && udf.return_type && udf.function)
+						.filter(udf => udf.name && udf.language && udf.returnType && udf.function)
 					: [],
 				procedures: Array.isArray(procedures)
 					? procedures
@@ -160,6 +164,7 @@ const snowflakeProvider = (baseProvider, options, app) => {
 								orReplace: procedure.orReplace || undefined,
 								args: procedure.inputArgs || undefined,
 								returnType: procedure.returnType || undefined,
+								notNull: procedure.notNull || undefined,
 								language: procedure.language || undefined,
 								runtimeVersion: procedure.runtimeVersion || undefined,
 								packages: procedure.packages || undefined,

@@ -181,8 +181,20 @@ making sure that you maintain a proper JSON format.
 					"propertyName": "Name",
 					"propertyKeyword": "name",
 					"shouldValidate": false,
-					"propertyTooltip": "",
+					"propertyTooltip": "Specifies the identifier for the UDF",
 					"propertyType": "text"
+				},
+				{
+					"propertyName": "Or Replace",
+					"propertyKeyword": "orReplace",
+					"propertyType": "checkbox",
+					"propertyTooltip": "Specifies that if a UDF with the same name and input argument data types, or signature, as this one already exists, the existing UDF is replaced. You can only replace a UDF with a new UDF that defines an identical set of data types."
+				},
+				{
+					"propertyName": "Temporary",
+					"propertyKeyword": "temporary",
+					"propertyType": "checkbox",
+					"propertyTooltip": "Specifies that the function persists only for the duration of the session that you created it in. A temporary function is dropped at the end of the session."
 				},
 				{
 					"propertyName": "Language",
@@ -192,8 +204,11 @@ making sure that you maintain a proper JSON format.
 					"propertyType": "select",
 					"defaultValue": "sql",
 					"options": [
-						"sql",
-						"javascript"
+						"java",
+						"javascript",
+						"python",
+						"scala",
+						"sql"
 					]
 				},
 				{
@@ -219,10 +234,77 @@ making sure that you maintain a proper JSON format.
 					"propertyType": "text"
 				},
 				{
+					"propertyName": "Not Null",
+					"propertyKeyword": "notNull",
+					"propertyType": "checkbox",
+					"propertyTooltip": "Specifies whether the function can return NULL values or must return only NON-NULL values."
+				},
+				{
+					"propertyName": "Runtime version",
+					"propertyKeyword": "runtimeVersion",
+					"propertyType": "text",
+					"dependency": {
+						"type": "or",
+						"values": [
+							{
+								"key": "functionLanguage",
+								"value": "java"
+							},
+							{
+								"key": "functionLanguage",
+								"value": "python"
+							},
+							{
+								"key": "functionLanguage",
+								"value": "scala"
+							}
+						]
+					},
+					"propertyTooltip": "Specifies a UDF language runtime version"
+				},
+				{
+					"propertyName": "Packages",
+					"propertyKeyword": "packages",
+					"propertyType": "group",
+					"structure": [
+						{
+							"propertyName": "Name",
+							"propertyKeyword": "packageName",
+							"propertyType": "text"
+						}
+					],
+					"dependency": {
+						"type": "or",
+						"values": [
+							{
+								"key": "functionLanguage",
+								"value": "java"
+							},
+							{
+								"key": "functionLanguage",
+								"value": "python"
+							},
+							{
+								"key": "functionLanguage",
+								"value": "scala"
+							}
+						]
+					},
+					"propertyTooltip": "The name and version number of Snowflake system packages required as dependencies"
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "functionDescription",
+					"shouldValidate": false,
+					"propertyTooltip": "",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
 					"propertyName": "Function",
 					"propertyKeyword": "functionBody",
 					"shouldValidate": false,
-					"propertyTooltip": "description",
+					"propertyTooltip": "Defines the handler code executed when the UDF is called",
 					"propertyType": "details",
 					"template": "textarea",
 					"markdown": false
@@ -280,11 +362,11 @@ making sure that you maintain a proper JSON format.
 					"propertyType": "select",
 					"defaultValue": "sql",
 					"options": [
-						"sql",
-						"javascript",
 						"java",
+						"javascript",
 						"python",
-						"scala"
+						"scala",
+						"sql"
 					]
 				},
 				{
@@ -344,7 +426,7 @@ making sure that you maintain a proper JSON format.
 							}
 						]
 					},
-					"propertyTooltip": "Specifies procedure language runtime version"
+					"propertyTooltip": "The name and version number of Snowflake system packages required as dependencies"
 				},
 				{
 					"propertyName": "Handler",

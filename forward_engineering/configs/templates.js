@@ -36,9 +36,9 @@ module.exports = {
 		'\t${column_list}\n' +
 		')\n${copy_grants}${comment}AS ${select_statement}',
 	createUDF:
-		"CREATE OR REPLACE FUNCTION ${name}(${arguments})\n\tRETURNS ${return_type}\n\tLANGUAGE ${language}\n\tAS '\n${function}\n'${comment};\n",
+		"CREATE${orReplace} FUNCTION ${name}(${arguments})\n\tRETURNS ${returnType}${notNull}\n\tLANGUAGE ${language}${parameters}${comment}\n\tAS ${body};\n",
 	createProcedure:
-		'CREATE${orReplace} PROCEDURE ${name}(${arguments})\n\tRETURNS ${returnType}\n\tLANGUAGE ${language}\n\t${parameters}${comment}AS ${body};\n',
+		'CREATE${orReplace} PROCEDURE ${name}(${arguments})\n\tRETURNS ${returnType}${notNull}\n\tLANGUAGE ${language}${parameters}${comment}\n\tAS ${body};\n',
 	createSequence: 'CREATE SEQUENCE IF NOT EXISTS ${name} START ${start} INCREMENT ${increment}${comment};\n',
 	createFileFormat: 'CREATE FILE FORMAT IF NOT EXISTS ${name}${options}${comment};\n',
 	createStage:
