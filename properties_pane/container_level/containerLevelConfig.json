@@ -212,14 +212,6 @@ making sure that you maintain a proper JSON format.
 					]
 				},
 				{
-					"propertyName": "Comments",
-					"propertyKeyword": "functionDescription",
-					"shouldValidate": false,
-					"propertyTooltip": "description",
-					"propertyType": "details",
-					"template": "textarea"
-				},
-				{
 					"propertyName": "Argument signature",
 					"propertyKeyword": "functionArguments",
 					"shouldValidate": false,
