@@ -10,14 +10,14 @@
 const {
 	checkFieldPropertiesChanged, 
 	getNames, 
-	getBaseAndContaienrNames,
+	getBaseAndContainerNames,
 } = require('./common');
 
-const getAddCollectionScript = (_, ddlProvider) => collection => {
-	const { getEntityName, getName } = require('../general')(_);
+const getAddCollectionScript = (_, ddlProvider, app) => collection => {
+	const { getEntityName, getName } = require('../general')(_, app);
 	const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(_);
 
-	const { schemaName, databaseName } = getBaseAndContaienrNames(collection, getName);
+	const { schemaName, databaseName } = getBaseAndContainerNames(collection, getName);
 	const jsonSchema = {
 		...collection,
 		...(_.omit(collection?.role, 'properties') || {}),
@@ -47,8 +47,8 @@ const getAddCollectionScript = (_, ddlProvider) => collection => {
 	return ddlProvider.createTable(hydratedTable, jsonSchema.isActivated);
 };
 
-const getDeleteCollectionScript = _ => collection => {
-	const { getEntityName, getFullName, getName } = require('../general')(_);
+const getDeleteCollectionScript = (_, app) => collection => {
+	const { getEntityName, getFullName, getName } = require('../general')(_, app);
 
 	const jsonData = {
 		...collection,
@@ -66,8 +66,8 @@ const getModifyCollectionScript = ddlProvider => collection => {
 	return ddlProvider.alterTable(data);
 };
 
-const getAddColumnScript = (_, ddlProvider) => collection => {
-	const { getEntityName, getFullName, getName } = require('../general')(_);
+const getAddColumnScript = (_, ddlProvider, app) => collection => {
+	const { getEntityName, getFullName, getName } = require('../general')(_, app);
 	const { createColumnDefinitionBySchema } = require('./createColumnDefinition')(_);
 	const { commentIfDeactivated } = require('../commentDeactivatedHelper')(_);
 
@@ -98,8 +98,8 @@ const getAddColumnScript = (_, ddlProvider) => collection => {
 		);
 };
 
-const getDeleteColumnScript = _ => collection => {
-	const { getEntityName, getFullName, getName } = require('../general')(_);
+const getDeleteColumnScript = (_, app) => collection => {
+	const { getEntityName, getFullName, getName } = require('../general')(_, app);
 
 	const collectionSchema = {
 		...collection,
@@ -113,8 +113,8 @@ const getDeleteColumnScript = _ => collection => {
 		.map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN ${name};`);
 };
 
-const getModifyColumnScript = _ => collection => {
-	const { getEntityName, getFullName, getName } = require('../general')(_);
+const getModifyColumnScript = (_, app) => collection => {
+	const { getEntityName, getFullName, getName } = require('../general')(_, app);
 
 	const collectionSchema = {
 		...collection,

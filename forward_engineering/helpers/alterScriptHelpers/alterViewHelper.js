@@ -9,16 +9,16 @@
 
 const {
 	getNames, 
-	getBaseAndContaienrNames,
+	getBaseAndContainerNames,
 } = require('./common');
 
 const getViewName = view => (view && view.code || view.name) || '';
 
 const getAddViewScript = (_, ddlProvider, app) => view => {
-	const { getName } = require('../general')(_);
+	const { getName } = require('../general')(_, app);
 	const { mapProperties } = app.require('@hackolade/ddl-fe-utils');
 
-	const { schemaName, databaseName } = getBaseAndContaienrNames(view, getName);
+	const { schemaName, databaseName } = getBaseAndContainerNames(view, getName);
 
 	const viewData = {
 		name: view.code || view.name,
@@ -40,8 +40,8 @@ const getAddViewScript = (_, ddlProvider, app) => view => {
 	return ddlProvider.createView(hydratedView, {}, view.isActivated);
 };
 
-const getDeleteViewScript = _ => view => {
-	const { getFullName, getName } = require('../general')(_);
+const getDeleteViewScript = (_, app) => view => {
+	const { getFullName, getName } = require('../general')(_, app);
 
 	const jsonData = {
 		...view,

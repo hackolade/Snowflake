@@ -25,7 +25,7 @@ const prepareContainerLevelData = container => ({
 });
 
 const getNames = (schema, getName, getEntityName) => {
-	const { schemaName, databaseName } = getBaseAndContaienrNames(schema, getName);
+	const { schemaName, databaseName } = getBaseAndContainerNames(schema, getName);
 	const tableName = getName(schema.isCaseSensitive, getEntityName(schema));
 
 	return {
@@ -35,7 +35,7 @@ const getNames = (schema, getName, getEntityName) => {
 	};
 };
 
-const getBaseAndContaienrNames = (schema, getName) => {
+const getBaseAndContainerNames = (schema, getName) => {
 	const { database, isCaseSensitive } = schema.compMod?.bucketProperties || {};
 	const { keyspaceName } = schema.compMod;
 	const schemaName = getName(isCaseSensitive, keyspaceName);
@@ -233,7 +233,7 @@ const prepareCollectionStageCopyOptions = (clean, getStageCopyOptions, _) => ({ 
 module.exports = {
 	checkFieldPropertiesChanged,
 	prepareContainerLevelData,
-	getBaseAndContaienrNames,
+	getBaseAndContainerNames,
 	getNames,
 	prepareTableName,
 	prepareContainerName,

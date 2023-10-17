@@ -32,9 +32,9 @@ const getItems = (collection, nameProperty, modify, objectMethod) =>
 		.filter(Boolean)
 		.map(items => Object[objectMethod](items.properties)[0]);
 
-const getAlterContainersScripts = (collection, _, ddlProvider) => {
+const getAlterContainersScripts = (collection, _, ddlProvider, app) => {
 	const addedContainerScripts = getItems(collection, 'containers', 'added', 'values').map(
-		getAddContainerScript(_, ddlProvider)
+		getAddContainerScript(_, ddlProvider, app)
 	);
 	const deletedContainerScripts = getItems(collection, 'containers', 'deleted', 'values').map(
 		getDeleteContainerScript(ddlProvider)
@@ -45,7 +45,7 @@ const getAlterContainersScripts = (collection, _, ddlProvider) => {
 	return { addedContainerScripts, deletedContainerScripts, modifiedContainerScripts };
 };
 
-const getAlterCollectionsScripts = (collection, _, ddlProvider) => {
+const getAlterCollectionsScripts = (collection, _, ddlProvider, app) => {
 	const getCollectionScripts = (items, compMode, getScript) =>
 		items.filter(item => item.compMod?.[compMode]).map(getScript);
 
@@ -54,12 +54,12 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider) => {
 	const addedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'added', 'values'),
 		'created',
-		getAddCollectionScript(_, ddlProvider)
+		getAddCollectionScript(_, ddlProvider, app)
 	);
 	const deletedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
 		'deleted',
-		getDeleteCollectionScript(_, ddlProvider)
+		getDeleteCollectionScript(_, ddlProvider, app)
 	);
 
 	const modifiedCollectionScripts = getCollectionScripts(
@@ -70,15 +70,15 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider) => {
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
-		getAddColumnScript(_, ddlProvider)
+		getAddColumnScript(_, ddlProvider, app)
 	);
 	const deletedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
-		getDeleteColumnScript(_, ddlProvider)
+		getDeleteColumnScript(_, app)
 	);
 	const modifiedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'modified', 'values'),
-		getModifyColumnScript(_, ddlProvider)
+		getModifyColumnScript(_, app)
 	);
 
 	return {
@@ -109,7 +109,7 @@ const getAlterViewsScripts = ({ schema, _, ddlProvider, app }) => {
 	const deletedViewScripts = getViewScripts(
 		getItems(schema, 'views', 'deleted', 'values'),
 		'deleted',
-		getDeleteViewScript(_)
+		getDeleteViewScript(_, app)
 	);
 	const modifiedViewScripts = getModifiedScript(
 		getItems(schema, 'views', 'modified', 'values'),
@@ -126,8 +126,8 @@ const getAlterViewsScripts = ({ schema, _, ddlProvider, app }) => {
 
 const getAlterScript = ({ collection, _, ddlProvider, app }) => {
 	const script = {
-		...getAlterCollectionsScripts(collection, _, ddlProvider),
-		...getAlterContainersScripts(collection, _, ddlProvider),
+		...getAlterCollectionsScripts(collection, _, ddlProvider, app),
+		...getAlterContainersScripts(collection, _, ddlProvider, app),
 		...getAlterViewsScripts({ schema: collection, _, ddlProvider, app }),
 	}
 	return [

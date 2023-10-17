@@ -192,6 +192,10 @@ module.exports = (_, app) => {
 		return isValidCaseInsensitiveName(name) ? name : addQuotes(name);
 	};
 
+	const getEntityName = entityData => {
+		return (entityData && (entityData.code || entityData.collectionName)) || '';
+	};
+
 	const getFullName = (schemaName, name) => {
 		if (!schemaName) {
 			return name;
@@ -228,6 +232,7 @@ module.exports = (_, app) => {
 		foreignActiveKeysToString,
 		viewColumnsToString,
 		getName,
+		getEntityName,
 		getFullName,
 	}
 }

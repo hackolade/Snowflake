@@ -16,7 +16,7 @@ module.exports = {
 		try {
 			const { getAlterScript } = require('./helpers/alterScriptFromDeltaHelper');
 			const _ = app.require('lodash');
-			const ddlProvider = require('./ddlProvider')(_);
+			const ddlProvider = require('./ddlProvider')(_, data.options, app);
 
 			const collection = JSON.parse(data.jsonSchema);
 
