@@ -217,7 +217,7 @@ module.exports = (_, app) => {
 	};
 
 	const getDbName = containerData => {
-		return _.get(containerData, '[0].code') || _.get(containerData, '[0].name', '');
+		return _.get(containerData, 'code') || _.get(containerData, 'name', '');
 	};
 
 	return {
