@@ -49,7 +49,6 @@ const snowflakeProvider = (baseProvider, options, app) => {
 		createExternalColumn,
 	} = require('./helpers/columnDefinitionHelper')(_, app);
 
-	const alterStatements = require('./helpers/alterStatements')(_, app);
 	const createStatements = require('./helpers/createStatements')(_, app);
 	const { generateConstraint } = require('./helpers/constraintHelper')(_, app);
 	const { commentIfDeactivated } = require('./helpers/commentDeactivatedHelper')(_);
@@ -65,9 +64,7 @@ const snowflakeProvider = (baseProvider, options, app) => {
 		getAlterSchemaScript,
 	} = require('./helpers/alterScriptHelpers/commonScript')({ getName, getFullName, templates, assignTemplates, tab, _ });
 
-	let statementCreator = options.isUpdate || options.isUpdateScript ? alterStatements : createStatements;
-
-	return statementCreator({
+	return createStatements({
 		createForeignKeyConstraint(fkData, dbData, schemaData) {
 			const isRelationActivated = checkIfForeignKeyActivated(fkData);
 			const foreignKeys = isRelationActivated
@@ -237,6 +234,7 @@ const snowflakeProvider = (baseProvider, options, app) => {
 					: [],
 			};
 		},
+
 		hydrateTable({ tableData, entityData, jsonSchema }) {
 			const keyConstraints = keyHelper.getTableKeyConstraints({ jsonSchema });
 			const firstTab = _.get(entityData, '[0]', {});
