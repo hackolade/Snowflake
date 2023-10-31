@@ -186,15 +186,9 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Or Replace",
-					"propertyKeyword": "orReplace",
+					"propertyKeyword": "functionOrReplace",
 					"propertyType": "checkbox",
 					"propertyTooltip": "Specifies that if a UDF with the same name and input argument data types, or signature, as this one already exists, the existing UDF is replaced. You can only replace a UDF with a new UDF that defines an identical set of data types."
-				},
-				{
-					"propertyName": "Temporary",
-					"propertyKeyword": "temporary",
-					"propertyType": "checkbox",
-					"propertyTooltip": "Specifies that the function persists only for the duration of the session that you created it in. A temporary function is dropped at the end of the session."
 				},
 				{
 					"propertyName": "Language",
@@ -227,13 +221,13 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Not Null",
-					"propertyKeyword": "notNull",
+					"propertyKeyword": "functionNotNull",
 					"propertyType": "checkbox",
 					"propertyTooltip": "Specifies whether the function can return NULL values or must return only NON-NULL values."
 				},
 				{
 					"propertyName": "Runtime version",
-					"propertyKeyword": "runtimeVersion",
+					"propertyKeyword": "functionRuntimeVersion",
 					"propertyType": "text",
 					"dependency": {
 						"type": "or",
@@ -256,7 +250,7 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Packages",
-					"propertyKeyword": "packages",
+					"propertyKeyword": "functionPackages",
 					"propertyType": "group",
 					"structure": [
 						{

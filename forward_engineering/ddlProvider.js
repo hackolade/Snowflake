@@ -133,7 +133,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 
 			const getOrReplaceStatement = (isEnabled) => isEnabled ? ' OR REPLACE' : '';
-			const getBodyStatement = (body) => body ? `$$\n${body}\n\t$$` : '';
+			const getBodyStatement = (body) => body ? `\n\t$$\n${body}\n\t$$` : '';
 			const getCommentsStatement = (text) => text ? `\n\tCOMMENT = '${text}'` : ''
 			const getNotNullStatement = (isEnabled) => isEnabled ? '\n\tNOT NULL' : '';
 
@@ -531,13 +531,14 @@ module.exports = (baseProvider, options, app) => {
 						.map(udf =>
 							clean({
 								name: udf.name || undefined,
-								orReplace: udf.orReplace || undefined,
+								orReplace: udf.functionOrReplace || undefined,
 								language: udf.functionLanguage || udf.storedProcLanguage || undefined,
-								runtimeVersion: udf.runtimeVersion || undefined,
-								packages: udf.packages || undefined,
+								runtimeVersion: udf.functionRuntimeVersion || undefined,
+								packages: udf.functionPackages || undefined,
 								arguments: udf.functionArguments || udf.storedProcArgument || undefined,
 								returnType: udf.functionReturnType || udf.storedProcDataType || undefined,
-								notNull: udf.notNull || undefined,
+								notNull: udf.functionNotNull || undefined,
+								handler: udf.functionHandler || undefined,
 								function:
 									udf.functionBody || udf.storedProcFunction
 										? tab(_.trim(udf.functionBody || udf.storedProcFunction))
