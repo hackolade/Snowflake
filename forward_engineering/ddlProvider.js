@@ -373,7 +373,7 @@ module.exports = (baseProvider, options, app) => {
 				constraint: fkData.name ? `CONSTRAINT ${getName(schemaData.isCaseSensitive, fkData.name)} ` : '',
 				columns: foreignKeys,
 				primary_table: getFullName(
-					fkData.primarySchemaName || schemaData.schemaName,
+					getName(fkData.primarySchemaName || schemaData.schemaName),
 					getName(fkData.primaryTableIsCaseSensitive, fkData.primaryTable),
 				),
 				primary_columns: primaryKeys,
