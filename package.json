@@ -26,7 +26,14 @@
                 "jsonSchema": true,
                 "excel": true,
                 "plugin": true
-			},
+            },
+            "forwardEngineering": {
+                "jsonSchema": {
+                    "keepParentType": {
+                        "integer": "integer"
+                    }
+                }
+            },
             "enableReverseEngineering": true,
             "disableChoices": true,
             "enableJsonType": true,
