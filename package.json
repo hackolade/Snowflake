@@ -1,7 +1,7 @@
 {
     "name": "Snowflake",
-    "version": "0.1.70",
-    "versionDate": "2023-05-18",
+    "version": "0.1.77",
+    "versionDate": "2023-12-01",
     "author": "hackolade",
     "engines": {
         "hackolade": "6.1.2",
@@ -20,13 +20,20 @@
                 "disablePipelines": true
             },
             "nestedCollections": false,
-            "disablePatternField": false,
+            "disablePatternField": true,
             "enableForwardEngineering": {
                 "jsonDocument": true,
                 "jsonSchema": true,
                 "excel": true,
                 "plugin": true
-			},
+            },
+            "forwardEngineering": {
+                "jsonSchema": {
+                    "keepParentType": {
+                        "integer": "integer"
+                    }
+                }
+            },
             "enableReverseEngineering": true,
             "disableChoices": true,
             "enableJsonType": true,

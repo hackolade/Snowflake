@@ -101,7 +101,7 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 				logger.progress({ message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table });
 				logger.log('info', { message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table }, 'Getting schema');
 
-				const { documents, jsonSchema } = await snowflakeHelper.getJsonSchema(logger, getCount(quantity, data.recordSamplingSettings), fullTableName);
+				const { documents, jsonSchema } = await snowflakeHelper.getJsonSchema(logger, getSampleDocSize(quantity, data.recordSamplingSettings), fullTableName);
 				const entityData = await snowflakeHelper.getEntityData(fullTableName, logger);
 
 				logger.progress({ message: `Schema inference`, containerName: schema, entityName: table });
@@ -202,12 +202,14 @@ const filterMetaProperties = (entityData, jsonSchema, logger) => {
 	};
 };
 
-const getCount = (count, recordSamplingSettings) => {
-	const per = recordSamplingSettings.relative.value;
-	const size = (recordSamplingSettings.active === 'absolute')
-		? recordSamplingSettings.absolute.value
-		: Math.round(count / 100 * per);
-	return size;
+const getSampleDocSize = (count, recordSamplingSettings) => {
+	if (recordSamplingSettings.active === 'absolute') {
+		return Number(recordSamplingSettings.absolute.value);
+	}
+
+	const limit = Math.ceil((count * recordSamplingSettings.relative.value) / 100);
+
+	return Math.min(limit, recordSamplingSettings.maxValue);
 };
 
 const handleError = (logger, error, cb) => {

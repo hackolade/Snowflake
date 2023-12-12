@@ -51,6 +51,7 @@
 	"PROPERTIES_PANE___ALTERNATE": "Alternate",
 	"PROPERTIES_PANE___MAX_VARIABLE": "Max variable",
 	"PROPERTIES_PANE___BACKWARDS": "Backwards",
+	"PROPERTIES_PANE___DESCRIPTIONS": "comments",
 	"MAIN_MENU___FORWARD_DB_COLLECTIONS": "Snowflake DDL script",
 	"CENTRAL_PANE___FE_SCRIPT": "Snowflake DDL script",
 	"PROPERTIES_PANE___NORMALIZATION": "Normalization",

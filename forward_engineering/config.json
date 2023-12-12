@@ -3,7 +3,7 @@
 	"filterName": "SQL",
 	"type": "ddl",
 	"mode": "pgsql",
-	"ddlType": "snowflake",
+	"ddlType": "plugin",
 	"namePrefix": "Snowflake",
 	"resolvedDefinitions": true,
 	"combinedContainers": true,
