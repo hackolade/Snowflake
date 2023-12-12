@@ -1,5 +1,4 @@
 const { DROP_STATEMENTS } = require('./constants');
-
 const commentDropStatements = (script = '') =>
 	script
 		.split('\n')

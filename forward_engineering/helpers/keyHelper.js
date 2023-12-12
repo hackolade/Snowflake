@@ -1,4 +1,6 @@
-module.exports = (_, clean) => {
+module.exports = (_, app) => {
+	const { clean } = app.require('@hackolade/ddl-fe-utils').general;
+
 	const mapProperties = (jsonSchema, iteratee) => {
 		return Object.entries(jsonSchema.properties).map(iteratee);
 	};

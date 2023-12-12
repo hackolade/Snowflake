@@ -1030,6 +1030,24 @@ const getFunctions = async (dbName, schemaName) => {
 	});
 };
 
+const getProcedures = async (dbName, schemaName) => {
+	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.procedures where PROCEDURE_SCHEMA='${schemaName}'`);
+
+	return rows.map(row => {
+		const procedureArguments = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'].replace(/[\(\)]/gm, '');
+
+		return {
+			name: row['PROCEDURE_NAME'],
+			orReplace: true,
+			language: _.toLower(row['PROCEDURE_LANGUAGE']),
+			inputArgs: procedureArguments,
+			returnType: row['DATA_TYPE'],
+			body: row['PROCEDURE_DEFINITION'],
+			description: row['COMMENT'] || '',
+		}
+	});
+};
+
 const getStages = async (dbName, schemaName) => {
 	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.stages where STAGE_SCHEMA='${schemaName}'`);
 
@@ -1123,6 +1141,7 @@ const getContainerData = async schema => {
 		const isCaseSensitive = _.toUpper(schemaName) !== schemaName;
 		const schemaData = _.first(schemaRows);
 		const functions = await getFunctions(dbName, schemaName);
+		const procedures = await getProcedures(dbName, schemaName);
 		const stages = await getStages(dbName, schemaName);
 		const sequences = await getSequences(dbName, schemaName);
 		const fileFormats = await getFileFormats(dbName, schemaName);
@@ -1132,6 +1151,7 @@ const getContainerData = async schema => {
 			description: _.get(schemaData, 'COMMENT') || _.get(dbData, 'COMMENT') || '',
 			managedAccess: _.get(schemaData, 'IS_TRANSIENT') !== 'NO',
 			UDFs: functions,
+			Procedures: procedures,
 			stages,
 			sequences,
 			fileFormats,
