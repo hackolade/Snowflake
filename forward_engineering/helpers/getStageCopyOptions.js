@@ -1,6 +1,5 @@
-
-module.exports = _ => {
-	const { toNumber, toBoolean } = require('./general')(_);
+module.exports = (_, app) => {
+	const { toNumber, toBoolean } = require('./general')(_, app);
 
 	const getOnError = properties => {
 		if (properties.ON_ERROR === 'SKIP_FILE_<num>') {
@@ -11,7 +10,7 @@ module.exports = _ => {
 			return properties.ON_ERROR;
 		}
 	};
-	
+
 	const getStageCopyOptions = properties => {
 		return {
 			ON_ERROR: getOnError(properties),
@@ -25,5 +24,8 @@ module.exports = _ => {
 			FORCE: toBoolean(properties.FORCE),
 		};
 	};
-	return getStageCopyOptions;
+
+	return {
+		getStageCopyOptions
+	}
 }

@@ -1,9 +1,9 @@
-const { 
+const {
 	prepareContainerLevelData, 
 } = require('./common');
 
-const getAddContainerScript = (_, ddlProvider) => container => {
-	const { getDbName } = require('../general')(_);
+const getAddContainerScript = (_, ddlProvider, app) => container => {
+	const { getDbName } = require('../general')(_, app);
 	const containerData = { ...container.role, name: getDbName(container.role) }
 	const containerLevelData = prepareContainerLevelData(containerData);
 	const hydratedContainer = ddlProvider.hydrateSchema(containerData, containerLevelData);
