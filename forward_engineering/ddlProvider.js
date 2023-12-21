@@ -449,7 +449,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const selectStatement =
 				viewData.selectStatement ||
-				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')};\n`;
+				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')}`;
 
 			return assignTemplates(templates.createView, {
 				secure: viewData.secure ? ' SECURE' : '',

@@ -151,7 +151,8 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 					data: viewData,
 					ddl: {
 						script: ddl,
-						type: 'snowflake'
+						type: 'snowflake',
+						takeAllDdlProperties: true,
 					}
 				};
 			}));
