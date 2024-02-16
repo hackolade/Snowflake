@@ -74,7 +74,7 @@ class Agent extends httpsAgent {
           response: stapling
         }, cb)
       } else {
-        return ocsp.check({ cert: cert, issuer: issuer }, cb)
+        return ocsp.check({ cert, issuer }, cb)
       }
     }
 
