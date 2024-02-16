@@ -1,7 +1,14 @@
+# OCSP client and server implementation in nodejs
+
 This package is a fork of https://github.com/indutny/ocsp
 
-Changes:
-- Node 14 compatibility
+## Changelog
+### 1.0.1
+- node 16,18 compatibility
+- tests fixed
+
+### 1.0.0
+- node 14 compatibility
 - dependency upgrades
 - ES6 classes
 - standardjs instead of jshint

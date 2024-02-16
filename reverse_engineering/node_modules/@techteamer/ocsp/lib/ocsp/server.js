@@ -114,7 +114,7 @@ class Server extends httpServer {
             value: this.certID.sha1.issuerKeyHash
           },
           producedAt: new Date(),
-          responses: responses
+          responses
         },
 
         signatureAlgorithm: {

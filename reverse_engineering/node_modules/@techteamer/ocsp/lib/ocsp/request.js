@@ -57,11 +57,11 @@ exports.generate = function generate (rawCert, rawIssuer) {
 
   return {
     id: sha1(rfc2560.CertID.encode(certID, 'der')),
-    certID: certID,
+    certID,
     data: rfc2560.OCSPRequest.encode(req, 'der'),
 
     // Just to avoid re-parsing DER
-    cert: cert,
-    issuer: issuer
+    cert,
+    issuer
   }
 }

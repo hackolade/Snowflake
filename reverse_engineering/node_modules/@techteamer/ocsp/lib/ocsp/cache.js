@@ -35,7 +35,7 @@ class Cache {
     }
 
     this.cache[id] = {
-      response: response,
+      response,
       timer: setTimeout(() => { delete this.cache[id] }, maxTime)
     }
 

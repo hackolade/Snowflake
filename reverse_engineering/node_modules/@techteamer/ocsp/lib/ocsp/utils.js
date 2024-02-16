@@ -103,8 +103,8 @@ exports.parseResponse = function parseResponse (raw) {
     start: tbs.start,
     end: tbs.end,
     value: basic,
-    certs: certs,
-    certsTbs: certsTbs
+    certs,
+    certsTbs
   }
 }
 
