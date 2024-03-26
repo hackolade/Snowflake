@@ -10,30 +10,35 @@
 		"primaryKey": false,
 		"default": "",
 		"enum": [],
-		"sample":"",
-		"comments":"",
-		"pattern":"",
+		"sample": "",
+		"comments": "",
+		"pattern": "",
 		"format": ""
 	},
-	"descriptor": [{
-		"schema": {
-			"tPrecision": ""
+	"descriptor": [
+		{
+			"schema": {
+				"tPrecision": ""
+			},
+			"format": "YYYY-MM-DD hh:mm:ss"
 		},
-		"format": "YYYY-MM-DD hh:mm:ss"
-	}, {
-		"schema": {
-			"tPrecision": 3
+		{
+			"schema": {
+				"tPrecision": 3
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnn"
 		},
-		"format": "YYYY-MM-DD hh:mm:ss.nnn"
-	}, {
-		"schema": {
-			"tPrecision": 6
+		{
+			"schema": {
+				"tPrecision": 6
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnnnnn"
 		},
-		"format": "YYYY-MM-DD hh:mm:ss.nnnnnn"
-	}, {
-		"schema": {
-			"tPrecision": 9
-		},
-		"format": "YYYY-MM-DD hh:mm:ss.nnnnnnnnn"
-	}]
+		{
+			"schema": {
+				"tPrecision": 9
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnnnnnnnn"
+		}
+	]
 }

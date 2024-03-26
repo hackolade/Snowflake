@@ -51,7 +51,7 @@ const getExternalBrowserUrl = async (connectionInfo, logger, cb, app) => {
 	} catch (err) {
 		handleError(logger, err, cb);
 	}
-}
+};
 
 const getDatabases = (connectionInfo, logger, cb) => {
 	cb();
@@ -89,28 +89,52 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 			const entities = snowflakeHelper.splitEntityNames(collections[schema]);
 
 			const containerData = await snowflakeHelper.getContainerData(schema);
-			const [ database, schemaName ] = schema.split('.');
+			const [database, schemaName] = schema.split('.');
 
 			const tablesPackages = entities.tables.map(async table => {
 				const fullTableName = snowflakeHelper.getFullEntityName(schema, table);
 				logger.progress({ message: `Start getting data from table`, containerName: schema, entityName: table });
-				logger.log('info', { message: `Start getting data from table`, containerName: schema, entityName: table }, 'Getting schema');
+				logger.log(
+					'info',
+					{ message: `Start getting data from table`, containerName: schema, entityName: table },
+					'Getting schema',
+				);
 				const ddl = await snowflakeHelper.getDDL(fullTableName, logger);
 				const quantity = await snowflakeHelper.getRowsCount(fullTableName);
 
-				logger.progress({ message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table });
-				logger.log('info', { message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table }, 'Getting schema');
+				logger.progress({
+					message: `Fetching record for JSON schema inference`,
+					containerName: schema,
+					entityName: table,
+				});
+				logger.log(
+					'info',
+					{ message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table },
+					'Getting schema',
+				);
 
-				const { documents, jsonSchema } = await snowflakeHelper.getJsonSchema(logger, getSampleDocSize(quantity, data.recordSamplingSettings), fullTableName);
+				const { documents, jsonSchema } = await snowflakeHelper.getJsonSchema(
+					logger,
+					getSampleDocSize(quantity, data.recordSamplingSettings),
+					fullTableName,
+				);
 				const entityData = await snowflakeHelper.getEntityData(fullTableName, logger);
 
 				logger.progress({ message: `Schema inference`, containerName: schema, entityName: table });
-				logger.log('info', { message: `Schema inference`, containerName: schema, entityName: table }, 'Getting schema');
+				logger.log(
+					'info',
+					{ message: `Schema inference`, containerName: schema, entityName: table },
+					'Getting schema',
+				);
 
 				const handledDocuments = snowflakeHelper.handleComplexTypesDocuments(jsonSchema, documents);
 
 				logger.progress({ message: `Data retrieved successfully`, containerName: schema, entityName: table });
-				logger.log('info', { message: `Data retrieved successfully`, containerName: schema, entityName: table }, 'Getting schema');
+				logger.log(
+					'info',
+					{ message: `Data retrieved successfully`, containerName: schema, entityName: table },
+					'Getting schema',
+				);
 
 				return {
 					dbName: schemaName,
@@ -125,40 +149,58 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 					},
 					emptyBucket: false,
 					validation: {
-						jsonSchema: filterMetaProperties(entityData, jsonSchema, logger)
+						jsonSchema: filterMetaProperties(entityData, jsonSchema, logger),
 					},
 					bucketInfo: {
 						indexes: [],
 						database,
-						...containerData
-					}
+						...containerData,
+					},
 				};
 			});
 
-			const views = await Promise.all(entities.views.map(async view => {
-				const fullViewName = snowflakeHelper.getFullEntityName(schema, view);
-				logger.progress({ message: `Start getting data from view`, containerName: schema, entityName: view });
-				logger.log('info', { message: `Start getting data from view`, containerName: schema, entityName: view }, 'Getting schema');
-				
-				const ddl = await snowflakeHelper.getViewDDL(fullViewName, logger);
-				const viewData = await snowflakeHelper.getViewData(fullViewName, logger);
+			const views = await Promise.all(
+				entities.views.map(async view => {
+					const fullViewName = snowflakeHelper.getFullEntityName(schema, view);
+					logger.progress({
+						message: `Start getting data from view`,
+						containerName: schema,
+						entityName: view,
+					});
+					logger.log(
+						'info',
+						{ message: `Start getting data from view`, containerName: schema, entityName: view },
+						'Getting schema',
+					);
 
-				logger.progress({ message: `Data retrieved successfully`, containerName: schema, entityName: view });
-				logger.log('info', { message: `Data retrieved successfully`, containerName: schema, entityName: view }, 'Getting schema');
+					const ddl = await snowflakeHelper.getViewDDL(fullViewName, logger);
+					const viewData = await snowflakeHelper.getViewData(fullViewName, logger);
 
-				return {
-					name: view,
-					data: viewData,
-					ddl: {
-						script: ddl,
-						type: 'snowflake',
-						takeAllDdlProperties: true,
-					}
-				};
-			}));
+					logger.progress({
+						message: `Data retrieved successfully`,
+						containerName: schema,
+						entityName: view,
+					});
+					logger.log(
+						'info',
+						{ message: `Data retrieved successfully`, containerName: schema, entityName: view },
+						'Getting schema',
+					);
+
+					return {
+						name: view,
+						data: viewData,
+						ddl: {
+							script: ddl,
+							type: 'snowflake',
+							takeAllDdlProperties: true,
+						},
+					};
+				}),
+			);
 
 			if (_.isEmpty(views)) {
-				return [ ...packages, ...tablesPackages ];
+				return [...packages, ...tablesPackages];
 			}
 
 			const viewPackage = Promise.resolve({
@@ -169,11 +211,11 @@ const getDbCollectionsData = async (data, logger, cb, app) => {
 				bucketInfo: {
 					indexes: [],
 					database,
-					...containerData
-				}
+					...containerData,
+				},
 			});
 
-			return [ ...packages, ...tablesPackages, viewPackage ];
+			return [...packages, ...tablesPackages, viewPackage];
 		}, Promise.resolve([]));
 
 		const packages = await Promise.all(entitiesPromises);
@@ -188,14 +230,30 @@ const filterMetaProperties = (entityData, jsonSchema, logger) => {
 	if (!entityData.external) {
 		const valueMetaColumn = jsonSchema?.properties?.VALUE;
 		if (valueMetaColumn && valueMetaColumn.type === 'variant') {
-			logger.log('info', { message: `The VALUE meta property was found`, containerName: entityData.containerName, entityName: entityData.entityName }, 'Filtering meta properties');
+			logger.log(
+				'info',
+				{
+					message: `The VALUE meta property was found`,
+					containerName: entityData.containerName,
+					entityName: entityData.entityName,
+				},
+				'Filtering meta properties',
+			);
 
 			return _.omit(jsonSchema.properties, 'VALUE');
 		}
 		return jsonSchema;
 	}
 	const columnList = Object.keys(jsonSchema.properties || {}).join();
-	logger.log('info', { message: `External table columns from DESC TABLE: ${columnList}`, containerName: entityData.containerName, entityName: entityData.entityName }, 'Filtering meta properties');
+	logger.log(
+		'info',
+		{
+			message: `External table columns from DESC TABLE: ${columnList}`,
+			containerName: entityData.containerName,
+			entityName: entityData.entityName,
+		},
+		'Filtering meta properties',
+	);
 
 	return {
 		...jsonSchema,
@@ -214,7 +272,7 @@ const getSampleDocSize = (count, recordSamplingSettings) => {
 };
 
 const handleError = (logger, error, cb) => {
-	const message = _.isString(error) ? error : _.get(error, 'message', 'Reverse Engineering error')
+	const message = _.isString(error) ? error : _.get(error, 'message', 'Reverse Engineering error');
 	logger.log('error', { error }, 'Reverse Engineering error');
 
 	return cb({ message });
@@ -234,5 +292,5 @@ module.exports = {
 	getDocumentKinds,
 	getDbCollectionsNames,
 	getDbCollectionsData,
-	getExternalBrowserUrl
-}
+	getExternalBrowserUrl,
+};

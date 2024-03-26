@@ -20,12 +20,14 @@ module.exports = (_, app) => {
 			ENFORCE_LENGTH: toBoolean(properties.ENFORCE_LENGTH),
 			RETURN_FAILED_ONLY: toBoolean(properties.RETURN_FAILED_ONLY),
 			TRUNCATECOLUMNS: toBoolean(properties.TRUNCATECOLUMNS),
-			LOAD_UNCERTAIN_FILES: !properties.LOAD_UNCERTAIN_FILES ? undefined : toBoolean(properties.LOAD_UNCERTAIN_FILES),
+			LOAD_UNCERTAIN_FILES: !properties.LOAD_UNCERTAIN_FILES
+				? undefined
+				: toBoolean(properties.LOAD_UNCERTAIN_FILES),
 			FORCE: toBoolean(properties.FORCE),
 		};
 	};
 
 	return {
-		getStageCopyOptions
-	}
-}
+		getStageCopyOptions,
+	};
+};

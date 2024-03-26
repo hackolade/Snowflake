@@ -2,7 +2,9 @@ module.exports = (_, app) => {
 	const { foreignKeysToString, foreignActiveKeysToString, getName } = require('./general')(_, app);
 
 	const generateConstraint = ({ name, keys, keyType, isParentActivated, isCaseSensitive }) => {
-		const keysAsStrings = keys.map(key => Object.assign({}, key, { name: `${getName(isCaseSensitive, key.name)}` }));
+		const keysAsStrings = keys.map(key =>
+			Object.assign({}, key, { name: `${getName(isCaseSensitive, key.name)}` }),
+		);
 		const atLeastOneActive = keysAsStrings.some(key => key.isActivated);
 		let finalStringOfKeys = foreignActiveKeysToString(isCaseSensitive, keysAsStrings);
 		if (atLeastOneActive && isParentActivated) {
@@ -17,6 +19,6 @@ module.exports = (_, app) => {
 	};
 
 	return {
-		generateConstraint
-	}
+		generateConstraint,
+	};
 };

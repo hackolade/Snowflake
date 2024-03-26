@@ -6,9 +6,9 @@ const LANGUAGES = {
 	PYTHON: 'python',
 	SCALA: 'scala',
 	SQL: 'sql',
-}
+};
 
 module.exports = {
 	DROP_STATEMENTS,
-	LANGUAGES
+	LANGUAGES,
 };

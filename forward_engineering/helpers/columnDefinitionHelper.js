@@ -145,5 +145,5 @@ module.exports = (_, app) => {
 		getCollation,
 		getInlineConstraint,
 		createExternalColumn,
-	}
+	};
 };

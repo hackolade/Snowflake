@@ -67,7 +67,7 @@ module.exports = (_, app) => {
 		return _.get(
 			Object.values(properties).find(prop => prop.GUID === keyId),
 			'isActivated',
-			true
+			true,
 		);
 	};
 
@@ -130,9 +130,9 @@ module.exports = (_, app) => {
 				}
 
 				return schema.uniqueKeyOptions.map(uniqueKey =>
-					hydrateUniqueOptions(uniqueKey, name, schema.isActivated, jsonSchema)
+					hydrateUniqueOptions(uniqueKey, name, schema.isActivated, jsonSchema),
 				);
-			})
+			}),
 		).filter(Boolean);
 
 		return [

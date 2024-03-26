@@ -1,9 +1,6 @@
-const {
-	getNames, 
-	getBaseAndContainerNames,
-} = require('./common');
+const { getNames, getBaseAndContainerNames } = require('./common');
 
-const getViewName = view => (view && view.code || view.name) || '';
+const getViewName = view => (view && view.code) || view.name || '';
 
 const getAddViewScript = (_, ddlProvider, app) => view => {
 	const { getName } = require('../general')(_, app);
@@ -13,12 +10,12 @@ const getAddViewScript = (_, ddlProvider, app) => view => {
 
 	const viewData = {
 		name: view.code || view.name,
-		keys: getKeys({ 
-			viewSchema: view, 
+		keys: getKeys({
+			viewSchema: view,
 			collectionRefsDefinitionsMap: view.compMod?.collectionData?.collectionRefsDefinitionsMap ?? {},
 			ddlProvider,
 			mapProperties,
-			_
+			_,
 		}),
 		schemaData: { schemaName, databaseName },
 	};
@@ -51,13 +48,7 @@ const getModifyViewScript = ddlProvider => view => {
 	return ddlProvider.alterView(data);
 };
 
-const getKeys = ({ 
-	viewSchema, 
-	collectionRefsDefinitionsMap, 
-	ddlProvider,
-	mapProperties,
-	_,
-}) => {
+const getKeys = ({ viewSchema, collectionRefsDefinitionsMap, ddlProvider, mapProperties, _ }) => {
 	return mapProperties(viewSchema, (propertyName, schema) => {
 		const definition = collectionRefsDefinitionsMap[schema.refId];
 
@@ -99,7 +90,6 @@ const getKeys = ({
 		});
 	});
 };
-
 
 module.exports = {
 	getAddViewScript,

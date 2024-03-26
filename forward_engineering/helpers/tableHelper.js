@@ -19,7 +19,10 @@ module.exports = (_, app) => {
 	};
 
 	const addOptions = (options, comment) => {
-		const allOptions = _.trim(tab(options.filter(statement => Boolean(_.trim(statement, '\t\n '))).join('\n')), '\t\n');
+		const allOptions = _.trim(
+			tab(options.filter(statement => Boolean(_.trim(statement, '\t\n '))).join('\n')),
+			'\t\n',
+		);
 
 		if (_.trim(comment)) {
 			return allOptions + '\n\t' + comment;
@@ -48,5 +51,5 @@ module.exports = (_, app) => {
 		addOptions,
 		getAtOrBefore,
 		mergeKeys,
-	}
+	};
 };

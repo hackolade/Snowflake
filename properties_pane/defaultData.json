@@ -22,38 +22,46 @@
 		"punctuationSensitivity": "",
 		"firstLetterPreference": "",
 		"caseConversion": "",
-		"spaceTrimming": ""	,
+		"spaceTrimming": "",
 		"defaultOption": {
 			"value": "",
-			"valueDependencies": [{
-				"value": "Default",
-				"dependency": {
-					"key": "default",
-					"exist": true
+			"valueDependencies": [
+				{
+					"value": "Default",
+					"dependency": {
+						"key": "default",
+						"exist": true
+					}
+				},
+				{
+					"value": "Autoincrement",
+					"dependency": [
+						{
+							"key": "start_num",
+							"exist": true
+						},
+						{
+							"key": "step_num",
+							"exist": true
+						}
+					]
 				}
-			},{
-				"value": "Autoincrement",
-				"dependency": [{
-					"key": "start_num",
-					"exist": true
-				},{
-					"key": "step_num",
-					"exist": true
-				}]
-			}]	
+			]
 		},
 		"autoincrement": {
 			"step_num": 1
 		},
 		"tPrecision": 9,
 		"subtype": {
-			"valueDependencies": [{
-				"value": "json",
-				"dependency": {
-					"key": "childType",
-					"value": "object"
+			"valueDependencies": [
+				{
+					"value": "json",
+					"dependency": {
+						"key": "childType",
+						"value": "object"
+					}
 				}
-			}]
+			]
 		}
 	},
 	"patternField": {

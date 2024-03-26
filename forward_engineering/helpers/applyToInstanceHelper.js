@@ -1,8 +1,5 @@
 const snowflakeHelper = require('../../reverse_engineering/helpers/snowflakeHelper');
-const {
-	setDependencies,
-	dependencies,
-} = require('../../reverse_engineering/helpers/appDependencies');
+const { setDependencies, dependencies } = require('../../reverse_engineering/helpers/appDependencies');
 
 const applyToInstance = async (connectionInfo, logger, app) => {
 	const async = app.require('async');
@@ -29,11 +26,9 @@ const createQueries = (app, script = '') => {
 		.filter(Boolean)
 		.map(query => `${query.trim()};`)
 		.filter(query => !queryIsDeactivated(query));
+};
 
-}
-
-const createMessage = query =>
-	'Query: ' + query.replace(/\n+/, '').split('\n').shift().substring(0, 150);
+const createMessage = query => 'Query: ' + query.replace(/\n+/, '').split('\n').shift().substring(0, 150);
 
 const initDependencies = app => {
 	setDependencies(app);

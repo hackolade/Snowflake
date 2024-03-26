@@ -10,11 +10,7 @@ const maxClock = cpus => {
 const prefixZero = number => (number < 10 ? '0' + number : number);
 
 const toTime = number => {
-	return (
-		Math.floor(number / 3600) +
-		':' +
-		prefixZero(parseInt((number / 3600 - Math.floor(number / 3600)) * 60))
-	);
+	return Math.floor(number / 3600) + ':' + prefixZero(parseInt((number / 3600 - Math.floor(number / 3600)) * 60));
 };
 
 const getSystemInfo = appVersion => {

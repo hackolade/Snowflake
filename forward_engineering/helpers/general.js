@@ -230,5 +230,5 @@ module.exports = (_, app) => {
 		getEntityName,
 		getFullName,
 		getDbName,
-	}
-}
+	};
+};

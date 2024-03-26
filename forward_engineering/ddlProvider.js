@@ -22,7 +22,10 @@ module.exports = (baseProvider, options, app) => {
 	const { tab, hasType, clean } = app.require('@hackolade/ddl-fe-utils').general;
 
 	const keyHelper = require('./helpers/keyHelper')(_, app);
-	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys } = require('./helpers/tableHelper')(_, app);
+	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys } = require('./helpers/tableHelper')(
+		_,
+		app,
+	);
 	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(_, app);
 	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(_, app);
 
@@ -39,14 +42,8 @@ module.exports = (baseProvider, options, app) => {
 		viewColumnsToString,
 	} = require('./helpers/general')(_, app);
 
-	const {
-		decorateType,
-		getDefault,
-		getAutoIncrement,
-		getCollation,
-		getInlineConstraint,
-		createExternalColumn,
-	} = require('./helpers/columnDefinitionHelper')(_, app);
+	const { decorateType, getDefault, getAutoIncrement, getCollation, getInlineConstraint, createExternalColumn } =
+		require('./helpers/columnDefinitionHelper')(_, app);
 
 	const { generateConstraint } = require('./helpers/constraintHelper')(_, app);
 	const { commentIfDeactivated } = require('./helpers/commentDeactivatedHelper')(_);
@@ -60,8 +57,15 @@ module.exports = (baseProvider, options, app) => {
 		getAlterEntityRename,
 		getAlterTableFormat,
 		getAlterTableStageCopyOptions,
-		getAlterEntityScript
-	} = require('./helpers/alterScriptHelpers/commonScript')({ getName, getFullName, templates, assignTemplates, tab, _ });
+		getAlterEntityScript,
+	} = require('./helpers/alterScriptHelpers/commonScript')({
+		getName,
+		getFullName,
+		templates,
+		assignTemplates,
+		tab,
+		_,
+	});
 
 	const getOutOfLineConstraints = (
 		foreignKeyConstraints,
@@ -82,19 +86,19 @@ module.exports = (baseProvider, options, app) => {
 
 	return {
 		createSchema({
-									 schemaName,
-									 databaseName,
-									 transient,
-									 managedAccess,
-									 dataRetention,
-									 comment,
-									 udfs,
-									 procedures,
-									 sequences,
-									 fileFormats,
-									 stages,
-									 isCaseSensitive,
-								 }) {
+			schemaName,
+			databaseName,
+			transient,
+			managedAccess,
+			dataRetention,
+			comment,
+			udfs,
+			procedures,
+			sequences,
+			fileFormats,
+			stages,
+			isCaseSensitive,
+		}) {
 			const transientStatement = transient ? ' TRANSIENT' : '';
 			const dataRetentionStatement =
 				!isNaN(dataRetention) && dataRetention ? `\n\tDATA_RETENTION_TIME_IN_DAYS=${dataRetention}` : '';
@@ -111,7 +115,7 @@ module.exports = (baseProvider, options, app) => {
 				comment: commentStatement,
 			});
 
-			const getParameters = (payload) => {
+			const getParameters = payload => {
 				if (!payload) {
 					return;
 				}
@@ -132,10 +136,10 @@ module.exports = (baseProvider, options, app) => {
 				return `${runtimeVersionStatement}${handlerStatement}${packagesStatement}`;
 			};
 
-			const getOrReplaceStatement = (isEnabled) => isEnabled ? ' OR REPLACE' : '';
-			const getBodyStatement = (body) => body ? `\n\t$$\n${body}\n\t$$` : '';
-			const getCommentsStatement = (text) => text ? `\n\tCOMMENT = '${text}'` : ''
-			const getNotNullStatement = (isEnabled) => isEnabled ? '\n\tNOT NULL' : '';
+			const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
+			const getBodyStatement = body => (body ? `\n\t$$\n${body}\n\t$$` : '');
+			const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
+			const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
 
 			const userDefinedFunctions = udfs.map(udf =>
 				assignTemplates(templates.createUDF, {
@@ -153,18 +157,18 @@ module.exports = (baseProvider, options, app) => {
 
 			const proceduresStatements = procedures.map(
 				({
-					 name,
-					 orReplace,
-					 args,
-					 returnType,
-					 language,
-					 runtimeVersion,
-					 packages,
-					 handler,
-					 body,
-					 description,
-					 notNull,
-				 }) =>
+					name,
+					orReplace,
+					args,
+					returnType,
+					language,
+					runtimeVersion,
+					packages,
+					handler,
+					body,
+					description,
+					notNull,
+				}) =>
 					assignTemplates(templates.createProcedure, {
 						orReplace: getOrReplaceStatement(orReplace),
 						name: getFullName(currentSchemaName, getName(isCaseSensitive, name)),
@@ -174,7 +178,7 @@ module.exports = (baseProvider, options, app) => {
 						parameters: getParameters({ language, runtimeVersion, handler, packages }),
 						comment: getCommentsStatement(description),
 						body: getBodyStatement(body),
-						notNull: getNotNullStatement(notNull)
+						notNull: getNotNullStatement(notNull),
 					}),
 			);
 
@@ -234,23 +238,23 @@ module.exports = (baseProvider, options, app) => {
 			const transient = tableData.transient && !tableData.temporary ? ' TRANSIENT' : '';
 			const clusterKeys = !_.isEmpty(tableData.clusteringKey)
 				? ' CLUSTER BY (' +
-				(isActivated
-					? foreignKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)
-					: foreignActiveKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)) +
-				')'
+					(isActivated
+						? foreignKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)
+						: foreignActiveKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)) +
+					')'
 				: '';
 			const partitionKeys = !_.isEmpty(tableData.partitioningKey)
 				? ' PARTITION BY (' +
-				(isActivated
-					? foreignKeysToString(
-						tableData.isCaseSensitive,
-						tableData.partitioningKey.map(key => ({
-							name: `${getName(tableData.isCaseSensitive, key.name)}`,
-							isActivated: key.isActivated,
-						})),
-					)
-					: mergeKeys(tableData.partitioningKey)) +
-				')'
+					(isActivated
+						? foreignKeysToString(
+								tableData.isCaseSensitive,
+								tableData.partitioningKey.map(key => ({
+									name: `${getName(tableData.isCaseSensitive, key.name)}`,
+									isActivated: key.isActivated,
+								})),
+							)
+						: mergeKeys(tableData.partitioningKey)) +
+					')'
 				: '';
 			const comment = tableData.comment ? ` COMMENT=$$${tableData.comment}$$` : '';
 			const copyGrants = tableData.copyGrants ? ` COPY GRANTS` : '';
@@ -259,17 +263,17 @@ module.exports = (baseProvider, options, app) => {
 				: '';
 			const stageFileFormat = tableData.fileFormat
 				? tab(
-					'STAGE_FILE_FORMAT = ' +
-					getFileFormat(tableData.fileFormat, tableData.formatTypeOptions, tableData.formatName),
-					' ',
-				)
+						'STAGE_FILE_FORMAT = ' +
+							getFileFormat(tableData.fileFormat, tableData.formatTypeOptions, tableData.formatName),
+						' ',
+					)
 				: '';
 			const fileFormat = tableData.fileFormat
 				? tab(
-					'FILE_FORMAT = ' +
-					getFileFormat(tableData.fileFormat, tableData.formatTypeOptions, tableData.formatName),
-					' ',
-				)
+						'FILE_FORMAT = ' +
+							getFileFormat(tableData.fileFormat, tableData.formatTypeOptions, tableData.formatName),
+						' ',
+					)
 				: '';
 			const copyOptions = tab(getCopyOptions(tableData.copyOptions), ' ');
 			const atOrBefore = tab(getAtOrBefore(tableData.cloneParams), ' ');
@@ -305,7 +309,9 @@ module.exports = (baseProvider, options, app) => {
 				const autoRefresh = tableData.externalOptions.AUTO_REFRESH
 					? ' AUTO_REFRESH=' + tableData.externalOptions.AUTO_REFRESH
 					: '';
-				const pattern = tableData.externalOptions.PATTERN ? ' PATTERN=' + tableData.externalOptions.PATTERN : '';
+				const pattern = tableData.externalOptions.PATTERN
+					? ' PATTERN=' + tableData.externalOptions.PATTERN
+					: '';
 
 				return assignTemplates(templates.createExternalTable, {
 					name: tableData.fullName,
@@ -482,27 +488,27 @@ module.exports = (baseProvider, options, app) => {
 				autoincrement:
 					jsonSchema.defaultOption === 'Autoincrement' && jsonSchema.autoincrement
 						? {
-							start: _.get(jsonSchema, 'autoincrement.start_num'),
-							step: _.get(jsonSchema, 'autoincrement.step_num'),
-						}
+								start: _.get(jsonSchema, 'autoincrement.start_num'),
+								step: _.get(jsonSchema, 'autoincrement.step_num'),
+							}
 						: false,
 				identity:
 					jsonSchema.defaultOption === 'Identity' && jsonSchema.identity
 						? {
-							start: _.get(jsonSchema, 'identity.start_num'),
-							step: _.get(jsonSchema, 'identity.step_num'),
-						}
+								start: _.get(jsonSchema, 'identity.start_num'),
+								step: _.get(jsonSchema, 'identity.step_num'),
+							}
 						: false,
 				collation: jsonSchema.collate
 					? clean({
-						locale: jsonSchema.locale,
-						caseSensitivity: jsonSchema.caseSensitivity,
-						accentSensitivity: jsonSchema.accentSensitivity,
-						punctuationSensitivity: jsonSchema.punctuationSensitivity,
-						firstLetterPreference: jsonSchema.firstLetterPreference,
-						caseConversion: jsonSchema.caseConversion,
-						spaceTrimming: jsonSchema.spaceTrimming,
-					})
+							locale: jsonSchema.locale,
+							caseSensitivity: jsonSchema.caseSensitivity,
+							accentSensitivity: jsonSchema.accentSensitivity,
+							punctuationSensitivity: jsonSchema.punctuationSensitivity,
+							firstLetterPreference: jsonSchema.firstLetterPreference,
+							caseConversion: jsonSchema.caseConversion,
+							spaceTrimming: jsonSchema.spaceTrimming,
+						})
 					: {},
 				comment: jsonSchema.refDescription || jsonSchema.description,
 				unique: jsonSchema.uniqueKeyConstraintName ? false : jsonSchema.unique,
@@ -528,91 +534,91 @@ module.exports = (baseProvider, options, app) => {
 				dataRetention: containerData.DATA_RETENTION_TIME_IN_DAYS,
 				udfs: Array.isArray(udfs)
 					? udfs
-						.map(udf =>
-							clean({
-								name: udf.name || undefined,
-								orReplace: udf.functionOrReplace || undefined,
-								language: udf.functionLanguage || udf.storedProcLanguage || undefined,
-								runtimeVersion: udf.functionRuntimeVersion || undefined,
-								packages: udf.functionPackages || undefined,
-								arguments: udf.functionArguments || udf.storedProcArgument || undefined,
-								returnType: udf.functionReturnType || udf.storedProcDataType || undefined,
-								notNull: udf.functionNotNull || undefined,
-								handler: udf.functionHandler || undefined,
-								function:
-									udf.functionBody || udf.storedProcFunction
-										? tab(_.trim(udf.functionBody || udf.storedProcFunction))
-										: undefined,
-								comment:
-									udf.functionDescription || udf.storedProcDescription
-										? `${udf.functionDescription || udf.storedProcDescription}`
-										: '',
-							}),
-						)
-						.filter(udf => udf.name && udf.language && udf.returnType && udf.function)
+							.map(udf =>
+								clean({
+									name: udf.name || undefined,
+									orReplace: udf.functionOrReplace || undefined,
+									language: udf.functionLanguage || udf.storedProcLanguage || undefined,
+									runtimeVersion: udf.functionRuntimeVersion || undefined,
+									packages: udf.functionPackages || undefined,
+									arguments: udf.functionArguments || udf.storedProcArgument || undefined,
+									returnType: udf.functionReturnType || udf.storedProcDataType || undefined,
+									notNull: udf.functionNotNull || undefined,
+									handler: udf.functionHandler || undefined,
+									function:
+										udf.functionBody || udf.storedProcFunction
+											? tab(_.trim(udf.functionBody || udf.storedProcFunction))
+											: undefined,
+									comment:
+										udf.functionDescription || udf.storedProcDescription
+											? `${udf.functionDescription || udf.storedProcDescription}`
+											: '',
+								}),
+							)
+							.filter(udf => udf.name && udf.language && udf.returnType && udf.function)
 					: [],
 				procedures: Array.isArray(procedures)
 					? procedures
-						.map(procedure =>
-							clean({
-								name: procedure.name || undefined,
-								orReplace: procedure.orReplace || undefined,
-								args: procedure.inputArgs || undefined,
-								returnType: procedure.returnType || undefined,
-								notNull: procedure.notNull || undefined,
-								language: procedure.language || undefined,
-								runtimeVersion: procedure.runtimeVersion || undefined,
-								packages: procedure.packages || undefined,
-								handler: procedure.handler || undefined,
-								body: procedure.body ? tab(_.trim(procedure.body)) : undefined,
-								description: procedure.description || undefined,
-							}),
-						)
-						.filter(procedure => procedure.name)
+							.map(procedure =>
+								clean({
+									name: procedure.name || undefined,
+									orReplace: procedure.orReplace || undefined,
+									args: procedure.inputArgs || undefined,
+									returnType: procedure.returnType || undefined,
+									notNull: procedure.notNull || undefined,
+									language: procedure.language || undefined,
+									runtimeVersion: procedure.runtimeVersion || undefined,
+									packages: procedure.packages || undefined,
+									handler: procedure.handler || undefined,
+									body: procedure.body ? tab(_.trim(procedure.body)) : undefined,
+									description: procedure.description || undefined,
+								}),
+							)
+							.filter(procedure => procedure.name)
 					: [],
 				sequences: Array.isArray(sequences)
 					? sequences
-						.map(sequence =>
-							clean({
-								name: sequence.name || undefined,
-								start: sequence.sequenceStart || DEFAULT_SNOWFLAKE_SEQUENCE_START,
-								increment: sequence.sequenceIncrement || DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT,
-								comment: sequence.sequenceComments
-									? ` COMMENT=$$${sequence.sequenceComments}$$`
-									: '',
-							}),
-						)
-						.filter(sequence => sequence.name)
+							.map(sequence =>
+								clean({
+									name: sequence.name || undefined,
+									start: sequence.sequenceStart || DEFAULT_SNOWFLAKE_SEQUENCE_START,
+									increment: sequence.sequenceIncrement || DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT,
+									comment: sequence.sequenceComments
+										? ` COMMENT=$$${sequence.sequenceComments}$$`
+										: '',
+								}),
+							)
+							.filter(sequence => sequence.name)
 					: [],
 				fileFormats: Array.isArray(fileFormats)
 					? fileFormats
-						.map(fileFormat =>
-							clean({
-								name: fileFormat.name || undefined,
-								type: fileFormat.fileFormat,
-								formatTypeOptions: clean(
-									getFormatTypeOptions(fileFormat.fileFormat, fileFormat.formatTypeOptions),
-								),
-								comment: fileFormat.fileFormatComments
-									? ` COMMENT=$$${fileFormat.fileFormatComments}$$`
-									: '',
-							}),
-						)
-						.filter(fileFormat => fileFormat.name)
+							.map(fileFormat =>
+								clean({
+									name: fileFormat.name || undefined,
+									type: fileFormat.fileFormat,
+									formatTypeOptions: clean(
+										getFormatTypeOptions(fileFormat.fileFormat, fileFormat.formatTypeOptions),
+									),
+									comment: fileFormat.fileFormatComments
+										? ` COMMENT=$$${fileFormat.fileFormatComments}$$`
+										: '',
+								}),
+							)
+							.filter(fileFormat => fileFormat.name)
 					: [],
 				stages: Array.isArray(stages)
 					? stages
-						.map(stage =>
-							clean({
-								name: stage.name || undefined,
-								temporary: stage.temporary,
-								url: stage.url,
-								storageIntegration: stage.storageIntegration,
-								credentials: stage.credentials,
-								encryption: stage.encryption,
-							}),
-						)
-						.filter(stage => stage.name)
+							.map(stage =>
+								clean({
+									name: stage.name || undefined,
+									temporary: stage.temporary,
+									url: stage.url,
+									storageIntegration: stage.storageIntegration,
+									credentials: stage.credentials,
+									encryption: stage.encryption,
+								}),
+							)
+							.filter(stage => stage.name)
 					: [],
 			};
 		},
@@ -661,12 +667,12 @@ module.exports = (baseProvider, options, app) => {
 						...result,
 						[column.primaryKeyConstraintName]: Array.isArray(result[column.primaryKeyConstraintName])
 							? _.uniqBy(
-								[
-									...result[column.primaryKeyConstraintName],
-									{ name: column.name, isActivated: column.isActivated },
-								],
-								'name',
-							)
+									[
+										...result[column.primaryKeyConstraintName],
+										{ name: column.name, isActivated: column.isActivated },
+									],
+									'name',
+								)
 							: [{ name: column.name, isActivated: column.isActivated }],
 					};
 				}, entityLevelCompositePrimaryKeys);
@@ -682,12 +688,12 @@ module.exports = (baseProvider, options, app) => {
 						...result,
 						[column.uniqueKeyConstraintName]: Array.isArray(result[column.uniqueKeyConstraintName])
 							? _.uniqBy(
-								[
-									...result[column.uniqueKeyConstraintName],
-									{ name: column.name, isActivated: column.isActivated },
-								],
-								'name',
-							)
+									[
+										...result[column.uniqueKeyConstraintName],
+										{ name: column.name, isActivated: column.isActivated },
+									],
+									'name',
+								)
 							: [{ name: column.name, isActivated: column.isActivated }],
 					};
 				}, entityLevelCompositeUniqueKeys);
@@ -703,8 +709,8 @@ module.exports = (baseProvider, options, app) => {
 				isCaseSensitive: firstTab.isCaseSensitive,
 				clusteringKey: Array.isArray(firstTab.clusteringKey)
 					? firstTab.clusteringKey
-						.map(key => composeClusteringKey(firstTab.isCaseSensitive, jsonSchema, key))
-						.filter(Boolean)
+							.map(key => composeClusteringKey(firstTab.isCaseSensitive, jsonSchema, key))
+							.filter(Boolean)
 					: [],
 				partitioningKey: firstTab.partitioningKey,
 				comment: firstTab.description,
@@ -731,11 +737,11 @@ module.exports = (baseProvider, options, app) => {
 				cloneParams: _.isEmpty(firstTab.cloneParams)
 					? {}
 					: {
-						atOrBefore: _.toUpper(firstTab.cloneParams.atOrBefore),
-						TIMESTAMP: firstTab.cloneParams.TIMESTAMP,
-						OFFSET: firstTab.cloneParams.OFFSET,
-						STATEMENT: firstTab.cloneParams.STATEMENT,
-					},
+							atOrBefore: _.toUpper(firstTab.cloneParams.atOrBefore),
+							TIMESTAMP: firstTab.cloneParams.TIMESTAMP,
+							OFFSET: firstTab.cloneParams.OFFSET,
+							STATEMENT: firstTab.cloneParams.STATEMENT,
+						},
 				externalOptions: {
 					location: _.isPlainObject(firstTab.location) ? getLocation(firstTab.location) : '',
 					REFRESH_ON_CREATE: toBoolean(firstTab.REFRESH_ON_CREATE),
@@ -823,14 +829,16 @@ module.exports = (baseProvider, options, app) => {
 				prepareCollectionStageCopyOptions(clean, getStageCopyOptions, _),
 			)({ collection, data: {} });
 
-			const formatTypeOptions = clean(getFormatTypeOptions(data.formatData.fileFormat, data.formatTypeOptions.typeOptions))
+			const formatTypeOptions = clean(
+				getFormatTypeOptions(data.formatData.fileFormat, data.formatTypeOptions.typeOptions),
+			);
 
 			return {
 				...data,
 				formatTypeOptions: {
 					...data.formatTypeOptions,
-					typeOptions: formatTypeOptions
-				}
+					typeOptions: formatTypeOptions,
+				},
 			};
 		},
 
@@ -848,11 +856,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateAlterView(collection) {
-			const { data } = _.flow(
-				prepareName,
-				prepareTableName,
-				prepareAlterSetUnsetData,
-			)({ collection, data: {} });
+			const { data } = _.flow(prepareName, prepareTableName, prepareAlterSetUnsetData)({ collection, data: {} });
 
 			return data;
 		},
@@ -866,7 +870,7 @@ module.exports = (baseProvider, options, app) => {
 				getSchemaMenageAccess(alterSchemaScript),
 			)({ data, script: [] });
 
-			return script.join('\n')
+			return script.join('\n');
 		},
 
 		hydrateAlterSchema(schema) {
@@ -877,15 +881,15 @@ module.exports = (baseProvider, options, app) => {
 				prepareMenageContainerData,
 			)({ collection: schema, data: {} });
 
-			return preparedData.data
+			return preparedData.data;
 		},
 
 		hydrateForDeleteSchema(containerData) {
-			const containerName = getName(containerData.isCaseSensitive,  getDbName(containerData));
+			const containerName = getName(containerData.isCaseSensitive, getDbName(containerData));
 			const databaseName = getName(containerData.isCaseSensitive, containerData.database);
 			const name = getFullName(databaseName, containerName);
 
 			return { name };
 		},
-	}
+	};
 };

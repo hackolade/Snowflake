@@ -34,14 +34,14 @@
 			"mode": "decimal"
 		},
 		{
-			"schema":{
+			"schema": {
 				"mode": "decimal"
 			},
 			"capacity": 12,
 			"mode": "decimal"
 		},
 		{
-			"schema":{
+			"schema": {
 				"mode": "numeric"
 			},
 			"capacity": 12,

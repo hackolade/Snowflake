@@ -5,37 +5,83 @@ const BSON = require('bson');
 
 const ALREADY_CONNECTED_STATUS = 405502;
 const CANT_REACH_SNOWFLAKE_ERROR_STATUS = 401001;
-const CONNECTION_TIMED_OUT_CODE  = 'CONNECTION_TIMED_OUT'
+const CONNECTION_TIMED_OUT_CODE = 'CONNECTION_TIMED_OUT';
 
 let connection;
 let containers = {};
 
 const noConnectionError = { message: 'Connection error' };
-const oktaAuthenticatorError = { message: 'Can\'t get SSO URL. Please, check the authenticator' };
-const oktaCredentialsError = { message: 'Incorrect Okta username/password or MFA is enabled. Please, check credentials or use the "Identity Provider SSO (via external browser)" for MFA auth' };
-const oktaMFAError = { message: 'Native Okta auth doesn\'t support MFA. Please, use the "Identity Provider SSO (via external browser)" auth instead' };
+const oktaAuthenticatorError = { message: "Can't get SSO URL. Please, check the authenticator" };
+const oktaCredentialsError = {
+	message:
+		'Incorrect Okta username/password or MFA is enabled. Please, check credentials or use the "Identity Provider SSO (via external browser)" for MFA auth',
+};
+const oktaMFAError = {
+	message:
+		'Native Okta auth doesn\'t support MFA. Please, use the "Identity Provider SSO (via external browser)" auth instead',
+};
 
 const DEFAULT_CLIENT_APP_ID = 'JavaScript';
 const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
 const DEFAULT_WAREHOUSE = 'COMPUTE_WH';
 const DEFAULT_ROLE = 'PUBLIC';
 const HACKOLADE_APPLICATION = 'Hackolade';
-const CLOUD_PLATFORM_POSTFIXES = [ 'gcp', 'aws', 'azure' ];
+const CLOUD_PLATFORM_POSTFIXES = ['gcp', 'aws', 'azure'];
 
 let _;
 
-const connect = async (logger, { host, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform, queryRequestTimeout }) => {
+const connect = async (
+	logger,
+	{
+		host,
+		username,
+		password,
+		authType,
+		authenticator,
+		proofKey,
+		token,
+		role,
+		warehouse,
+		name,
+		cloudPlatform,
+		queryRequestTimeout,
+	},
+) => {
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 	const timeout = _.toNumber(queryRequestTimeout) || 2 * 60 * 1000;
 
-	logger.log('info', `Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`, 'Connection');
+	logger.log(
+		'info',
+		`Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`,
+		'Connection',
+	);
 
 	let authPromise;
 	if (authType === 'okta') {
-		authPromise = authByOkta(logger, { account, accessUrl, username, password, authenticator, role, warehouse, timeout });
-	} if (authType === 'externalbrowser') {
-		authPromise = authByExternalBrowser(logger, { account, accessUrl, token, proofKey, username, password, role, warehouse, timeout })
+		authPromise = authByOkta(logger, {
+			account,
+			accessUrl,
+			username,
+			password,
+			authenticator,
+			role,
+			warehouse,
+			timeout,
+		});
+	}
+	if (authType === 'externalbrowser') {
+		authPromise = authByExternalBrowser(logger, {
+			account,
+			accessUrl,
+			token,
+			proofKey,
+			username,
+			password,
+			role,
+			warehouse,
+			timeout,
+		});
 	} else {
 		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
 	}
@@ -45,21 +91,46 @@ const connect = async (logger, { host, username, password, authType, authenticat
 			throw err;
 		}
 
-		const message = _.isString(err) ? err : _.get(err, 'message', 'Reverse Engineering error')
-		logger.log('info', `Can't reach Snowflake server. Trying to add cloudPlatformName. \nInitial error: ${message}`, 'Connection');
+		const message = _.isString(err) ? err : _.get(err, 'message', 'Reverse Engineering error');
+		logger.log(
+			'info',
+			`Can't reach Snowflake server. Trying to add cloudPlatformName. \nInitial error: ${message}`,
+			'Connection',
+		);
 
-		return connect(logger, { host: `${host}.${_.toLower(cloudPlatform)}`, username, password, authType, authenticator, proofKey, token, role, warehouse, name, cloudPlatform, queryRequestTimeout });
+		return connect(logger, {
+			host: `${host}.${_.toLower(cloudPlatform)}`,
+			username,
+			password,
+			authType,
+			authenticator,
+			proofKey,
+			token,
+			role,
+			warehouse,
+			name,
+			cloudPlatform,
+			queryRequestTimeout,
+		});
 	});
 };
 
-const authByOkta = async (logger, { account, accessUrl, username, password, authenticator, role, timeout, warehouse = DEFAULT_WAREHOUSE }) => {
+const authByOkta = async (
+	logger,
+	{ account, accessUrl, username, password, authenticator, role, timeout, warehouse = DEFAULT_WAREHOUSE },
+) => {
 	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
-	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request?Application=${HACKOLADE_APPLICATION}`, { data: {
-		ACCOUNT_NAME: accountName, 
-		LOGIN_NAME: username,
-		AUTHENTICATOR: getOktaAuthenticatorUrl(authenticator)
-	} });
+	const ssoUrlsData = await axios.post(
+		`${accessUrl}/session/authenticator-request?Application=${HACKOLADE_APPLICATION}`,
+		{
+			data: {
+				ACCOUNT_NAME: accountName,
+				LOGIN_NAME: username,
+				AUTHENTICATOR: getOktaAuthenticatorUrl(authenticator),
+			},
+		},
+	);
 
 	logger.log('info', `Starting Okta connection...`, 'Connection');
 	const tokenUrl = _.get(ssoUrlsData, 'data.data.tokenUrl', '');
@@ -71,11 +142,17 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 		return Promise.reject(oktaAuthenticatorError);
 	}
 
-	const authNData = await axios.post(authNUrl, { username, password, options: {
-		multiOptionalFactorEnroll: false,
-		warnBeforePasswordExpired: false,
-	}}).catch(err => ({}));
-	const status =  _.get(authNData, 'data.status', 'SUCCESS');
+	const authNData = await axios
+		.post(authNUrl, {
+			username,
+			password,
+			options: {
+				multiOptionalFactorEnroll: false,
+				warnBeforePasswordExpired: false,
+			},
+		})
+		.catch(err => ({}));
+	const status = _.get(authNData, 'data.status', 'SUCCESS');
 	const authToken = _.get(authNData, 'data.sessionToken', '');
 	if (status.startsWith('MFA')) {
 		return Promise.reject(oktaMFAError);
@@ -97,10 +174,10 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	const samlResponseData = await axios.get(samlUrl, { headers: { HTTP_HEADER_ACCEPT: '*/*' } });
 	const rawSamlResponse = _.get(samlResponseData, 'data', '');
 
-	if (!rawSamlResponse) {	
+	if (!rawSamlResponse) {
 		logger.log('info', `Warning: RAW_SAML_RESPONSE is empty`, 'Connection');
 	} else {
-		logger.log('info', `RAW_SAML_RESPONSE has been provided`, 'Connection')
+		logger.log('info', `RAW_SAML_RESPONSE has been provided`, 'Connection');
 	}
 
 	const requestId = uuid.v4();
@@ -120,13 +197,15 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 			CLIENT_ENVIRONMENT: {
 				APPLICATION: HACKOLADE_APPLICATION,
 			},
-		}
+		},
 	});
 	let tokensData = authData.data;
 	if (_.isString(tokensData)) {
 		try {
 			tokensData = JSON.parse(tokensData);
-		} catch (err) {}
+		} catch (err) {
+			logger.log('error', 'Failed parsing of tokens', 'Connection');
+		}
 	}
 	if (!tokensData.success) {
 		return Promise.reject(tokensData.message);
@@ -135,21 +214,27 @@ const authByOkta = async (logger, { account, accessUrl, username, password, auth
 	const sessionToken = _.get(tokensData, 'data.token', '');
 	logger.log('info', `Tokens have been provided`, 'Connection');
 
-	return connectWithTimeout({
-		accessUrl,
-		masterToken,
-		sessionToken,
-		account,
-		username,
-		password,
-		role,
-		warehouse,
-		timeout,
-		host: '',
-	}, (error) => error.code === ALREADY_CONNECTED_STATUS)
+	return connectWithTimeout(
+		{
+			accessUrl,
+			masterToken,
+			sessionToken,
+			account,
+			username,
+			password,
+			role,
+			warehouse,
+			timeout,
+			host: '',
+		},
+		error => error.code === ALREADY_CONNECTED_STATUS,
+	);
 };
 
-const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, username, account, role, timeout, warehouse = DEFAULT_WAREHOUSE }) => {
+const authByExternalBrowser = async (
+	logger,
+	{ token, accessUrl, proofKey, username, account, role, timeout, warehouse = DEFAULT_WAREHOUSE },
+) => {
 	const accountName = getAccountName(account);
 	warehouse = _.trim(warehouse);
 	role = _.trim(role);
@@ -159,29 +244,36 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 	role = role || DEFAULT_ROLE;
 	authUrl += `&roleName=${encodeURIComponent(getRole(role))}`;
 
-	const authData = await axios.post(authUrl, {
-		data: {
-			CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
-			CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
-			TOKEN: token,
-			AUTHENTICATOR: 'EXTERNALBROWSER',
-			PROOF_KEY: proofKey,
-			LOGIN_NAME: username,
-			ACCOUNT_NAME: accountName,
-			CLIENT_ENVIRONMENT: {
-				APPLICATION: HACKOLADE_APPLICATION,
+	const authData = await axios.post(
+		authUrl,
+		{
+			data: {
+				CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
+				CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
+				TOKEN: token,
+				AUTHENTICATOR: 'EXTERNALBROWSER',
+				PROOF_KEY: proofKey,
+				LOGIN_NAME: username,
+				ACCOUNT_NAME: accountName,
+				CLIENT_ENVIRONMENT: {
+					APPLICATION: HACKOLADE_APPLICATION,
+				},
 			},
-		}}, { 
-		headers: {
-			Accept: 'application/json',
-			Authorization: 'Basic'
-		}
-	});
+		},
+		{
+			headers: {
+				Accept: 'application/json',
+				Authorization: 'Basic',
+			},
+		},
+	);
 	let tokensData = authData.data;
 	if (_.isString(tokensData)) {
 		try {
 			tokensData = JSON.parse(tokensData);
-		} catch (err) {}
+		} catch (err) {
+			logger.log('error', 'Failed parsing of tokens', 'Connection');
+		}
 	}
 	if (!tokensData.success) {
 		return Promise.reject(tokensData.message);
@@ -190,67 +282,87 @@ const authByExternalBrowser = async (logger, { token, accessUrl, proofKey, usern
 	const sessionToken = _.get(tokensData, 'data.token', '');
 	logger.log('info', `Tokens have been provided`, 'Connection');
 
-	await connectWithTimeout({
-		accessUrl,
-		masterToken,
-		sessionToken,
-		account,
-		username,
-		role,
-		warehouse,
-		password: 'password',
-		timeout,
-		host: '',
-	}, (error) => error.code === ALREADY_CONNECTED_STATUS)
+	await connectWithTimeout(
+		{
+			accessUrl,
+			masterToken,
+			sessionToken,
+			account,
+			username,
+			role,
+			warehouse,
+			password: 'password',
+			timeout,
+			host: '',
+		},
+		error => error.code === ALREADY_CONNECTED_STATUS,
+	);
 
 	return new Promise((resolve, reject) => {
-		execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`)
-			.then(resolve, async err => {
+		execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`).then(resolve, async err => {
+			logger.log('error', err.message, 'Connection');
+			await execute(`USE ROLE "${role}"`).catch(err => {});
+			let userData = await execute(`DESC USER "${username}"`).catch(err => []);
+			userData = userData.filter(data => data.property !== 'PASSWORD');
+			logger.log('info', `User info: ${JSON.stringify(userData)}`, 'Connection');
+			let warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {
 				logger.log('error', err.message, 'Connection');
-				await execute(`USE ROLE "${role}"`).catch(err => { });
-				let userData = await execute(`DESC USER "${username}"`).catch(err => []);
-				userData = userData.filter(data => data.property !== 'PASSWORD');
-				logger.log('info', `User info: ${JSON.stringify(userData)}`, 'Connection');
-				let warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => { logger.log('error', err.message, 'Connection'); return [] });
-				const roles = await execute(`SHOW ROLES;`).catch(err => { logger.log('error', err.message, 'Connection'); return [] });
-				const roleNames = roles.map(role => role.name);
-				const defaultRoleData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_ROLE');
-				if (_.isEmpty(warehouses)) {
-					const userRole = _.get(defaultRoleData, 'value', '');
-					if (userRole !== 'null') {
-						await execute(`USE ROLE "${userRole}"`).catch(err => { });
-					}
-					warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => { logger.log('error', err.message, 'Connection'); return [] });
-					if (_.isEmpty(warehouses)) {
-						reject('Warehouse is not available. Please check your role and warehouse');
-					}
-				}
-				const names = warehouses.map(wh => wh.name);
-
-				const defaultWarehouseData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_WAREHOUSE');
-				const defaultUserWarehouse = _.get(defaultWarehouseData, 'value', '');
-				const defaultWarehouse = names.includes(defaultUserWarehouse) ? defaultUserWarehouse : _.first(names);
-
-				logger.log('info', `Available warehouses: ${names.join()}; Available roles: ${roleNames.join()}`, 'Connection');
-				logger.log('info', `Fallback to ${defaultWarehouse} warehouse`, 'Connection');
-
-				execute(`USE WAREHOUSE "${removeQuotes(defaultWarehouse)}";`).then(
-					resolve,
-					async err => {
-						const currentInfo = await execute(`select current_warehouse() as warehouse, current_role() as role;`).catch(err => []);
-						const infoRow = _.first(currentInfo);
-						const currentWarehouse = _.get(infoRow, 'WAREHOUSE', '');
-						const currentRole = _.get(infoRow, 'ROLE', '');
-						logger.log('info', `Current warehouse: ${currentWarehouse}\n Current role: ${currentRole}`, 'Connection');
-						resolve();
-					}
-				);
+				return [];
 			});
+			const roles = await execute(`SHOW ROLES;`).catch(err => {
+				logger.log('error', err.message, 'Connection');
+				return [];
+			});
+			const roleNames = roles.map(role => role.name);
+			const defaultRoleData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_ROLE');
+			if (_.isEmpty(warehouses)) {
+				const userRole = _.get(defaultRoleData, 'value', '');
+				if (userRole !== 'null') {
+					await execute(`USE ROLE "${userRole}"`).catch(err => {});
+				}
+				warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {
+					logger.log('error', err.message, 'Connection');
+					return [];
+				});
+				if (_.isEmpty(warehouses)) {
+					reject('Warehouse is not available. Please check your role and warehouse');
+				}
+			}
+			const names = warehouses.map(wh => wh.name);
+
+			const defaultWarehouseData = userData.find(
+				data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_WAREHOUSE',
+			);
+			const defaultUserWarehouse = _.get(defaultWarehouseData, 'value', '');
+			const defaultWarehouse = names.includes(defaultUserWarehouse) ? defaultUserWarehouse : _.first(names);
+
+			logger.log(
+				'info',
+				`Available warehouses: ${names.join()}; Available roles: ${roleNames.join()}`,
+				'Connection',
+			);
+			logger.log('info', `Fallback to ${defaultWarehouse} warehouse`, 'Connection');
+
+			execute(`USE WAREHOUSE "${removeQuotes(defaultWarehouse)}";`).then(resolve, async err => {
+				const currentInfo = await execute(
+					`select current_warehouse() as warehouse, current_role() as role;`,
+				).catch(err => []);
+				const infoRow = _.first(currentInfo);
+				const currentWarehouse = _.get(infoRow, 'WAREHOUSE', '');
+				const currentRole = _.get(infoRow, 'ROLE', '');
+				logger.log(
+					'info',
+					`Current warehouse: ${currentWarehouse}\n Current role: ${currentRole}`,
+					'Connection',
+				);
+				resolve();
+			});
+		});
 	});
 };
 
 const getOktaAuthenticatorUrl = (authenticator = '') => {
-	if (/^http(s)?/mi.test(authenticator)) {
+	if (/^http(s)?/im.test(authenticator)) {
 		return authenticator;
 	}
 
@@ -262,23 +374,25 @@ const getOktaAuthenticatorUrl = (authenticator = '') => {
 };
 
 const authByCredentials = ({ account, username, password, role, timeout, warehouse }) => {
-	return connectWithTimeout({ account, username, password, role, timeout, warehouse })
+	return connectWithTimeout({ account, username, password, role, timeout, warehouse });
 };
 
-const connectWithTimeout = ({timeout, ...options}, isErrorAllowed = () => false) => {
+const connectWithTimeout = ({ timeout, ...options }, isErrorAllowed = () => false) => {
 	const connectPromise = new Promise((resolve, reject) => {
 		connection = snowflake.createConnection(options);
 		connection.connect(err => {
 			if (err && !isErrorAllowed(err)) {
 				connection = null;
-				return reject(err); 
+				return reject(err);
 			}
 
 			resolve();
 		});
 	});
 
-	const timeoutPromise = new Promise((resolve, reject) => setTimeout(() => reject(getConnectionTimeoutError(timeout)), timeout));
+	const timeoutPromise = new Promise((resolve, reject) =>
+		setTimeout(() => reject(getConnectionTimeoutError(timeout)), timeout),
+	);
 
 	return Promise.race([connectPromise, timeoutPromise]).catch(error => {
 		if (error.code === CONNECTION_TIMED_OUT_CODE) {
@@ -286,20 +400,21 @@ const connectWithTimeout = ({timeout, ...options}, isErrorAllowed = () => false)
 		}
 
 		throw error;
-	})
-}
+	});
+};
 
-const getConnectionTimeoutError = (timeout) => {
+const getConnectionTimeoutError = timeout => {
 	const error = new Error(`Connection timeout ${timeout} ms exceeded!`);
 	error.code = CONNECTION_TIMED_OUT_CODE;
 
-	return error
-}
+	return error;
+};
 
-const getAccount = hostUrl => (hostUrl || '')
-	.trim()
-	.replace(/\.snowflakecomputing\.com.*$/gi,'')
-	.replace(/^http(s)?:\/\//gi, '');
+const getAccount = hostUrl =>
+	(hostUrl || '')
+		.trim()
+		.replace(/\.snowflakecomputing\.com.*$/gi, '')
+		.replace(/^http(s)?:\/\//gi, '');
 
 const getRole = role => {
 	if (!_.isString(role)) {
@@ -316,13 +431,12 @@ const getRole = role => {
 
 	return `"${role}"`;
 };
-	
+
 const getAccessUrl = account => `https://${account}.snowflakecomputing.com`;
 
 const getAccountName = account => _.toUpper(_.first(account.split('.')));
 
 const disconnect = () => {
-	connectionRole = '';
 	if (!connection) {
 		return Promise.reject(noConnectionError);
 	}
@@ -334,8 +448,8 @@ const disconnect = () => {
 			}
 			resolve();
 		});
-	})
-}
+	});
+};
 
 const testConnection = async (logger, info) => {
 	await connect(logger, info);
@@ -345,9 +459,12 @@ const testConnection = async (logger, info) => {
 
 const showTables = () => execute('SHOW TABLES;');
 
-const showTablesByDatabases = async databases => _.isEmpty(databases) ?
-	showTables() :
-	Promise.allSettled(databases.map(database => execute(`SHOW TABLES IN DATABASE "${removeQuotes(database.name)}";`)));
+const showTablesByDatabases = async databases =>
+	_.isEmpty(databases)
+		? showTables()
+		: Promise.allSettled(
+				databases.map(database => execute(`SHOW TABLES IN DATABASE "${removeQuotes(database.name)}";`)),
+			);
 
 const showDatabases = () => execute('SHOW DATABASES;');
 
@@ -359,10 +476,10 @@ const showViews = () => execute('SHOW VIEWS;');
 
 const showMaterializedViews = () => execute('SHOW MATERIALIZED VIEWS;');
 
-const annotateView = row => ({ ...row, name: `${row.name} (v)`});
+const annotateView = row => ({ ...row, name: `${row.name} (v)` });
 
 const splitEntityNames = names => {
-	const namesByCategory =_.partition(names, isView);
+	const namesByCategory = _.partition(names, isView);
 
 	return { views: namesByCategory[0].map(name => name.slice(0, -4)), tables: namesByCategory[1] };
 };
@@ -376,8 +493,13 @@ const getSchemasInfo = async () => {
 		return schemas;
 	}
 
-	return schemas.map(schema => ({ name: schema.name, database: schema.database_name, isDefault: schema.is_default, isCurrent: schema.is_current }));
-}
+	return schemas.map(schema => ({
+		name: schema.name,
+		database: schema.database_name,
+		isDefault: schema.is_default,
+		isCurrent: schema.is_current,
+	}));
+};
 
 const getNamesBySchemas = entitiesRows => {
 	return entitiesRows.reduce((namesBySchemas, entityRow) => {
@@ -388,13 +510,10 @@ const getNamesBySchemas = entitiesRows => {
 
 		return {
 			...namesBySchemas,
-			[schema] : [
-				..._.get(namesBySchemas, schema, []),
-				entityRow.name
-			]
+			[schema]: [..._.get(namesBySchemas, schema, []), entityRow.name],
 		};
 	}, {});
-}
+};
 
 const getRowsByDatabases = entitiesRows => {
 	return entitiesRows.reduce((entitiesByDatabases, entityRow) => {
@@ -402,10 +521,7 @@ const getRowsByDatabases = entitiesRows => {
 
 		return {
 			...entitiesByDatabases,
-			[database] : [
-				..._.get(entitiesByDatabases, database, []),
-				entityRow
-			]
+			[database]: [..._.get(entitiesByDatabases, database, []), entityRow],
 		};
 	}, {});
 };
@@ -421,11 +537,11 @@ const getEntitiesNames = async () => {
 		...tablesRows.flatMap(row => row.value).filter(Boolean),
 		...externalTableRows,
 		...viewsRows.map(annotateView),
-		...materializedViewsRows.map(annotateView)
+		...materializedViewsRows.map(annotateView),
 	];
 
 	const rowsByDatabases = getRowsByDatabases(entitiesRows);
-	
+
 	return Object.keys(rowsByDatabases).reduce((buckets, dbName) => {
 		const namesBySchemas = getNamesBySchemas(rowsByDatabases[dbName]);
 
@@ -434,18 +550,21 @@ const getEntitiesNames = async () => {
 			...Object.keys(namesBySchemas).reduce((buckets, schema) => {
 				const entities = namesBySchemas[schema];
 
-				return [ ...buckets, {
-					dbName: `${dbName}.${schema}`,
-					dbCollections: entities,
-					isEmpty: !entities.length
-				}];
-			}, [])
+				return [
+					...buckets,
+					{
+						dbName: `${dbName}.${schema}`,
+						dbCollections: entities,
+						isEmpty: !entities.length,
+					},
+				];
+			}, []),
 		];
 	}, []);
 };
 
 const getFullEntityName = (schemaName, tableName) => {
-	return  [ ...schemaName.split('.'), tableName].map(addQuotes).join('.');
+	return [...schemaName.split('.'), tableName].map(addQuotes).join('.');
 };
 
 const addQuotes = string => {
@@ -473,8 +592,8 @@ const getDDL = async (tableName, logger) => {
 
 		return getFirstObjectItem(_.first(queryResult));
 	} catch (err) {
-		logger.log('error', { tableName, message: err.message, stack: err.stack }, 'Getting table DDL')
-		return ''
+		logger.log('error', { tableName, message: err.message, stack: err.stack }, 'Getting table DDL');
+		return '';
 	}
 };
 
@@ -484,7 +603,7 @@ const getViewDDL = async (viewName, logger) => {
 
 		return getFirstObjectItem(_.first(queryResult));
 	} catch (err) {
-		logger.log('error', { viewName, message: err.message, stack: err.stack }, 'Getting view DDL')
+		logger.log('error', { viewName, message: err.message, stack: err.stack }, 'Getting view DDL');
 		return '';
 	}
 };
@@ -493,11 +612,11 @@ const getFirstObjectItem = object => {
 	const index = _.first(Object.keys(object));
 
 	return object[index];
-}
+};
 
 const execute = command => {
 	if (!connection) {
-		return Promise.reject(noConnectionError)
+		return Promise.reject(noConnectionError);
 	}
 	return new Promise((resolve, reject) => {
 		connection.execute({
@@ -506,9 +625,9 @@ const execute = command => {
 				if (err) {
 					return reject(err);
 				}
-				resolve(rows)
-			}
-		})
+				resolve(rows);
+			},
+		});
 	});
 };
 
@@ -525,7 +644,7 @@ const getRowsCount = async tableName => {
 const getDocuments = async (tableName, limit) => {
 	try {
 		const rows = await execute(`SELECT * FROM ${tableName} LIMIT ${limit};`);
-		
+
 		return filterDocuments(rows.map(filterNull));
 	} catch (err) {
 		return [];
@@ -540,7 +659,7 @@ const filterNull = row => {
 		}
 		return {
 			...filteredRow,
-			[key]: value
+			[key]: value,
 		};
 	}, {});
 };
@@ -550,12 +669,12 @@ const handleComplexTypesDocuments = (jsonSchema, documents) => {
 		return documents.map(row => {
 			return Object.keys(row).reduce((rows, key) => {
 				const property = row[key];
-				const schemaRow = _.get(jsonSchema, ['properties', key ]);
+				const schemaRow = _.get(jsonSchema, ['properties', key]);
 				if (_.toLower(_.get(schemaRow, 'type')) === 'array') {
 					if (!_.isArray(property)) {
 						return {
 							...rows,
-							[key]: property
+							[key]: property,
 						};
 					}
 					return {
@@ -565,14 +684,14 @@ const handleComplexTypesDocuments = (jsonSchema, documents) => {
 								return [...items, JSON.stringify(item)];
 							}
 							return items;
-						}, [])
+						}, []),
 					};
 				}
 				return {
 					...rows,
-					[key]: property
+					[key]: property,
 				};
-			}, {})
+			}, {});
 		});
 	} catch (err) {
 		return documents;
@@ -587,23 +706,23 @@ const getJsonSchemaFromRows = (documents, rows) => {
 			if (_.toLower(row.type) === 'variant') {
 				return {
 					...properties,
-					[row.name]: handleVariant(documents, row.name)
+					[row.name]: handleVariant(documents, row.name),
 				};
 			} else if (_.toLower(row.type) === 'array') {
 				return {
 					...properties,
-					[row.name]: handleArray(documents, row.name)
+					[row.name]: handleArray(documents, row.name),
 				};
 			} else if (_.toLower(row.type) === 'object') {
 				return {
 					...properties,
-					[row.name]: handleObject(documents, row.name)
-				} 
+					[row.name]: handleObject(documents, row.name),
+				};
 			} else if (_.toLower(row.type) === 'geography') {
 				return {
 					...properties,
-					[row.name]: handleGeography(documents, row.name)
-				}
+					[row.name]: handleGeography(documents, row.name),
+				};
 			}
 
 			return properties;
@@ -619,21 +738,21 @@ const handleGeography = (documents, rowName) => {
 		}
 		const property = document[rowName];
 		const type = getVariantPropertyType(property);
-		if (types.includes(type)) {	
-			return types;	
-		}	
+		if (types.includes(type)) {
+			return types;
+		}
 
-		return [ ...types, type ];
+		return [...types, type];
 	}, []);
 
 	let type = _.first(types);
 	let variantProperties = {};
 	if (types.includes('object')) {
 		type = 'object';
-		variantProperties = { properties: {} } ;
+		variantProperties = { properties: {} };
 	}
-	return {type: 'geography', variantType: 'JSON', subtype: type, ...variantProperties}
-}
+	return { type: 'geography', variantType: 'JSON', subtype: type, ...variantProperties };
+};
 
 const handleVariant = (documents, name) => {
 	const types = documents.reduce((types, document) => {
@@ -643,11 +762,11 @@ const handleVariant = (documents, name) => {
 		const property = _.get(document, name);
 		const type = getVariantPropertyType(property);
 
-		if (types.includes(type)) {	
-			return types;	
-		}	
+		if (types.includes(type)) {
+			return types;
+		}
 
-		return [ ...types, type ];
+		return [...types, type];
 	}, []);
 
 	let variantProperties = {};
@@ -662,7 +781,7 @@ const handleVariant = (documents, name) => {
 	if (type === 'array') {
 		variantProperties = { items: [] };
 	} else if (type === 'object') {
-		variantProperties = { properties: {} } ;
+		variantProperties = { properties: {} };
 	}
 	return { type: 'variant', variantType: 'JSON', subtype: type, ...variantProperties };
 };
@@ -679,32 +798,33 @@ const getVariantPropertyType = property => {
 	return type;
 };
 
-const handleArray = ( documents, rowName ) => {
+const handleArray = (documents, rowName) => {
 	const types = documents.reduce((types, document) => {
 		const rawArrayDocuments = document[rowName];
 		const arrayDocuments = _.isArray(rawArrayDocuments) ? rawArrayDocuments : [];
 		const propertyTypes = arrayDocuments.map(getVariantPropertyType).filter(type => !_.isUndefined(type));
 
-		return [ ...types, ...propertyTypes ];
+		return [...types, ...propertyTypes];
 	}, []);
 
 	return {
 		type: 'array',
-		items: _.uniq(types).map(type => { 
+		items: _.uniq(types).map(type => {
 			let variantProperties = {};
 			type = _.isArray(type) ? _.first(type) : type;
 
 			if (type === 'array') {
 				variantProperties = { items: [] };
 			} else if (type === 'object') {
-				variantProperties = { properties: {} } ;
+				variantProperties = { properties: {} };
 			}
 
-			return {type: 'variant', subtype: type, ...variantProperties }})
+			return { type: 'variant', subtype: type, ...variantProperties };
+		}),
 	};
 };
 
-const handleObject = ( documents, rowName ) => {
+const handleObject = (documents, rowName) => {
 	const objectDocuments = documents.map(document => _.get(document, rowName), {});
 	const objectKeys = objectDocuments.reduce((rows, document) => {
 		if (!_.isPlainObject(document)) {
@@ -718,31 +838,33 @@ const handleObject = ( documents, rowName ) => {
 	return {
 		type: 'object',
 		subtype: 'json',
-		properties: getJsonSchemaFromRows(objectDocuments, objectRows)
+		properties: getJsonSchemaFromRows(objectDocuments, objectRows),
 	};
 };
 
 const getJsonSchema = async (logger, limit, tableName) => {
 	try {
 		const rows = await execute(`DESC TABLE ${tableName};`);
-		const hasJsonFields = rows.some(row => ['variant', 'object', 'array', 'geography'].includes(_.toLower(row.type)));
+		const hasJsonFields = rows.some(row =>
+			['variant', 'object', 'array', 'geography'].includes(_.toLower(row.type)),
+		);
 		if (!hasJsonFields) {
 			return {
 				jsonSchema: { properties: {} },
 				documents: [],
-			}
+			};
 		}
 
 		const documents = await getDocuments(tableName, limit).catch(err => {
 			logger.log('error', err.message, 'Connection');
 			return [];
 		});
-		
+
 		return {
 			documents,
 			jsonSchema: {
-				properties: getJsonSchemaFromRows(documents, rows)
-			}
+				properties: getJsonSchemaFromRows(documents, rows),
+			},
 		};
 	} catch (err) {
 		const documents = await getDocuments(tableName, limit).catch(err => {
@@ -753,8 +875,8 @@ const getJsonSchema = async (logger, limit, tableName) => {
 		return {
 			documents,
 			jsonSchema: {
-				properties: {}
-			}
+				properties: {},
+			},
 		};
 	}
 };
@@ -765,7 +887,7 @@ const removeQuotes = str => {
 
 const removeLinear = str => {
 	return (str || '').replace(/^linear([\s\S]*)$/im, '$1');
-}
+};
 const removeBrackets = str => {
 	return (str || '').replace(/^\(([\s\S]*)\)$/im, '$1');
 };
@@ -784,48 +906,51 @@ const handleClusteringKey = (fieldsNames, keysExpression) => {
 	return items.reduce((keys, item) => {
 		const arguments = item.split('(');
 		let expression = '';
-		const clusteringKeys = arguments.map(argument => {
-			const rawName = _.get(_.trim(argument).match(/^([\S]+)/), 1);
-			if (!rawName) {
-				if (expression) {
-					expression += '(';
+		const clusteringKeys = arguments
+			.map(argument => {
+				const rawName = _.get(_.trim(argument).match(/^([\S]+)/), 1);
+				if (!rawName) {
+					if (expression) {
+						expression += '(';
+					}
+					expression += argument;
+					return false;
 				}
-				expression += argument;
-				return false;
-			}
-			const name = removeQuotes(_.last(getVariantName(_.trim(rawName)).split('.')));
-			const fieldName = fieldsNames.find(fieldName => _.toUpper(fieldName) === _.toUpper(name));
-			if (!fieldName) {
-				if (expression) {
-					expression += '(';
+				const name = removeQuotes(_.last(getVariantName(_.trim(rawName)).split('.')));
+				const fieldName = fieldsNames.find(fieldName => _.toUpper(fieldName) === _.toUpper(name));
+				if (!fieldName) {
+					if (expression) {
+						expression += '(';
+					}
+					expression += argument;
+					return false;
 				}
-				expression += argument;
-				return false;
-			}
-			
-			if (name === _.trim(removeQuotes(item))) {
-				return {
-					name: fieldName
-				};
-			}
-			
-			if (expression) {
-				expression += '(';
-			}
-			expression += argument.replace(new RegExp(`^${name}`), '${name}');
 
-			return {
-				name: fieldName
-			};
-			
-			
-		}).filter(Boolean);
+				if (name === _.trim(removeQuotes(item))) {
+					return {
+						name: fieldName,
+					};
+				}
+
+				if (expression) {
+					expression += '(';
+				}
+				expression += argument.replace(new RegExp(`^${name}`), '${name}');
+
+				return {
+					name: fieldName,
+				};
+			})
+			.filter(Boolean);
 
 		if (!_.isEmpty(clusteringKeys)) {
-			return [ ...keys, {
-				clusteringKey: clusteringKeys,
-				expression: _.trim(expression)
-			}];
+			return [
+				...keys,
+				{
+					clusteringKey: clusteringKeys,
+					expression: _.trim(expression),
+				},
+			];
 		}
 		const lastKey = _.last(keys);
 		let complexExpression = _.get(lastKey, 'expression', '');
@@ -836,8 +961,8 @@ const handleClusteringKey = (fieldsNames, keysExpression) => {
 			...keys.slice(0, -1),
 			{
 				...lastKey,
-				expression: complexExpression + expression
-			}
+				expression: complexExpression + expression,
+			},
 		];
 	}, []);
 };
@@ -847,36 +972,51 @@ const getEntityData = async (fullName, logger) => {
 
 	try {
 		let entityLevelData = {};
-		const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.tables where TABLE_NAME='${removeQuotes(tableName)}' AND TABLE_SCHEMA='${removeQuotes(schemaName)}'`);
+		const rows = await execute(
+			`select * from "${removeQuotes(dbName)}".information_schema.tables where TABLE_NAME='${removeQuotes(tableName)}' AND TABLE_SCHEMA='${removeQuotes(schemaName)}'`,
+		);
 		const data = _.first(rows);
 		const fields = await execute(`DESC TABLE ${fullName};`).catch(e => []);
 		const fieldsNames = fields.map(field => field.name);
 		const clusteringKey = handleClusteringKey(fieldsNames, _.get(data, 'CLUSTERING_KEY', ''));
 		const stageData = await execute(`DESCRIBE TABLE ${fullName} type = stage;`);
-		const fileFormat = _.toUpper(_.get(stageData.find(item => item.property === 'TYPE'), 'property_value', ''));
+		const fileFormat = _.toUpper(
+			_.get(
+				stageData.find(item => item.property === 'TYPE'),
+				'property_value',
+				'',
+			),
+		);
 		let external = _.toUpper(_.get(data, 'TABLE_TYPE', '')) === 'EXTERNAL TABLE';
 		if (!external && checkExternalMetaFields(fields)) {
 			logger.log(
 				'info',
 				{
 					message: `External table was detected by meta properties. Table type: ${_.get(data, 'TABLE_TYPE', '')}`,
-					containerName: schemaName, entityName: tableName
+					containerName: schemaName,
+					entityName: tableName,
 				},
-				'Getting external table data'
+				'Getting external table data',
 			);
 			external = true;
-		};
+		}
 		if (external) {
 			const externalTableData = await getExternalTableData(fullName);
 			entityLevelData = { ...data, ...externalTableData };
 		}
 		if (!fileFormat) {
-			entityLevelData.customFileFormatName = _.toUpper(_.get(stageData.find(item => item.property === 'FORMAT_NAME'), 'property_value', ''));
+			entityLevelData.customFileFormatName = _.toUpper(
+				_.get(
+					stageData.find(item => item.property === 'FORMAT_NAME'),
+					'property_value',
+					'',
+				),
+			);
 		}
 
 		const fileFormatKey = external ? 'externalFileFormat' : 'fileFormat';
 		if (hasStageCopyOptions(stageData)) {
-			entityLevelData.stageCopyOptions = getStageCopyOptions(stageData)
+			entityLevelData.stageCopyOptions = getStageCopyOptions(stageData);
 		}
 
 		return {
@@ -886,7 +1026,7 @@ const getEntityData = async (fullName, logger) => {
 			clusteringKey,
 			formatTypeOptions: getFileFormatOptions(stageData),
 			transient: Boolean(_.get(data, 'IS_TRANSIENT', false) && _.get(data, 'IS_TRANSIENT') !== 'NO'),
-			description: _.get(data, 'COMMENT') || ''
+			description: _.get(data, 'COMMENT') || '',
 		};
 	} catch (err) {
 		return {};
@@ -920,20 +1060,20 @@ const getStageCopyOptions = stageData => {
 const getOptions = optionsData => {
 	return optionsData.reduce((options, item) => {
 		if (item.property_type === 'List') {
-			const list = item.property_value.slice(1,-1).split(',').map(_.trim);
+			const list = item.property_value.slice(1, -1).split(',').map(_.trim);
 			if (!_.isArray(list)) {
 				return options;
 			}
 
 			return {
 				...options,
-				[item.property]: list.map(value => ({ [`${item.property}_item`]: value }))
+				[item.property]: list.map(value => ({ [`${item.property}_item`]: value })),
 			};
 		}
 		if (item.property_type === 'Boolean') {
 			return {
 				...options,
-				[item.property]: item.property_value && item.property_value !== 'false'
+				[item.property]: item.property_value && item.property_value !== 'false',
 			};
 		}
 		if (item.property_type === 'Long') {
@@ -941,18 +1081,18 @@ const getOptions = optionsData => {
 				return {
 					...options,
 					sizeLimit: !!item.property_value,
-					[item.property]: _.toNumber(item.property_value)
+					[item.property]: _.toNumber(item.property_value),
 				};
 			}
 			return {
 				...options,
-				[item.property]: _.toNumber(item.property_value)
+				[item.property]: _.toNumber(item.property_value),
 			};
 		}
 
 		return {
 			...options,
-			[item.property]: item.property_value
+			[item.property]: item.property_value,
 		};
 	}, {});
 };
@@ -961,12 +1101,14 @@ const getViewData = async (fullName, logger) => {
 	const [dbName, schemaName, tableName] = fullName.split('.');
 
 	try {
-		const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.views where TABLE_NAME='${removeQuotes(tableName)}' AND TABLE_SCHEMA='${removeQuotes(schemaName)}'`);
+		const rows = await execute(
+			`select * from "${removeQuotes(dbName)}".information_schema.views where TABLE_NAME='${removeQuotes(tableName)}' AND TABLE_SCHEMA='${removeQuotes(schemaName)}'`,
+		);
 		const data = _.first(rows);
 		if (!_.isEmpty(data)) {
 			return {
 				secure: _.get(data, 'IS_SECURE') && _.get(data, 'IS_SECURE') !== 'NO',
-				description: _.get(data, 'COMMENT') || ''
+				description: _.get(data, 'COMMENT') || '',
 			};
 		}
 		const materializedViewData = await getMaterializedViewData(fullName);
@@ -982,22 +1124,26 @@ const getMaterializedViewData = async fullName => {
 	const [dbName, schemaName, tableName] = fullName.split('.');
 
 	try {
-		const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.tables where TABLE_NAME='${removeQuotes(tableName)}' AND TABLE_SCHEMA='${removeQuotes(schemaName)}'`);
+		const rows = await execute(
+			`select * from "${removeQuotes(dbName)}".information_schema.tables where TABLE_NAME='${removeQuotes(tableName)}' AND TABLE_SCHEMA='${removeQuotes(schemaName)}'`,
+		);
 		const data = _.first(rows);
 		return {
 			secure: _.get(data, 'IS_SECURE') && _.get(data, 'IS_SECURE') !== 'NO',
-			description: _.get(data, 'COMMENT') || ''
+			description: _.get(data, 'COMMENT') || '',
 		};
 	} catch (err) {
 		return {};
 	}
 };
 
-const getExternalTableData  = async fullName => {
+const getExternalTableData = async fullName => {
 	const [dbName, schemaName, tableName] = fullName.split('.');
 
 	try {
-		const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.EXTERNAL_TABLES where TABLE_NAME='${removeQuotes(tableName)}' AND TABLE_SCHEMA='${removeQuotes(schemaName)}'`);
+		const rows = await execute(
+			`select * from "${removeQuotes(dbName)}".information_schema.EXTERNAL_TABLES where TABLE_NAME='${removeQuotes(tableName)}' AND TABLE_SCHEMA='${removeQuotes(schemaName)}'`,
+		);
 		const data = _.first(rows);
 		const location = _.get(data, 'LOCATION', '').split('/');
 		const namespace = _.first(location);
@@ -1005,8 +1151,8 @@ const getExternalTableData  = async fullName => {
 		return {
 			location: {
 				namespace,
-				path: path ? '/' + path : ''
-			}
+				path: path ? '/' + path : '',
+			},
 		};
 	} catch (err) {
 		return {};
@@ -1014,7 +1160,9 @@ const getExternalTableData  = async fullName => {
 };
 
 const getFunctions = async (dbName, schemaName) => {
-	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.functions where FUNCTION_SCHEMA='${schemaName}'`);
+	const rows = await execute(
+		`select * from "${removeQuotes(dbName)}".information_schema.functions where FUNCTION_SCHEMA='${schemaName}'`,
+	);
 
 	return rows.map(row => {
 		const functionArguments = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'];
@@ -1025,16 +1173,19 @@ const getFunctions = async (dbName, schemaName) => {
 			functionArguments,
 			functionReturnType: row['DATA_TYPE'],
 			functionBody: row['FUNCTION_DEFINITION'],
-			functionDescription: row['COMMENT'] || ''
-		}
+			functionDescription: row['COMMENT'] || '',
+		};
 	});
 };
 
 const getProcedures = async (dbName, schemaName) => {
-	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.procedures where PROCEDURE_SCHEMA='${schemaName}'`);
+	const rows = await execute(
+		`select * from "${removeQuotes(dbName)}".information_schema.procedures where PROCEDURE_SCHEMA='${schemaName}'`,
+	);
 
 	return rows.map(row => {
-		const procedureArguments = row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'].replace(/[\(\)]/gm, '');
+		const procedureArguments =
+			row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'].replace(/[\(\)]/gm, '');
 
 		return {
 			name: row['PROCEDURE_NAME'],
@@ -1044,12 +1195,14 @@ const getProcedures = async (dbName, schemaName) => {
 			returnType: row['DATA_TYPE'],
 			body: row['PROCEDURE_DEFINITION'],
 			description: row['COMMENT'] || '',
-		}
+		};
 	});
 };
 
 const getStages = async (dbName, schemaName) => {
-	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.stages where STAGE_SCHEMA='${schemaName}'`);
+	const rows = await execute(
+		`select * from "${removeQuotes(dbName)}".information_schema.stages where STAGE_SCHEMA='${schemaName}'`,
+	);
 
 	return rows.map(row => {
 		return {
@@ -1060,13 +1213,15 @@ const getStages = async (dbName, schemaName) => {
 };
 
 const getSequences = async (dbName, schemaName) => {
-	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.sequences where SEQUENCE_SCHEMA='${schemaName}'`);
+	const rows = await execute(
+		`select * from "${removeQuotes(dbName)}".information_schema.sequences where SEQUENCE_SCHEMA='${schemaName}'`,
+	);
 
 	return rows.map(row => ({
 		name: row['SEQUENCE_NAME'],
 		sequenceStart: Number(_.get(row, 'START_VALUE')) || 1,
 		sequenceIncrement: Number(_.get(row, 'INCREMENT')) || 1,
-		sequenceComments: row['COMMENT'] || ''
+		sequenceComments: row['COMMENT'] || '',
 	}));
 };
 
@@ -1097,7 +1252,13 @@ const convertFileFormatsOptions = optionsData => {
 		if (selectOptions.includes(key)) {
 			return { ...options, [key]: _.toUpper(value) };
 		} else if (groupOptions.includes(key)) {
-			return { ...options, [key]: value.slice(1, -1).split(',').map(value => ({ [`${key}_item`]: _.trim(value) })) };
+			return {
+				...options,
+				[key]: value
+					.slice(1, -1)
+					.split(',')
+					.map(value => ({ [`${key}_item`]: _.trim(value) })),
+			};
 		} else if (checkboxOptions.includes(key)) {
 			return { ...options, [key]: _.isBoolean(value) ? value : _.toUpper(value) !== 'FALSE' };
 		} else if (numericOptions.includes(key)) {
@@ -1109,35 +1270,48 @@ const convertFileFormatsOptions = optionsData => {
 };
 
 const getFileFormats = async (dbName, schemaName) => {
-	const rows = await execute(`select * from "${removeQuotes(dbName)}".information_schema.FILE_FORMATS where FILE_FORMAT_SCHEMA='${schemaName}'`);
+	const rows = await execute(
+		`select * from "${removeQuotes(dbName)}".information_schema.FILE_FORMATS where FILE_FORMAT_SCHEMA='${schemaName}'`,
+	);
 
-	return Promise.all(rows.map(async row => {
-		const describeProperties = await execute(`DESCRIBE FILE FORMAT "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"."${row['FILE_FORMAT_NAME']}"`);
-		const propertiesRow = describeProperties.reduce((properties, { property, property_value }) => ({
-			...properties,
-			[property]: property_value
-		}), {});
+	return Promise.all(
+		rows.map(async row => {
+			const describeProperties = await execute(
+				`DESCRIBE FILE FORMAT "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"."${row['FILE_FORMAT_NAME']}"`,
+			);
+			const propertiesRow = describeProperties.reduce(
+				(properties, { property, property_value }) => ({
+					...properties,
+					[property]: property_value,
+				}),
+				{},
+			);
 
-		return {
-			name: row['FILE_FORMAT_NAME'],
-			fileFormat: _.toUpper(row['FILE_FORMAT_TYPE']),
-			formatTypeOptions: convertFileFormatsOptions({ ...row, ...propertiesRow }),
-			fileFormatComments: row['COMMENT'] || ''
-		};
-	}));
+			return {
+				name: row['FILE_FORMAT_NAME'],
+				fileFormat: _.toUpper(row['FILE_FORMAT_TYPE']),
+				formatTypeOptions: convertFileFormatsOptions({ ...row, ...propertiesRow }),
+				fileFormatComments: row['COMMENT'] || '',
+			};
+		}),
+	);
 };
 
 const getContainerData = async schema => {
 	if (containers[schema]) {
 		return containers[schema];
 	}
-	const [ dbName, schemaName ] = schema.split('.');
+	const [dbName, schemaName] = schema.split('.');
 	const dbNameWithoutQuotes = removeQuotes(dbName);
 
 	try {
-		const dbRows = await execute(`select * from "${dbNameWithoutQuotes}".information_schema.databases where DATABASE_NAME='${dbNameWithoutQuotes}'`);
+		const dbRows = await execute(
+			`select * from "${dbNameWithoutQuotes}".information_schema.databases where DATABASE_NAME='${dbNameWithoutQuotes}'`,
+		);
 		const dbData = _.first(dbRows);
-		const schemaRows = await execute(`select * from "${dbNameWithoutQuotes}".information_schema.schemata where SCHEMA_NAME='${removeQuotes(schemaName)}'`);
+		const schemaRows = await execute(
+			`select * from "${dbNameWithoutQuotes}".information_schema.schemata where SCHEMA_NAME='${removeQuotes(schemaName)}'`,
+		);
 		const isCaseSensitive = _.toUpper(schemaName) !== schemaName;
 		const schemaData = _.first(schemaRows);
 		const functions = await getFunctions(dbName, schemaName);
@@ -1169,9 +1343,9 @@ const hasCloudPlatform = accountName => {
 	return CLOUD_PLATFORM_POSTFIXES.some(postfix => accountName.endsWith(postfix));
 };
 
-const setDependencies = ({ lodash }) => _ = lodash;
+const setDependencies = ({ lodash }) => (_ = lodash);
 
-const getObjSize = (obj) => {
+const getObjSize = obj => {
 	if (!obj) {
 		return 0;
 	}
@@ -1179,7 +1353,7 @@ const getObjSize = (obj) => {
 	return BSON.calculateObjectSize(obj) / (1024 * 1024);
 };
 
-const filterDocuments = (rows) => {
+const filterDocuments = rows => {
 	const size = getObjSize(rows);
 
 	if (size < 200) {
@@ -1191,7 +1365,7 @@ const filterDocuments = (rows) => {
 
 const applyScript = async script => {
 	return await execute(script);
-}
+};
 
 module.exports = {
 	connect,

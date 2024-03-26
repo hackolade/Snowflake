@@ -1,8 +1,4 @@
-const {
-	checkFieldPropertiesChanged, 
-	getNames, 
-	getBaseAndContainerNames,
-} = require('./common');
+const { checkFieldPropertiesChanged, getNames, getBaseAndContainerNames } = require('./common');
 
 const getAddCollectionScript = (_, ddlProvider, app) => collection => {
 	const { getEntityName, getName } = require('../general')(_, app);
@@ -19,7 +15,7 @@ const getAddCollectionScript = (_, ddlProvider, app) => collection => {
 			jsonSchema: column,
 			parentJsonSchema: jsonSchema,
 			ddlProvider,
-		})
+		}),
 	);
 
 	const tableData = {
@@ -77,15 +73,11 @@ const getAddColumnScript = (_, ddlProvider, app) => collection => {
 				jsonSchema,
 				parentJsonSchema: collectionSchema,
 				ddlProvider,
-			})
+			}),
 		)
 		.map(ddlProvider.convertColumnDefinition)
 		.map(
-			column =>
-				`ALTER TABLE IF EXISTS ${fullName} ADD COLUMN ${commentIfDeactivated(
-					column.statement,
-					column
-				)};`
+			column => `ALTER TABLE IF EXISTS ${fullName} ADD COLUMN ${commentIfDeactivated(column.statement, column)};`,
 		);
 };
 
@@ -118,18 +110,16 @@ const getModifyColumnScript = (_, app) => collection => {
 		.filter(jsonSchema => checkFieldPropertiesChanged(jsonSchema.compMod, ['name']))
 		.map(
 			jsonSchema =>
-				`ALTER TABLE IF EXISTS ${fullName} RENAME COLUMN ${jsonSchema.compMod.oldField.name} TO ${jsonSchema.compMod.newField.name};`
+				`ALTER TABLE IF EXISTS ${fullName} RENAME COLUMN ${jsonSchema.compMod.oldField.name} TO ${jsonSchema.compMod.newField.name};`,
 		);
 
 	const changeTypeScripts = _.toPairs(collection.properties)
-		.filter(([name, jsonSchema]) =>
-			checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode'])
-		)
+		.filter(([name, jsonSchema]) => checkFieldPropertiesChanged(jsonSchema.compMod, ['type', 'mode']))
 		.map(
 			([name, jsonSchema]) =>
 				`ALTER TABLE IF EXISTS ${fullName} ALTER COLUMN ${name} SET DATA TYPE ${
 					jsonSchema.compMod.newField.mode || jsonSchema.compMod.newField.type
-				};`
+				};`,
 		);
 
 	return [...renameColumnScripts, ...changeTypeScripts];

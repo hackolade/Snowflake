@@ -22,13 +22,15 @@
 	},
 	"applyScriptToInstance": true,
 	"applyToInstanceSettings": {
-		"scenario": [{
-			"dependency": {
-				"key": "authType",
-				"value": "externalbrowser"
-			},
-			"value": "connectByExternalBrowser"
-		}]
+		"scenario": [
+			{
+				"dependency": {
+					"key": "authType",
+					"value": "externalbrowser"
+				},
+				"value": "connectByExternalBrowser"
+			}
+		]
 	},
 	"additionalOptions": [
 		{

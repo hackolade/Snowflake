@@ -123,9 +123,7 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyTooltip": "DB vendor",
 				"propertyType": "select",
-				"options": [
-					"Snowflake"
-				],
+				"options": ["Snowflake"],
 				"disabledOption": true
 			},
 			{
@@ -133,11 +131,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "modelingMethodology",
 				"propertyTooltip": "Select from list of options",
 				"propertyType": "select",
-				"options": [
-					"Relational",
-					"Dimensional",
-					"Vault"
-				]
+				"options": ["Relational", "Dimensional", "Vault"]
 			},
 			{
 				"propertyName": "Comments",

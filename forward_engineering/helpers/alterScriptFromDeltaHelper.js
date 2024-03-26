@@ -11,11 +11,7 @@ const {
 	getDeleteColumnScript,
 	getModifyColumnScript,
 } = require('./alterScriptHelpers/alterEntityHelper');
-const {
-	getAddViewScript,
-	getDeleteViewScript,
-	getModifyViewScript,
-} = require('./alterScriptHelpers/alterViewHelper');
+const { getAddViewScript, getDeleteViewScript, getModifyViewScript } = require('./alterScriptHelpers/alterViewHelper');
 
 const getItems = (collection, nameProperty, modify, objectMethod) =>
 	[]
@@ -25,14 +21,14 @@ const getItems = (collection, nameProperty, modify, objectMethod) =>
 
 const getAlterContainersScripts = (collection, _, ddlProvider, app) => {
 	const addedContainerScripts = getItems(collection, 'containers', 'added', 'values').map(
-		getAddContainerScript(_, ddlProvider, app)
+		getAddContainerScript(_, ddlProvider, app),
 	);
 	const deletedContainerScripts = getItems(collection, 'containers', 'deleted', 'values').map(
-		getDeleteContainerScript(ddlProvider)
+		getDeleteContainerScript(ddlProvider),
 	);
 	const modifiedContainerScripts = getItems(collection, 'containers', 'modified', 'values').map(
-		getModifyContainerScript(_, ddlProvider)
-	)
+		getModifyContainerScript(_, ddlProvider),
+	);
 	return { addedContainerScripts, deletedContainerScripts, modifiedContainerScripts };
 };
 
@@ -45,31 +41,31 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider, app) => {
 	const addedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'added', 'values'),
 		'created',
-		getAddCollectionScript(_, ddlProvider, app)
+		getAddCollectionScript(_, ddlProvider, app),
 	);
 	const deletedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
 		'deleted',
-		getDeleteCollectionScript(_, app)
+		getDeleteCollectionScript(_, app),
 	);
 
 	const modifiedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'modified', 'values'),
 		'modified',
-		getModifyCollectionScript(ddlProvider)
+		getModifyCollectionScript(ddlProvider),
 	);
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
-		getAddColumnScript(_, ddlProvider, app)
+		getAddColumnScript(_, ddlProvider, app),
 	);
 	const deletedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
-		getDeleteColumnScript(_, app)
+		getDeleteColumnScript(_, app),
 	);
 	const modifiedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'modified', 'values'),
-		getModifyColumnScript(_, app)
+		getModifyColumnScript(_, app),
 	);
 
 	return {
@@ -85,42 +81,44 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider, app) => {
 const getAlterViewsScripts = ({ schema, _, ddlProvider, app }) => {
 	const getViewScripts = (views, compMode, getScript) =>
 		views
-		.map(view => ({ ...view, ...(view.role || {}) }))
-		.filter(view => view.compMod?.[compMode]).map(getScript);
+			.map(view => ({ ...view, ...(view.role || {}) }))
+			.filter(view => view.compMod?.[compMode])
+			.map(getScript);
 
-	const getModifiedScript = (items, getScript) => items
-		.map(view => ({ ...view, ...(view.role || {}) }))
-		.filter(view => !view.compMod?.created && !view.compMod?.deleted).flatMap(getScript);
+	const getModifiedScript = (items, getScript) =>
+		items
+			.map(view => ({ ...view, ...(view.role || {}) }))
+			.filter(view => !view.compMod?.created && !view.compMod?.deleted)
+			.flatMap(getScript);
 
 	const addedViewScripts = getViewScripts(
 		getItems(schema, 'views', 'added', 'values'),
 		'created',
-		getAddViewScript(_, ddlProvider, app)
+		getAddViewScript(_, ddlProvider, app),
 	);
 	const deletedViewScripts = getViewScripts(
 		getItems(schema, 'views', 'deleted', 'values'),
 		'deleted',
-		getDeleteViewScript(_, app)
+		getDeleteViewScript(_, app),
 	);
 	const modifiedViewScripts = getModifiedScript(
 		getItems(schema, 'views', 'modified', 'values'),
-		getModifyViewScript(ddlProvider)
+		getModifyViewScript(ddlProvider),
 	);
 
 	return {
 		addedViewScripts,
 		deletedViewScripts,
 		modifiedViewScripts,
-	}
+	};
 };
-
 
 const getAlterScript = ({ collection, _, ddlProvider, app }) => {
 	const script = {
 		...getAlterCollectionsScripts(collection, _, ddlProvider, app),
 		...getAlterContainersScripts(collection, _, ddlProvider, app),
 		...getAlterViewsScripts({ schema: collection, _, ddlProvider, app }),
-	}
+	};
 	return [
 		'addedContainerScripts',
 		'modifiedContainerScripts',
@@ -133,8 +131,12 @@ const getAlterScript = ({ collection, _, ddlProvider, app }) => {
 		'modifiedColumnScripts',
 		'addedViewScripts',
 		'modifiedViewScripts',
-		'deletedContainerScripts'
-	].flatMap(name => script[name] || []).map(script => script.trim()).filter(Boolean).join('\n\n');
+		'deletedContainerScripts',
+	]
+		.flatMap(name => script[name] || [])
+		.map(script => script.trim())
+		.filter(Boolean)
+		.join('\n\n');
 };
 
 module.exports = {
