@@ -96,8 +96,8 @@ const getDeleteColumnScript = app => collection => {
 		.map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN ${name};`);
 };
 
-const getModifyColumnScript = (_, app) => collection => {
-	const { getEntityName, getFullName, getName } = require('../general')(_, app);
+const getModifyColumnScript = app => collection => {
+	const { getEntityName, getFullName, getName } = require('../general')(app);
 
 	const collectionSchema = {
 		...collection,
