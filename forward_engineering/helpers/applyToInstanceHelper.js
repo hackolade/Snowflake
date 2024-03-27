@@ -1,8 +1,6 @@
-const _ = require('lodash');
 const async = require('async');
 const { filterDeactivatedQuery, queryIsDeactivated } = require('./commentDeactivatedHelper');
 const snowflakeHelper = require('../../reverse_engineering/helpers/snowflakeHelper');
-const { setDependencies, dependencies } = require('../../reverse_engineering/helpers/appDependencies');
 
 const createQueries = (script = '') => {
 	script = filterDeactivatedQuery(script);
@@ -15,13 +13,7 @@ const createQueries = (script = '') => {
 
 const createMessage = query => 'Query: ' + query.replace(/\n+/, '').split('\n').shift().substring(0, 150);
 
-const initDependencies = app => {
-	setDependencies(app);
-	snowflakeHelper.setDependencies(dependencies);
-};
-
-const applyToInstance = async (connectionInfo, logger, app) => {
-	initDependencies(app);
+const applyToInstance = async (connectionInfo, logger) => {
 	await snowflakeHelper.connect(logger, connectionInfo);
 
 	const queries = createQueries(connectionInfo.script);

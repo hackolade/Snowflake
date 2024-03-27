@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const snowflake = require('snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
@@ -27,8 +28,6 @@ const DEFAULT_WAREHOUSE = 'COMPUTE_WH';
 const DEFAULT_ROLE = 'PUBLIC';
 const HACKOLADE_APPLICATION = 'Hackolade';
 const CLOUD_PLATFORM_POSTFIXES = ['gcp', 'aws', 'azure'];
-
-let _;
 
 const connect = async (
 	logger,
@@ -1343,8 +1342,6 @@ const hasCloudPlatform = accountName => {
 	return CLOUD_PLATFORM_POSTFIXES.some(postfix => accountName.endsWith(postfix));
 };
 
-const setDependencies = ({ lodash }) => (_ = lodash);
-
 const getObjSize = obj => {
 	if (!obj) {
 		return 0;
@@ -1386,7 +1383,6 @@ module.exports = {
 	getContainerData,
 	getAccount,
 	getAccessUrl,
-	setDependencies,
 	getSchemasInfo,
 	applyScript,
 };

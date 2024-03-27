@@ -1,12 +1,10 @@
 'use strict';
 
+const _ = require('lodash');
 const snowflakeHelper = require('./helpers/snowflakeHelper');
 const ssoHelper = require('./helpers/ssoHelper');
-const { setDependencies, dependencies } = require('./helpers/appDependencies');
-let _;
 
-const connect = async (connectionInfo, logger, cb, app) => {
-	initDependencies(app);
+const connect = async (connectionInfo, logger, cb) => {
 	logger.clear();
 	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 	try {
@@ -17,8 +15,7 @@ const connect = async (connectionInfo, logger, cb, app) => {
 	}
 };
 
-const disconnect = async (connectionInfo, logger, cb, app) => {
-	initDependencies(app);
+const disconnect = async (connectionInfo, logger, cb) => {
 	try {
 		await snowflakeHelper.disconnect();
 		cb();
@@ -28,12 +25,11 @@ const disconnect = async (connectionInfo, logger, cb, app) => {
 };
 
 const testConnection = async (connectionInfo, logger, cb, app) => {
-	initDependencies(app);
 	logger.clear();
 	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 	try {
 		if (connectionInfo.authType === 'externalbrowser') {
-			await getExternalBrowserUrl(connectionInfo, logger, cb, app);
+			await getExternalBrowserUrl(connectionInfo, logger, cb);
 		} else {
 			await snowflakeHelper.testConnection(logger, connectionInfo);
 		}
@@ -43,10 +39,9 @@ const testConnection = async (connectionInfo, logger, cb, app) => {
 	}
 };
 
-const getExternalBrowserUrl = async (connectionInfo, logger, cb, app) => {
+const getExternalBrowserUrl = async (connectionInfo, logger, cb) => {
 	try {
-		initDependencies(app);
-		const ssoData = await ssoHelper.getSsoUrlData(logger, _, connectionInfo);
+		const ssoData = await ssoHelper.getSsoUrlData(logger, connectionInfo);
 		cb(null, ssoData);
 	} catch (err) {
 		handleError(logger, err, cb);
@@ -61,10 +56,9 @@ const getDocumentKinds = (connectionInfo, logger, cb) => {
 	cb();
 };
 
-const getDbCollectionsNames = async (connectionInfo, logger, cb, app) => {
+const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
 	try {
 		logger.clear();
-		initDependencies(app);
 		await snowflakeHelper.connect(logger, connectionInfo);
 		const schemasInfo = await snowflakeHelper.getSchemasInfo();
 		logger.log('info', { schemas: schemasInfo }, 'Found schemas');
@@ -78,9 +72,8 @@ const getDbCollectionsNames = async (connectionInfo, logger, cb, app) => {
 	}
 };
 
-const getDbCollectionsData = async (data, logger, cb, app) => {
+const getDbCollectionsData = async (data, logger, cb) => {
 	try {
-		initDependencies(app);
 		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
 		const collections = data.collectionData.collections;
 		const dataBaseNames = data.collectionData.dataBaseNames;
@@ -276,12 +269,6 @@ const handleError = (logger, error, cb) => {
 	logger.log('error', { error }, 'Reverse Engineering error');
 
 	return cb({ message });
-};
-
-const initDependencies = app => {
-	setDependencies(app);
-	_ = dependencies.lodash;
-	snowflakeHelper.setDependencies(dependencies);
 };
 
 module.exports = {
