@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
@@ -17,17 +18,14 @@ const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
 
 module.exports = (baseProvider, options, app) => {
-	const _ = app.require('lodash');
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
 	const { tab, hasType, clean } = app.require('@hackolade/ddl-fe-utils').general;
 
-	const keyHelper = require('./helpers/keyHelper')(_, app);
-	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys } = require('./helpers/tableHelper')(
-		_,
-		app,
-	);
-	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(_, app);
-	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(_, app);
+	const keyHelper = require('./helpers/keyHelper')(app);
+	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys } =
+		require('./helpers/tableHelper')(app);
+	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(app);
+	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(app);
 
 	const {
 		toString,
@@ -40,13 +38,13 @@ module.exports = (baseProvider, options, app) => {
 		getFullName,
 		getDbName,
 		viewColumnsToString,
-	} = require('./helpers/general')(_, app);
+	} = require('./helpers/general')(app);
 
 	const { decorateType, getDefault, getAutoIncrement, getCollation, getInlineConstraint, createExternalColumn } =
-		require('./helpers/columnDefinitionHelper')(_, app);
+		require('./helpers/columnDefinitionHelper')(app);
 
-	const { generateConstraint } = require('./helpers/constraintHelper')(_, app);
-	const { commentIfDeactivated } = require('./helpers/commentDeactivatedHelper')(_);
+	const { generateConstraint } = require('./helpers/constraintHelper')(app);
+	const { commentIfDeactivated } = require('./helpers/commentDeactivatedHelper');
 
 	const {
 		getAlterSchemaName,
@@ -64,7 +62,6 @@ module.exports = (baseProvider, options, app) => {
 		templates,
 		assignTemplates,
 		tab,
-		_,
 	});
 
 	const getOutOfLineConstraints = (
@@ -824,7 +821,7 @@ module.exports = (baseProvider, options, app) => {
 				prepareName,
 				prepareTableName,
 				prepareCollectionFileFormat,
-				prepareCollectionFormatTypeOptions(_),
+				prepareCollectionFormatTypeOptions,
 				prepareAlterSetUnsetData,
 				prepareCollectionStageCopyOptions(clean, getStageCopyOptions, _),
 			)({ collection, data: {} });

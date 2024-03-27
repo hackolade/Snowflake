@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 const COPY_OPTIONS_DEFAULT = {
 	ON_ERROR: 'ABORT_STATEMENT',
 	SIZE_LIMIT: null,
@@ -9,31 +11,29 @@ const COPY_OPTIONS_DEFAULT = {
 	FORCE: false,
 };
 
-const getDiffCopyOptionsByDefault =
-	_ =>
-	(oldOptions = {}, newOptions = {}, commonKeys = []) => {
-		return commonKeys.reduce((acc, key) => {
-			if (_.isEqual(oldOptions[key], newOptions[key])) {
-				return acc;
-			}
-
-			if (!newOptions[key] && oldOptions[key] !== COPY_OPTIONS_DEFAULT[key]) {
-				return {
-					...acc,
-					[key]: COPY_OPTIONS_DEFAULT[key],
-				};
-			}
-
-			if (newOptions[key]) {
-				return {
-					...acc,
-					[key]: newOptions[key],
-				};
-			}
-
+const getDiffCopyOptionsByDefault = (oldOptions = {}, newOptions = {}, commonKeys = []) => {
+	return commonKeys.reduce((acc, key) => {
+		if (_.isEqual(oldOptions[key], newOptions[key])) {
 			return acc;
-		}, {});
-	};
+		}
+
+		if (!newOptions[key] && oldOptions[key] !== COPY_OPTIONS_DEFAULT[key]) {
+			return {
+				...acc,
+				[key]: COPY_OPTIONS_DEFAULT[key],
+			};
+		}
+
+		if (newOptions[key]) {
+			return {
+				...acc,
+				[key]: newOptions[key],
+			};
+		}
+
+		return acc;
+	}, {});
+};
 
 module.exports = {
 	getDiffCopyOptionsByDefault,

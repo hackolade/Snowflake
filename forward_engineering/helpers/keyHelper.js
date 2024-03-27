@@ -1,4 +1,6 @@
-module.exports = (_, app) => {
+const _ = require('lodash');
+
+module.exports = app => {
 	const { clean } = app.require('@hackolade/ddl-fe-utils').general;
 
 	const mapProperties = (jsonSchema, iteratee) => {

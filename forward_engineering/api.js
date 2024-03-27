@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const { commentDropStatements } = require('./helpers/commentDropStatements');
 const { DROP_STATEMENTS } = require('./helpers/constants');
 
@@ -7,7 +8,6 @@ module.exports = {
 	generateScript(data, logger, callback, app) {
 		try {
 			const { getAlterScript } = require('./helpers/alterScriptFromDeltaHelper');
-			const _ = app.require('lodash');
 			const ddlProvider = require('./ddlProvider')(_, data.options, app);
 
 			const collection = JSON.parse(data.jsonSchema);
@@ -51,7 +51,7 @@ module.exports = {
 		logger.log('info', getSystemInfo(connectionInfo.appVersion), 'Apply to instance');
 		logger.log(
 			'info',
-			app.require('lodash').omit(connectionInfo, 'script', 'containerData'),
+			_.omit(connectionInfo, 'script', 'containerData'),
 			'connectionInfo',
 			connectionInfo.hiddenKeys,
 		);

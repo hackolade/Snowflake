@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { getDiffCopyOptionsByDefault } = require('./tableCopyOptionsHelper');
 
 const POSSIBLE_CHANGE_CONTAINER_DATA = ['DATA_RETENTION_TIME_IN_DAYS', 'description'];
@@ -175,42 +176,38 @@ const prepareCollectionFileFormat = ({ collection, data }) => {
 	};
 };
 
-const getObjectCommonKeys =
-	_ =>
-	(oldData = {}, newData = {}) => {
-		const newDataKeys = Object.keys(oldData);
-		const oldDataKeys = Object.keys(newData);
+const getObjectCommonKeys = (oldData = {}, newData = {}) => {
+	const newDataKeys = Object.keys(oldData);
+	const oldDataKeys = Object.keys(newData);
 
-		return _.union(newDataKeys, oldDataKeys).filter(key => !REDUNDANT_OPTIONS.includes(key));
-	};
+	return _.union(newDataKeys, oldDataKeys).filter(key => !REDUNDANT_OPTIONS.includes(key));
+};
 
-const prepareCollectionFormatTypeOptions =
-	_ =>
-	({ collection, data }) => {
-		const { new: newOptions = {}, old: oldOptions = {} } = collection?.role?.compMod?.formatTypeOptions || {};
-		const commonOptionsKeys = getObjectCommonKeys(_)(oldOptions, newOptions);
-		const optionsIsChanged = commonOptionsKeys.some(key => !_.isEqual(newOptions[key], oldOptions[key]));
+const prepareCollectionFormatTypeOptions = ({ collection, data }) => {
+	const { new: newOptions = {}, old: oldOptions = {} } = collection?.role?.compMod?.formatTypeOptions || {};
+	const commonOptionsKeys = getObjectCommonKeys(oldOptions, newOptions);
+	const optionsIsChanged = commonOptionsKeys.some(key => !_.isEqual(newOptions[key], oldOptions[key]));
 
-		return {
-			collection,
-			data: {
-				...data,
-				formatTypeOptions: {
-					optionsIsChanged,
-					typeOptions: newOptions,
-				},
+	return {
+		collection,
+		data: {
+			...data,
+			formatTypeOptions: {
+				optionsIsChanged,
+				typeOptions: newOptions,
 			},
-		};
+		},
 	};
+};
 
 const prepareCollectionStageCopyOptions =
 	(clean, getStageCopyOptions, _) =>
 	({ collection, data }) => {
 		const { new: newOptions = {}, old: oldOptions = {} } = collection?.role?.compMod?.stageCopyOptions || {};
-		const commonOptionsKeys = getObjectCommonKeys(_)(oldOptions, newOptions);
+		const commonOptionsKeys = getObjectCommonKeys(oldOptions, newOptions);
 
 		const optionsIsChanged = commonOptionsKeys.some(key => !_.isEqual(newOptions[key], oldOptions[key]));
-		let options = getDiffCopyOptionsByDefault(_)(oldOptions, newOptions, commonOptionsKeys);
+		let options = getDiffCopyOptionsByDefault(oldOptions, newOptions, commonOptionsKeys);
 		options = {
 			...options,
 			sizeLimit: _.has(options, 'SIZE_LIMIT'),

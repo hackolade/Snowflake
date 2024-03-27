@@ -1,5 +1,5 @@
-module.exports = (_, app) => {
-	const { foreignKeysToString, foreignActiveKeysToString, getName } = require('./general')(_, app);
+module.exports = app => {
+	const { foreignKeysToString, foreignActiveKeysToString, getName } = require('./general')(app);
 
 	const generateConstraint = ({ name, keys, keyType, isParentActivated, isCaseSensitive }) => {
 		const keysAsStrings = keys.map(key =>

@@ -1,4 +1,6 @@
-module.exports = _ => {
+const _ = require('lodash');
+
+module.exports = () => {
 	const createColumnDefinition = data => {
 		return Object.assign(
 			{

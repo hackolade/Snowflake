@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const {
 	getAddContainerScript,
 	getDeleteContainerScript,
@@ -19,20 +20,20 @@ const getItems = (collection, nameProperty, modify, objectMethod) =>
 		.filter(Boolean)
 		.map(items => Object[objectMethod](items.properties)[0]);
 
-const getAlterContainersScripts = (collection, _, ddlProvider, app) => {
+const getAlterContainersScripts = (collection, ddlProvider, app) => {
 	const addedContainerScripts = getItems(collection, 'containers', 'added', 'values').map(
-		getAddContainerScript(_, ddlProvider, app),
+		getAddContainerScript(ddlProvider, app),
 	);
 	const deletedContainerScripts = getItems(collection, 'containers', 'deleted', 'values').map(
 		getDeleteContainerScript(ddlProvider),
 	);
 	const modifiedContainerScripts = getItems(collection, 'containers', 'modified', 'values').map(
-		getModifyContainerScript(_, ddlProvider),
+		getModifyContainerScript(ddlProvider),
 	);
 	return { addedContainerScripts, deletedContainerScripts, modifiedContainerScripts };
 };
 
-const getAlterCollectionsScripts = (collection, _, ddlProvider, app) => {
+const getAlterCollectionsScripts = (collection, ddlProvider, app) => {
 	const getCollectionScripts = (items, compMode, getScript) =>
 		items.filter(item => item.compMod?.[compMode]).map(getScript);
 
@@ -41,12 +42,12 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider, app) => {
 	const addedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'added', 'values'),
 		'created',
-		getAddCollectionScript(_, ddlProvider, app),
+		getAddCollectionScript(ddlProvider, app),
 	);
 	const deletedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
 		'deleted',
-		getDeleteCollectionScript(_, app),
+		getDeleteCollectionScript(app),
 	);
 
 	const modifiedCollectionScripts = getCollectionScripts(
@@ -57,15 +58,15 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider, app) => {
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
-		getAddColumnScript(_, ddlProvider, app),
+		getAddColumnScript(ddlProvider, app),
 	);
 	const deletedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
-		getDeleteColumnScript(_, app),
+		getDeleteColumnScript(app),
 	);
 	const modifiedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'modified', 'values'),
-		getModifyColumnScript(_, app),
+		getModifyColumnScript(app),
 	);
 
 	return {
@@ -78,7 +79,7 @@ const getAlterCollectionsScripts = (collection, _, ddlProvider, app) => {
 	};
 };
 
-const getAlterViewsScripts = ({ schema, _, ddlProvider, app }) => {
+const getAlterViewsScripts = ({ schema, ddlProvider, app }) => {
 	const getViewScripts = (views, compMode, getScript) =>
 		views
 			.map(view => ({ ...view, ...(view.role || {}) }))
@@ -94,12 +95,12 @@ const getAlterViewsScripts = ({ schema, _, ddlProvider, app }) => {
 	const addedViewScripts = getViewScripts(
 		getItems(schema, 'views', 'added', 'values'),
 		'created',
-		getAddViewScript(_, ddlProvider, app),
+		getAddViewScript(ddlProvider, app),
 	);
 	const deletedViewScripts = getViewScripts(
 		getItems(schema, 'views', 'deleted', 'values'),
 		'deleted',
-		getDeleteViewScript(_, app),
+		getDeleteViewScript(app),
 	);
 	const modifiedViewScripts = getModifiedScript(
 		getItems(schema, 'views', 'modified', 'values'),
@@ -113,11 +114,11 @@ const getAlterViewsScripts = ({ schema, _, ddlProvider, app }) => {
 	};
 };
 
-const getAlterScript = ({ collection, _, ddlProvider, app }) => {
+const getAlterScript = ({ collection, ddlProvider, app }) => {
 	const script = {
-		...getAlterCollectionsScripts(collection, _, ddlProvider, app),
-		...getAlterContainersScripts(collection, _, ddlProvider, app),
-		...getAlterViewsScripts({ schema: collection, _, ddlProvider, app }),
+		...getAlterCollectionsScripts(collection, ddlProvider, app),
+		...getAlterContainersScripts(collection, ddlProvider, app),
+		...getAlterViewsScripts({ schema: collection, ddlProvider, app }),
 	};
 	return [
 		'addedContainerScripts',

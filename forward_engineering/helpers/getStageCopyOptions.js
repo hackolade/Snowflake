@@ -1,5 +1,5 @@
-module.exports = (_, app) => {
-	const { toNumber, toBoolean } = require('./general')(_, app);
+module.exports = app => {
+	const { toNumber, toBoolean } = require('./general')(app);
 
 	const getOnError = properties => {
 		if (properties.ON_ERROR === 'SKIP_FILE_<num>') {

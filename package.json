@@ -51,8 +51,10 @@
     "description": "Hackolade plugin for Snowflake",
     "disabled": false,
     "dependencies": {
+        "async": "3.2.5",
         "axios": "0.21.1",
         "bson": "4.6.1",
+        "lodash": "4.17.21",
         "snowflake-sdk": "1.9.3",
         "uuid": "7.0.3"
     },

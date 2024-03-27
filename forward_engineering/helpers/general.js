@@ -1,8 +1,9 @@
+const _ = require('lodash');
 const assignTemplates = require('../utils/assignTemplates');
+const { commentIfDeactivated } = require('./commentDeactivatedHelper');
 
-module.exports = (_, app) => {
+module.exports = app => {
 	const { checkAllKeysActivated } = app.require('@hackolade/ddl-fe-utils').general;
-	const { commentIfDeactivated } = require('./commentDeactivatedHelper')(_);
 
 	const escape = value => String(value).replace(/'/g, "''").replace(/\\\\/g, '\\').replace(/\\/g, '\\\\');
 	const toString = value => (_.isUndefined(value) ? value : `'${escape(value)}'`);

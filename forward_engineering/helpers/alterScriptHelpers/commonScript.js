@@ -1,4 +1,6 @@
-module.exports = ({ getName, getFullName, templates, assignTemplates, tab, _ }) => {
+const _ = require('lodash');
+
+module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => {
 	const getSchemaFullName = (database, schemaName, isCaseSensitive) => {
 		const setSchemaName = getName(isCaseSensitive, schemaName);
 		const databaseName = getName(isCaseSensitive, database);

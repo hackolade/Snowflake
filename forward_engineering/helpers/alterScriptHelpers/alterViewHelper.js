@@ -1,9 +1,10 @@
+const _ = require('lodash');
 const { getNames, getBaseAndContainerNames } = require('./common');
 
 const getViewName = view => (view && view.code) || view.name || '';
 
-const getAddViewScript = (_, ddlProvider, app) => view => {
-	const { getName } = require('../general')(_, app);
+const getAddViewScript = (ddlProvider, app) => view => {
+	const { getName } = require('../general')(app);
 	const { mapProperties } = app.require('@hackolade/ddl-fe-utils');
 
 	const { schemaName, databaseName } = getBaseAndContainerNames(view, getName);
@@ -15,7 +16,6 @@ const getAddViewScript = (_, ddlProvider, app) => view => {
 			collectionRefsDefinitionsMap: view.compMod?.collectionData?.collectionRefsDefinitionsMap ?? {},
 			ddlProvider,
 			mapProperties,
-			_,
 		}),
 		schemaData: { schemaName, databaseName },
 	};
@@ -28,8 +28,8 @@ const getAddViewScript = (_, ddlProvider, app) => view => {
 	return ddlProvider.createView(hydratedView, {}, view.isActivated);
 };
 
-const getDeleteViewScript = (_, app) => view => {
-	const { getFullName, getName } = require('../general')(_, app);
+const getDeleteViewScript = app => view => {
+	const { getFullName, getName } = require('../general')(app);
 
 	const jsonData = {
 		...view,
@@ -48,7 +48,7 @@ const getModifyViewScript = ddlProvider => view => {
 	return ddlProvider.alterView(data);
 };
 
-const getKeys = ({ viewSchema, collectionRefsDefinitionsMap, ddlProvider, mapProperties, _ }) => {
+const getKeys = ({ viewSchema, collectionRefsDefinitionsMap, ddlProvider, mapProperties }) => {
 	return mapProperties(viewSchema, (propertyName, schema) => {
 		const definition = collectionRefsDefinitionsMap[schema.refId];
 

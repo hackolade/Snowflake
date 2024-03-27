@@ -1,6 +1,8 @@
-module.exports = (_, app) => {
+const _ = require('lodash');
+
+module.exports = app => {
 	const { tab } = app.require('@hackolade/ddl-fe-utils').general;
-	const { toOptions } = require('./general')(_, app);
+	const { toOptions } = require('./general')(app);
 
 	const getFileFormat = (fileFormat, formatTypeOptions, formatName = '') => {
 		if (fileFormat !== 'custom') {
