@@ -23,7 +23,15 @@ const applyToInstance = async (connectionInfo, logger) => {
 		logger.progress({ message });
 		logger.log('info', { message }, 'Apply to instance');
 
-		await snowflakeHelper.applyScript(query);
+		try {
+			await snowflakeHelper.applyScript(query);
+		} catch (error) {
+			logger.log('error', error, `Failed to apply statement:\n${query}`);
+			throw {
+				...error,
+				message: `Failed to apply statement:\n${query.substring(0, 80)}...\nReason: ${error.message}`
+			}
+		}
 	});
 };
 
