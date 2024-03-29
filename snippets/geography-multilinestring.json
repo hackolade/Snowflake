@@ -1,106 +1,164 @@
 {
 	"name": "geography-multilinestring",
 	"parentType": "document",
-	"properties": [{
-		"name": "type",
-		"type": "jsonString",
-		"sample": "multilinestring"
-	}, {
-		"name": "coordinates",
-		"type": "jsonArray",
-		"properties": [{
+	"properties": [
+		{
+			"name": "type",
+			"type": "jsonString",
+			"sample": "multilinestring"
+		},
+		{
+			"name": "coordinates",
 			"type": "jsonArray",
-			"properties": [{
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}]
-		}, {
-			"type": "jsonArray",
-			"properties": [{
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}]
-		}, {
-			"type": "jsonArray",
-			"properties": [{
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}, {
-				"type": "jsonArray",
-				"properties": [{
-					"type": "jsonNumber"
-				}, {
-					"type": "jsonNumber"
-				}]
-			}]
-		}]
-	}]
+			"properties": [
+				{
+					"type": "jsonArray",
+					"properties": [
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "jsonArray",
+					"properties": [
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						}
+					]
+				},
+				{
+					"type": "jsonArray",
+					"properties": [
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						},
+						{
+							"type": "jsonArray",
+							"properties": [
+								{
+									"type": "jsonNumber"
+								},
+								{
+									"type": "jsonNumber"
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
 }

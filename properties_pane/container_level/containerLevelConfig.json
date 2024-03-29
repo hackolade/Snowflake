@@ -155,7 +155,6 @@ making sure that you maintain a proper JSON format.
 				"valueType": "number",
 				"minValue": 0,
 				"maxValue": 90
-
 			},
 			{
 				"propertyName": "Remarks",
@@ -170,809 +169,753 @@ making sure that you maintain a proper JSON format.
 	},
 	{
 		"lowerTab": "UDFs",
-		"structure": [{
-			"propertyName": "UDFs",
-			"propertyType": "group",
-			"propertyKeyword": "UDFs",
-			"shouldValidate": false,
-			"propertyTooltip": "",
-			"structure": [
-				{
-					"propertyName": "Name",
-					"propertyKeyword": "name",
-					"shouldValidate": false,
-					"propertyTooltip": "Specifies the identifier for the UDF",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Or Replace",
-					"propertyKeyword": "functionOrReplace",
-					"propertyType": "checkbox",
-					"propertyTooltip": "Specifies that if a UDF with the same name and input argument data types, or signature, as this one already exists, the existing UDF is replaced. You can only replace a UDF with a new UDF that defines an identical set of data types."
-				},
-				{
-					"propertyName": "Language",
-					"propertyKeyword": "functionLanguage",
-					"shouldValidate": false,
-					"propertyTooltip": "language",
-					"propertyType": "select",
-					"defaultValue": "sql",
-					"options": [
-						"java",
-						"javascript",
-						"python",
-						"scala",
-						"sql"
-					]
-				},
-				{
-					"propertyName": "Argument signature",
-					"propertyKeyword": "functionArguments",
-					"shouldValidate": false,
-					"propertyTooltip": "Argument signature",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Returns data type",
-					"propertyKeyword": "functionReturnType",
-					"shouldValidate": false,
-					"propertyTooltip": "Data type",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Not Null",
-					"propertyKeyword": "functionNotNull",
-					"propertyType": "checkbox",
-					"propertyTooltip": "Specifies whether the function can return NULL values or must return only NON-NULL values."
-				},
-				{
-					"propertyName": "Runtime version",
-					"propertyKeyword": "functionRuntimeVersion",
-					"propertyType": "text",
-					"dependency": {
-						"type": "or",
-						"values": [
-							{
-								"key": "functionLanguage",
-								"value": "java"
-							},
-							{
-								"key": "functionLanguage",
-								"value": "python"
-							},
-							{
-								"key": "functionLanguage",
-								"value": "scala"
-							}
-						]
+		"structure": [
+			{
+				"propertyName": "UDFs",
+				"propertyType": "group",
+				"propertyKeyword": "UDFs",
+				"shouldValidate": false,
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"shouldValidate": false,
+						"propertyTooltip": "Specifies the identifier for the UDF",
+						"propertyType": "text"
 					},
-					"propertyTooltip": "Specifies a UDF language runtime version"
-				},
-				{
-					"propertyName": "Packages",
-					"propertyKeyword": "functionPackages",
-					"propertyType": "group",
-					"structure": [
-						{
-							"propertyName": "Name",
-							"propertyKeyword": "packageName",
-							"propertyType": "text"
-						}
-					],
-					"dependency": {
-						"type": "or",
-						"values": [
-							{
-								"key": "functionLanguage",
-								"value": "java"
-							},
-							{
-								"key": "functionLanguage",
-								"value": "python"
-							},
-							{
-								"key": "functionLanguage",
-								"value": "scala"
-							}
-						]
+					{
+						"propertyName": "Or Replace",
+						"propertyKeyword": "functionOrReplace",
+						"propertyType": "checkbox",
+						"propertyTooltip": "Specifies that if a UDF with the same name and input argument data types, or signature, as this one already exists, the existing UDF is replaced. You can only replace a UDF with a new UDF that defines an identical set of data types."
 					},
-					"propertyTooltip": "The name and version number of Snowflake system packages required as dependencies"
-				},
-				{
-					"propertyName": "Comments",
-					"propertyKeyword": "functionDescription",
-					"shouldValidate": false,
-					"propertyTooltip": "",
-					"propertyType": "details",
-					"template": "textarea"
-				},
-				{
-					"propertyName": "Function",
-					"propertyKeyword": "functionBody",
-					"shouldValidate": false,
-					"propertyTooltip": "Defines the handler code executed when the UDF is called",
-					"propertyType": "details",
-					"template": "textarea",
-					"markdown": false
-				},
-				{
-					"propertyName": "Remarks",
-					"propertyKeyword": "functionComments",
-					"shouldValidate": false,
-					"propertyTooltip": "comments",
-					"addTimestampButton": false,
-					"propertyType": "details",
-					"template": "textarea"
-				}
-			]
-		}]
+					{
+						"propertyName": "Language",
+						"propertyKeyword": "functionLanguage",
+						"shouldValidate": false,
+						"propertyTooltip": "language",
+						"propertyType": "select",
+						"defaultValue": "sql",
+						"options": ["java", "javascript", "python", "scala", "sql"]
+					},
+					{
+						"propertyName": "Argument signature",
+						"propertyKeyword": "functionArguments",
+						"shouldValidate": false,
+						"propertyTooltip": "Argument signature",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Returns data type",
+						"propertyKeyword": "functionReturnType",
+						"shouldValidate": false,
+						"propertyTooltip": "Data type",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Not Null",
+						"propertyKeyword": "functionNotNull",
+						"propertyType": "checkbox",
+						"propertyTooltip": "Specifies whether the function can return NULL values or must return only NON-NULL values."
+					},
+					{
+						"propertyName": "Runtime version",
+						"propertyKeyword": "functionRuntimeVersion",
+						"propertyType": "text",
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "functionLanguage",
+									"value": "java"
+								},
+								{
+									"key": "functionLanguage",
+									"value": "python"
+								},
+								{
+									"key": "functionLanguage",
+									"value": "scala"
+								}
+							]
+						},
+						"propertyTooltip": "Specifies a UDF language runtime version"
+					},
+					{
+						"propertyName": "Packages",
+						"propertyKeyword": "functionPackages",
+						"propertyType": "group",
+						"structure": [
+							{
+								"propertyName": "Name",
+								"propertyKeyword": "packageName",
+								"propertyType": "text"
+							}
+						],
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "functionLanguage",
+									"value": "java"
+								},
+								{
+									"key": "functionLanguage",
+									"value": "python"
+								},
+								{
+									"key": "functionLanguage",
+									"value": "scala"
+								}
+							]
+						},
+						"propertyTooltip": "The name and version number of Snowflake system packages required as dependencies"
+					},
+					{
+						"propertyName": "Comments",
+						"propertyKeyword": "functionDescription",
+						"shouldValidate": false,
+						"propertyTooltip": "",
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Function",
+						"propertyKeyword": "functionBody",
+						"shouldValidate": false,
+						"propertyTooltip": "Defines the handler code executed when the UDF is called",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "Remarks",
+						"propertyKeyword": "functionComments",
+						"shouldValidate": false,
+						"propertyTooltip": "comments",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			}
+		]
 	},
 	{
 		"lowerTab": "Procedures",
-		"structure": [{
-			"propertyName": "Procedure",
-			"propertyType": "group",
-			"propertyKeyword": "Procedures",
-			"propertyTooltip": "Creates a new stored procedure or replaces an existing procedure for the current database.",
-			"structure": [
-				{
-					"propertyName": "Name",
-					"propertyKeyword": "name",
-					"propertyTooltip": "The name of the procedure.",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Or replace",
-					"propertyKeyword": "orReplace",
-					"propertyType": "checkbox",
-					"propertyTooltip": "Specifies that if a procedure with the same name and input argument data types, or signature, as this one already exists, the existing procedure is replaced. You can only replace a procedure with a new procedure that defines an identical set of data types."
-				},
-				{
-					"propertyName": "Arguments",
-					"propertyKeyword": "inputArgs",
-					"propertyTooltip": "A list of arguments' names and their data types. ",
-					"propertyType": "details",
-					"template": "textarea",
-					"markdown": false
-				},
-				{
-					"propertyName": "Return type",
-					"propertyKeyword": "returnType",
-					"propertyType": "text",
-					"propertyTooltip": "Specifies procedure return type"
-				},
-				{
-					"propertyName": "Language",
-					"propertyKeyword": "language",
-					"propertyTooltip": "language",
-					"propertyType": "select",
-					"defaultValue": "sql",
-					"options": [
-						"java",
-						"javascript",
-						"python",
-						"scala",
-						"sql"
-					]
-				},
-				{
-					"propertyName": "Comments",
-					"propertyKeyword": "description",
-					"propertyType": "details",
-					"template": "textarea"
-				},
-				{
-					"propertyName": "Runtime version",
-					"propertyKeyword": "runtimeVersion",
-					"propertyType": "text",
-					"dependency": {
-						"type": "or",
-						"values": [
-							{
-								"key": "language",
-								"value": "java"
-							},
-							{
-								"key": "language",
-								"value": "python"
-							},
-							{
-								"key": "language",
-								"value": "scala"
-							}
-						]
+		"structure": [
+			{
+				"propertyName": "Procedure",
+				"propertyType": "group",
+				"propertyKeyword": "Procedures",
+				"propertyTooltip": "Creates a new stored procedure or replaces an existing procedure for the current database.",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyTooltip": "The name of the procedure.",
+						"propertyType": "text"
 					},
-					"propertyTooltip": "Specifies procedure language runtime version"
-				},
-				{
-					"propertyName": "Packages",
-					"propertyKeyword": "packages",
-					"propertyType": "group",
-					"structure": [
-						{
-							"propertyName": "Name",
-							"propertyKeyword": "packageName",
-							"propertyType": "text"
-						}
-					],
-					"dependency": {
-						"type": "or",
-						"values": [
-							{
-								"key": "language",
-								"value": "java"
-							},
-							{
-								"key": "language",
-								"value": "python"
-							},
-							{
-								"key": "language",
-								"value": "scala"
-							}
-						]
+					{
+						"propertyName": "Or replace",
+						"propertyKeyword": "orReplace",
+						"propertyType": "checkbox",
+						"propertyTooltip": "Specifies that if a procedure with the same name and input argument data types, or signature, as this one already exists, the existing procedure is replaced. You can only replace a procedure with a new procedure that defines an identical set of data types."
 					},
-					"propertyTooltip": "The name and version number of Snowflake system packages required as dependencies"
-				},
-				{
-					"propertyName": "Handler",
-					"propertyKeyword": "handler",
-					"propertyTooltip": "Name of a procedure handler method.",
-					"propertyType": "text",
-					"dependency": {
-						"type": "or",
-						"values": [
-							{
-								"key": "language",
-								"value": "java"
-							},
-							{
-								"key": "language",
-								"value": "python"
-							},
-							{
-								"key": "language",
-								"value": "scala"
-							}
-						]
+					{
+						"propertyName": "Arguments",
+						"propertyKeyword": "inputArgs",
+						"propertyTooltip": "A list of arguments' names and their data types. ",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
 					},
-					"template": "textarea",
-					"markdown": false
-				},
-				{
-					"propertyName": "Procedure body",
-					"propertyKeyword": "body",
-					"propertyTooltip": "Valid SQL procedure statement.",
-					"propertyType": "details",
-					"template": "textarea",
-					"markdown": false
-				},
-				{
-					"propertyName": "Remarks",
-					"propertyKeyword": "comments",
-					"shouldValidate": false,
-					"propertyTooltip": "comments",
-					"addTimestampButton": false,
-					"propertyType": "details",
-					"template": "textarea"
-				}
-			]
-		}]
+					{
+						"propertyName": "Return type",
+						"propertyKeyword": "returnType",
+						"propertyType": "text",
+						"propertyTooltip": "Specifies procedure return type"
+					},
+					{
+						"propertyName": "Language",
+						"propertyKeyword": "language",
+						"propertyTooltip": "language",
+						"propertyType": "select",
+						"defaultValue": "sql",
+						"options": ["java", "javascript", "python", "scala", "sql"]
+					},
+					{
+						"propertyName": "Comments",
+						"propertyKeyword": "description",
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Runtime version",
+						"propertyKeyword": "runtimeVersion",
+						"propertyType": "text",
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "language",
+									"value": "java"
+								},
+								{
+									"key": "language",
+									"value": "python"
+								},
+								{
+									"key": "language",
+									"value": "scala"
+								}
+							]
+						},
+						"propertyTooltip": "Specifies procedure language runtime version"
+					},
+					{
+						"propertyName": "Packages",
+						"propertyKeyword": "packages",
+						"propertyType": "group",
+						"structure": [
+							{
+								"propertyName": "Name",
+								"propertyKeyword": "packageName",
+								"propertyType": "text"
+							}
+						],
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "language",
+									"value": "java"
+								},
+								{
+									"key": "language",
+									"value": "python"
+								},
+								{
+									"key": "language",
+									"value": "scala"
+								}
+							]
+						},
+						"propertyTooltip": "The name and version number of Snowflake system packages required as dependencies"
+					},
+					{
+						"propertyName": "Handler",
+						"propertyKeyword": "handler",
+						"propertyTooltip": "Name of a procedure handler method.",
+						"propertyType": "text",
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "language",
+									"value": "java"
+								},
+								{
+									"key": "language",
+									"value": "python"
+								},
+								{
+									"key": "language",
+									"value": "scala"
+								}
+							]
+						},
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "Procedure body",
+						"propertyKeyword": "body",
+						"propertyTooltip": "Valid SQL procedure statement.",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					},
+					{
+						"propertyName": "Remarks",
+						"propertyKeyword": "comments",
+						"shouldValidate": false,
+						"propertyTooltip": "comments",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			}
+		]
 	},
 	{
 		"lowerTab": "Sequences",
-		"structure": [{
-			"propertyName": "Sequence",
-			"propertyType": "group",
-			"propertyKeyword": "sequences",
-			"propertyTooltip": "",
-			"structure": [
-				{
-					"propertyName": "Name",
-					"propertyKeyword": "name",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Start with",
-					"propertyKeyword": "sequenceStart",
-					"propertyType": "numeric"
-				},
-				{
-					"propertyName": "Increment by",
-					"propertyKeyword": "sequenceIncrement",
-					"propertyType": "numeric"
-				},
-				{
-					"propertyName": "Comments",
-					"propertyKeyword": "sequenceComments",
-					"propertyType": "details",
-					"template": "textarea"
-				},
-				{
-					"propertyName": "Remarks",
-					"propertyKeyword": "sequenceRemarks",
-					"shouldValidate": false,
-					"addTimestampButton": true,
-					"propertyTooltip": "remarks",
-					"propertyType": "details",
-					"template": "textarea"
-				}
-			]
-		}]
+		"structure": [
+			{
+				"propertyName": "Sequence",
+				"propertyType": "group",
+				"propertyKeyword": "sequences",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Start with",
+						"propertyKeyword": "sequenceStart",
+						"propertyType": "numeric"
+					},
+					{
+						"propertyName": "Increment by",
+						"propertyKeyword": "sequenceIncrement",
+						"propertyType": "numeric"
+					},
+					{
+						"propertyName": "Comments",
+						"propertyKeyword": "sequenceComments",
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Remarks",
+						"propertyKeyword": "sequenceRemarks",
+						"shouldValidate": false,
+						"addTimestampButton": true,
+						"propertyTooltip": "remarks",
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			}
+		]
 	},
 	{
 		"lowerTab": "File formats",
-		"structure": [{
-			"propertyName": "File format",
-			"propertyType": "group",
-			"propertyKeyword": "fileFormats",
-			"propertyTooltip": "",
-			"structure": [
-				{
-					"propertyName": "Name",
-					"propertyKeyword": "name",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "File format type",
-					"propertyKeyword": "fileFormat",
-					"propertyTooltip": "Select from list of options",
-					"propertyType": "select",
-					"options": [
-						"",
-						"CSV",
-						"JSON",
-						"AVRO",
-						"ORC",
-						"PARQUET",
-						"XML"
-					]
-				},
-				{
-					"propertyName": "Format type options",
-					"propertyType": "block",
-					"propertyKeyword": "formatTypeOptions",
-					"propertyTooltip": "",
-					"dependency": {
-						"key": "fileFormat",
-						"value": "CSV"
+		"structure": [
+			{
+				"propertyName": "File format",
+				"propertyType": "group",
+				"propertyKeyword": "fileFormats",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyTooltip": "",
+						"propertyType": "text"
 					},
-					"defaultValue": {
-						"COMPRESSION": "AUTO",
-						"RECORD_DELIMITER": "\\r\\n",
-						"FIELD_DELIMITER": ",",
-						"FILE_EXTENSION": "NONE",
-						"SKIP_HEADER": 0,
-						"DATE_FORMAT": "AUTO",
-						"TIME_FORMAT": "AUTO",
-						"TIMESTAMP_FORMAT": "AUTO",
-						"BINARY_FORMAT": "HEX",
-						"ESCAPE": "NONE",
-						"ESCAPE_UNENCLOSED_FIELD": "\\",
-						"TRIM_SPACE": false, 
-						"FIELD_OPTIONALLY_ENCLOSED_BY": "NONE",
-						"NULL_IF": [{ "NULL_IF_item": "\\N" }],
-						"ERROR_ON_COLUMN_COUNT_MISMATCH": true,
-						"VALIDATE_UTF8": true,
-						"EMPTY_FIELD_AS_NULL": true,
-						"SKIP_BYTE_ORDER_MARK": true,
-						"ENCODING": "UTF8",
-						"SNAPPY_COMPRESSION": true,
-						"BINARY_AS_TEXT": true,
-						"ON_ERROR": "ABORT_STATEMENT"
+					{
+						"propertyName": "File format type",
+						"propertyKeyword": "fileFormat",
+						"propertyTooltip": "Select from list of options",
+						"propertyType": "select",
+						"options": ["", "CSV", "JSON", "AVRO", "ORC", "PARQUET", "XML"]
 					},
-					"structure": [
-						{
-							"propertyName": "Compression",
-							"propertyKeyword": "COMPRESSION",
-							"propertyTooltip": "Select from list of options",
-							"propertyType": "select",
-							"options": [
-								"AUTO",
-								"GZIP",
-								"BZ2",
-								"BROTLI",
-								"ZSTD",
-								"DEFLATE",
-								"RAW_DEFLATE",
-								"NONE"
-							]
+					{
+						"propertyName": "Format type options",
+						"propertyType": "block",
+						"propertyKeyword": "formatTypeOptions",
+						"propertyTooltip": "",
+						"dependency": {
+							"key": "fileFormat",
+							"value": "CSV"
 						},
-						{
-							"propertyName": "Record delimiter",
-							"propertyKeyword": "RECORD_DELIMITER",
-							"propertyType": "text"
+						"defaultValue": {
+							"COMPRESSION": "AUTO",
+							"RECORD_DELIMITER": "\\r\\n",
+							"FIELD_DELIMITER": ",",
+							"FILE_EXTENSION": "NONE",
+							"SKIP_HEADER": 0,
+							"DATE_FORMAT": "AUTO",
+							"TIME_FORMAT": "AUTO",
+							"TIMESTAMP_FORMAT": "AUTO",
+							"BINARY_FORMAT": "HEX",
+							"ESCAPE": "NONE",
+							"ESCAPE_UNENCLOSED_FIELD": "\\",
+							"TRIM_SPACE": false,
+							"FIELD_OPTIONALLY_ENCLOSED_BY": "NONE",
+							"NULL_IF": [{ "NULL_IF_item": "\\N" }],
+							"ERROR_ON_COLUMN_COUNT_MISMATCH": true,
+							"VALIDATE_UTF8": true,
+							"EMPTY_FIELD_AS_NULL": true,
+							"SKIP_BYTE_ORDER_MARK": true,
+							"ENCODING": "UTF8",
+							"SNAPPY_COMPRESSION": true,
+							"BINARY_AS_TEXT": true,
+							"ON_ERROR": "ABORT_STATEMENT"
 						},
-						{
-							"propertyName": "Field delimiter",
-							"propertyKeyword": "FIELD_DELIMITER",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "File extension",
-							"propertyKeyword": "FILE_EXTENSION",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "Skip header",
-							"propertyKeyword": "SKIP_HEADER",
-							"propertyType": "numeric",
-							"valueType": "number",
-							"minValue": 0,
-							"maxValue": 1,
-							"step": 1
-						},
-						{
-							"propertyName": "Date format",
-							"propertyKeyword": "DATE_FORMAT",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "Time format",
-							"propertyKeyword": "TIME_FORMAT",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "Timestamp format",
-							"propertyKeyword": "TIMESTAMP_FORMAT",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "Binary format",
-							"propertyKeyword": "BINARY_FORMAT",
-							"propertyTooltip": "Select from list of options",
-							"propertyType": "select",
-							"options": [
-								"HEX",
-								"BASE64",
-								"UTF8"
-							]
-						},
-						{
-							"propertyName": "Escape character",
-							"propertyKeyword": "ESCAPE",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "Escape unenclosed field",
-							"propertyKeyword": "ESCAPE_UNENCLOSED_FIELD",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "Trim space",
-							"propertyKeyword": "TRIM_SPACE",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Field optionally enclosed by",
-							"propertyKeyword": "FIELD_OPTIONALLY_ENCLOSED_BY",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "NULL if",
-							"propertyType": "group",
-							"propertyKeyword": "NULL_IF",
-							"propertyTooltip": "",
-							"structure": [
-								{
-									"propertyName": "value",
-									"propertyKeyword": "NULL_IF_item",
-									"propertyTooltip": "",
-									"propertyType": "text"
-								}
-							]
-						},
-						{
-							"propertyName": "Error on column count mismatch",
-							"propertyKeyword": "ERROR_ON_COLUMN_COUNT_MISMATCH",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Validate UTF8",
-							"propertyKeyword": "VALIDATE_UTF8",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Empty field as NULL",
-							"propertyKeyword": "EMPTY_FIELD_AS_NULL",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Skip byte order mark",
-							"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Encoding",
-							"propertyKeyword": "ENCODING",
-							"propertyType": "text"
-						}
-					]
-				},
-				{
-					"propertyName": "Format type options",
-					"propertyType": "block",
-					"propertyKeyword": "formatTypeOptions",
-					"propertyTooltip": "",
-					"dependency": {
-						"key": "fileFormat",
-						"value": "JSON"
+						"structure": [
+							{
+								"propertyName": "Compression",
+								"propertyKeyword": "COMPRESSION",
+								"propertyTooltip": "Select from list of options",
+								"propertyType": "select",
+								"options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
+							},
+							{
+								"propertyName": "Record delimiter",
+								"propertyKeyword": "RECORD_DELIMITER",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Field delimiter",
+								"propertyKeyword": "FIELD_DELIMITER",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "File extension",
+								"propertyKeyword": "FILE_EXTENSION",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Skip header",
+								"propertyKeyword": "SKIP_HEADER",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"minValue": 0,
+								"maxValue": 1,
+								"step": 1
+							},
+							{
+								"propertyName": "Date format",
+								"propertyKeyword": "DATE_FORMAT",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Time format",
+								"propertyKeyword": "TIME_FORMAT",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Timestamp format",
+								"propertyKeyword": "TIMESTAMP_FORMAT",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Binary format",
+								"propertyKeyword": "BINARY_FORMAT",
+								"propertyTooltip": "Select from list of options",
+								"propertyType": "select",
+								"options": ["HEX", "BASE64", "UTF8"]
+							},
+							{
+								"propertyName": "Escape character",
+								"propertyKeyword": "ESCAPE",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Escape unenclosed field",
+								"propertyKeyword": "ESCAPE_UNENCLOSED_FIELD",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Trim space",
+								"propertyKeyword": "TRIM_SPACE",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Field optionally enclosed by",
+								"propertyKeyword": "FIELD_OPTIONALLY_ENCLOSED_BY",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "NULL if",
+								"propertyType": "group",
+								"propertyKeyword": "NULL_IF",
+								"propertyTooltip": "",
+								"structure": [
+									{
+										"propertyName": "value",
+										"propertyKeyword": "NULL_IF_item",
+										"propertyTooltip": "",
+										"propertyType": "text"
+									}
+								]
+							},
+							{
+								"propertyName": "Error on column count mismatch",
+								"propertyKeyword": "ERROR_ON_COLUMN_COUNT_MISMATCH",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Validate UTF8",
+								"propertyKeyword": "VALIDATE_UTF8",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Empty field as NULL",
+								"propertyKeyword": "EMPTY_FIELD_AS_NULL",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Skip byte order mark",
+								"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Encoding",
+								"propertyKeyword": "ENCODING",
+								"propertyType": "text"
+							}
+						]
 					},
-					"defaultValue": {
-						"COMPRESSION": "GZIP",
-						"FILE_EXTENSION": "JSON"
+					{
+						"propertyName": "Format type options",
+						"propertyType": "block",
+						"propertyKeyword": "formatTypeOptions",
+						"propertyTooltip": "",
+						"dependency": {
+							"key": "fileFormat",
+							"value": "JSON"
+						},
+						"defaultValue": {
+							"COMPRESSION": "GZIP",
+							"FILE_EXTENSION": "JSON"
+						},
+						"structure": [
+							{
+								"propertyName": "Compression",
+								"propertyKeyword": "COMPRESSION",
+								"propertyTooltip": "Select from list of options",
+								"propertyType": "select",
+								"options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
+							},
+							{
+								"propertyName": "File extension",
+								"propertyKeyword": "FILE_EXTENSION",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Enable octal",
+								"propertyKeyword": "ENABLE_OCTAL",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Allow duplicate",
+								"propertyKeyword": "ALLOW_DUPLICATE",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Strip outer array",
+								"propertyKeyword": "STRIP_OUTER_ARRAY",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Strip NULL values",
+								"propertyKeyword": "STRIP_NULL_VALUES",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Ignore UTF8 errors",
+								"propertyKeyword": "IGNORE_UTF8_ERRORS",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Skip byte order mark",
+								"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+								"propertyType": "checkbox"
+							}
+						]
 					},
-					"structure": [
-						{
-							"propertyName": "Compression",
-							"propertyKeyword": "COMPRESSION",
-							"propertyTooltip": "Select from list of options",
-							"propertyType": "select",
-							"options": [
-								"AUTO",
-								"GZIP",
-								"BZ2",
-								"BROTLI",
-								"ZSTD",
-								"DEFLATE",
-								"RAW_DEFLATE",
-								"NONE"
-							]
+					{
+						"propertyName": "Format type options",
+						"propertyType": "block",
+						"propertyKeyword": "formatTypeOptions",
+						"propertyTooltip": "",
+						"dependency": {
+							"key": "fileFormat",
+							"value": "AVRO"
 						},
-						{
-							"propertyName": "File extension",
-							"propertyKeyword": "FILE_EXTENSION",
-							"propertyType": "text"
-						},
-						{
-							"propertyName": "Enable octal",
-							"propertyKeyword": "ENABLE_OCTAL",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Allow duplicate",
-							"propertyKeyword": "ALLOW_DUPLICATE",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Strip outer array",
-							"propertyKeyword": "STRIP_OUTER_ARRAY",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Strip NULL values",
-							"propertyKeyword": "STRIP_NULL_VALUES",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Ignore UTF8 errors",
-							"propertyKeyword": "IGNORE_UTF8_ERRORS",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Skip byte order mark",
-							"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
-							"propertyType": "checkbox"
-						}
-					]
-				},
-				{
-					"propertyName": "Format type options",
-					"propertyType": "block",
-					"propertyKeyword": "formatTypeOptions",
-					"propertyTooltip": "",
-					"dependency": {
-						"key": "fileFormat",
-						"value": "AVRO"
+						"structure": [
+							{
+								"propertyName": "Compression",
+								"propertyKeyword": "COMPRESSION",
+								"propertyTooltip": "Select from list of options",
+								"propertyType": "select",
+								"options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
+							}
+						]
 					},
-					"structure": [
-						{
-							"propertyName": "Compression",
-							"propertyKeyword": "COMPRESSION",
-							"propertyTooltip": "Select from list of options",
-							"propertyType": "select",
-							"options": [
-								"AUTO",
-								"GZIP",
-								"BZ2",
-								"BROTLI",
-								"ZSTD",
-								"DEFLATE",
-								"RAW_DEFLATE",
-								"NONE"
-							]
-						}
-					]
-				},
-				{
-					"propertyName": "Format type options",
-					"propertyType": "block",
-					"propertyKeyword": "formatTypeOptions",
-					"propertyTooltip": "",
-					"dependency": {
-						"key": "fileFormat",
-						"value": "ORC"
+					{
+						"propertyName": "Format type options",
+						"propertyType": "block",
+						"propertyKeyword": "formatTypeOptions",
+						"propertyTooltip": "",
+						"dependency": {
+							"key": "fileFormat",
+							"value": "ORC"
+						},
+						"structure": [
+							{
+								"propertyName": "Trim space",
+								"propertyKeyword": "TRIM_SPACE",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "NULL if",
+								"propertyType": "group",
+								"propertyKeyword": "NULL_IF",
+								"propertyTooltip": "",
+								"structure": [
+									{
+										"propertyName": "value",
+										"propertyKeyword": "NULL_IF_item",
+										"propertyTooltip": "",
+										"propertyType": "text"
+									}
+								]
+							}
+						]
 					},
-					"structure": [
-						{
-							"propertyName": "Trim space",
-							"propertyKeyword": "TRIM_SPACE",
-							"propertyType": "checkbox"
+					{
+						"propertyName": "Format type options",
+						"propertyType": "block",
+						"propertyKeyword": "formatTypeOptions",
+						"propertyTooltip": "",
+						"dependency": {
+							"key": "fileFormat",
+							"value": "PARQUET"
 						},
-						{
-							"propertyName": "NULL if",
-							"propertyType": "group",
-							"propertyKeyword": "NULL_IF",
-							"propertyTooltip": "",
-							"structure": [
-								{
-									"propertyName": "value",
-									"propertyKeyword": "NULL_IF_item",
-									"propertyTooltip": "",
-									"propertyType": "text"
-								}
-							]
-						}
-					]
-				},
-				{
-					"propertyName": "Format type options",
-					"propertyType": "block",
-					"propertyKeyword": "formatTypeOptions",
-					"propertyTooltip": "",
-					"dependency": {
-						"key": "fileFormat",
-						"value": "PARQUET"
+						"structure": [
+							{
+								"propertyName": "Compression",
+								"propertyKeyword": "COMPRESSION",
+								"propertyTooltip": "Select from list of options",
+								"propertyType": "select",
+								"options": ["AUTO", "LZO", "SNAPPY", "NONE"]
+							},
+							{
+								"propertyName": "Snappy compression",
+								"propertyKeyword": "SNAPPY_COMPRESSION",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Binary as text",
+								"propertyKeyword": "BINARY_AS_TEXT",
+								"propertyType": "checkbox"
+							}
+						]
 					},
-					"structure": [
-						{
-							"propertyName": "Compression",
-							"propertyKeyword": "COMPRESSION",
-							"propertyTooltip": "Select from list of options",
-							"propertyType": "select",
-							"options": [
-								"AUTO",
-								"LZO",
-								"SNAPPY",
-								"NONE"
-							]
+					{
+						"propertyName": "Format type options",
+						"propertyType": "block",
+						"propertyKeyword": "formatTypeOptions",
+						"propertyTooltip": "",
+						"dependency": {
+							"key": "fileFormat",
+							"value": "XML"
 						},
-						{
-							"propertyName": "Snappy compression",
-							"propertyKeyword": "SNAPPY_COMPRESSION",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Binary as text",
-							"propertyKeyword": "BINARY_AS_TEXT",
-							"propertyType": "checkbox"
-						}
-					]
-				},
-				{
-					"propertyName": "Format type options",
-					"propertyType": "block",
-					"propertyKeyword": "formatTypeOptions",
-					"propertyTooltip": "",
-					"dependency": {
-						"key": "fileFormat",
-						"value": "XML"
+						"structure": [
+							{
+								"propertyName": "Compression",
+								"propertyKeyword": "COMPRESSION",
+								"propertyTooltip": "Select from list of options",
+								"propertyType": "select",
+								"options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
+							},
+							{
+								"propertyName": "Ignore UTF8 errors",
+								"propertyKeyword": "IGNORE_UTF8_ERRORS",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Preserve space",
+								"propertyKeyword": "PRESERVE_SPACE",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Strip outer element",
+								"propertyKeyword": "STRIP_OUTER_ELEMENT",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Disable Snowflake data",
+								"propertyKeyword": "DISABLE_SNOWFLAKE_DATA",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Disable auto convert",
+								"propertyKeyword": "DISABLE_AUTO_CONVERT",
+								"propertyType": "checkbox"
+							},
+							{
+								"propertyName": "Skip byte order mark",
+								"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+								"propertyType": "checkbox"
+							}
+						]
 					},
-					"structure": [
-						{
-							"propertyName": "Compression",
-							"propertyKeyword": "COMPRESSION",
-							"propertyTooltip": "Select from list of options",
-							"propertyType": "select",
-							"options": [
-								"AUTO",
-								"GZIP",
-								"BZ2",
-								"BROTLI",
-								"ZSTD",
-								"DEFLATE",
-								"RAW_DEFLATE",
-								"NONE"
-							]
-						},
-						{
-							"propertyName": "Ignore UTF8 errors",
-							"propertyKeyword": "IGNORE_UTF8_ERRORS",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Preserve space",
-							"propertyKeyword": "PRESERVE_SPACE",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Strip outer element",
-							"propertyKeyword": "STRIP_OUTER_ELEMENT",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Disable Snowflake data",
-							"propertyKeyword": "DISABLE_SNOWFLAKE_DATA",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Disable auto convert",
-							"propertyKeyword": "DISABLE_AUTO_CONVERT",
-							"propertyType": "checkbox"
-						},
-						{
-							"propertyName": "Skip byte order mark",
-							"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
-							"propertyType": "checkbox"
-						}
-					]
-				},
-				{
-					"propertyName": "Comments",
-					"propertyKeyword": "fileFormatComments",
-					"propertyType": "details",
-					"template": "textarea"
-				},
-				{
-					"propertyName": "Remarks",
-					"propertyKeyword": "fileFormatRemarks",
-					"shouldValidate": false,
-					"addTimestampButton": true,
-					"propertyTooltip": "remarks",
-					"propertyType": "details",
-					"template": "textarea"
-				}
-			]
-		}]
+					{
+						"propertyName": "Comments",
+						"propertyKeyword": "fileFormatComments",
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Remarks",
+						"propertyKeyword": "fileFormatRemarks",
+						"shouldValidate": false,
+						"addTimestampButton": true,
+						"propertyTooltip": "remarks",
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			}
+		]
 	},
 	{
 		"lowerTab": "Stages",
-		"structure": [{
-			"propertyName": "Stage",
-			"propertyType": "group",
-			"propertyKeyword": "stages",
-			"propertyTooltip": "",
-			"structure": [
-				{
-					"propertyName": "Name",
-					"propertyKeyword": "name",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Stage URL",
-					"propertyKeyword": "url",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Temporary",
-					"propertyKeyword": "temporary",
-					"propertyTooltip": "",
-					"propertyType": "checkbox"
-				},
-				{
-					"propertyName": "StorageIntegration",
-					"propertyKeyword": "storageIntegration",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Credentials",
-					"propertyKeyword": "credentials",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Encryption",
-					"propertyKeyword": "encryption",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				}
-			]
-		}]
+		"structure": [
+			{
+				"propertyName": "Stage",
+				"propertyType": "group",
+				"propertyKeyword": "stages",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Stage URL",
+						"propertyKeyword": "url",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Temporary",
+						"propertyKeyword": "temporary",
+						"propertyTooltip": "",
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "StorageIntegration",
+						"propertyKeyword": "storageIntegration",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Credentials",
+						"propertyKeyword": "credentials",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Encryption",
+						"propertyKeyword": "encryption",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					}
+				]
+			}
+		]
 	}
 ]
-

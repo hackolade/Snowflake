@@ -41,14 +41,14 @@
  */
 
 {
-  "modify": {
-    "view": [
-      {
-        "from": {},
-        "to": {
-          "viewOn": ""
-        }
-      }
-    ]
-  }
+	"modify": {
+		"view": [
+			{
+				"from": {},
+				"to": {
+					"viewOn": ""
+				}
+			}
+		]
+	}
 }

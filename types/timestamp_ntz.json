@@ -10,20 +10,23 @@
 		"primaryKey": false,
 		"default": "",
 		"enum": [],
-		"sample":"",
-		"comments":"",
-		"pattern":"",
+		"sample": "",
+		"comments": "",
+		"pattern": "",
 		"format": ""
 	},
-	"descriptor": [{
-		"schema": {
-			"tPrecision": 3
+	"descriptor": [
+		{
+			"schema": {
+				"tPrecision": 3
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnnZ"
 		},
-		"format": "YYYY-MM-DD hh:mm:ss.nnnZ"
-	}, {
-		"schema": {
-			"tPrecision": 6
-		},
-		"format": "YYYY-MM-DD hh:mm:ss.nnnnnnZ"
-	}]
+		{
+			"schema": {
+				"tPrecision": 6
+			},
+			"format": "YYYY-MM-DD hh:mm:ss.nnnnnnZ"
+		}
+	]
 }

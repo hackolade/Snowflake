@@ -6,12 +6,14 @@
 	"excludeDocKind": ["id"],
 	"defaultDdlType": "snowflake",
 	"connectionList": ["name", "host", "cloudPlatform", "username"],
-	"scenario": [{
-		"dependency": {
-			"key": "authType",
-			"value": "externalbrowser"
-		},
-		"value": "connectByExternalBrowser"
-	}],
+	"scenario": [
+		{
+			"dependency": {
+				"key": "authType",
+				"value": "externalbrowser"
+			},
+			"value": "connectByExternalBrowser"
+		}
+	],
 	"helpUrl": "https://hackolade.com/help/ConnecttoaSnowflakeinstance.html"
 }
