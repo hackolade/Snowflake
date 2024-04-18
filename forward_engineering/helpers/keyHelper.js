@@ -108,7 +108,7 @@ module.exports = app => {
 			}));
 	};
 
-	const getTableKeyConstraints = jsonSchema => {
+	const getTableKeyConstraints = ({ jsonSchema }) => {
 		if (!jsonSchema.properties) {
 			return [];
 		}
