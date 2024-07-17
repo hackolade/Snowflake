@@ -302,24 +302,28 @@ module.exports = (baseProvider, options, app) => {
 			const columnDefinitions = tableData.columns
 				.map(column => commentIfDeactivated(column.statement, column))
 				.join(',\n\t\t');
+			const tagsStatement = getTagStatement({
+				tags: tableData.tableTags,
+				isCaseSensitive: tableData.isCaseSensitive,
+			});
 
 			if (tableData.selectStatement) {
 				return assignTemplates(templates.createAsSelect, {
 					name: tableData.fullName,
 					selectStatement: tableData.selectStatement,
-					tableOptions: addOptions([clusterKeys, copyGrants]),
+					tableOptions: addOptions([clusterKeys, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.cloneTableName) {
 				return assignTemplates(templates.createCloneTable, {
 					name: tableData.fullName,
 					source_table: getFullName(schemaName, tableData.cloneTableName),
-					tableOptions: addOptions([atOrBefore, copyGrants]),
+					tableOptions: addOptions([atOrBefore, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.likeTableName) {
 				return assignTemplates(templates.createLikeTable, {
 					name: tableData.fullName,
 					source_table: getFullName(schemaName, tableData.likeTableName),
-					tableOptions: addOptions([clusterKeys, copyGrants]),
+					tableOptions: addOptions([clusterKeys, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.external) {
 				const location = tableData.externalOptions.location
@@ -338,7 +342,16 @@ module.exports = (baseProvider, options, app) => {
 				return assignTemplates(templates.createExternalTable, {
 					name: tableData.fullName,
 					tableOptions: addOptions(
-						[partitionKeys, fileFormat, location, refreshOnCreate, autoRefresh, pattern, copyGrants],
+						[
+							partitionKeys,
+							fileFormat,
+							location,
+							refreshOnCreate,
+							autoRefresh,
+							pattern,
+							copyGrants,
+							tagsStatement,
+						],
 						comment,
 					),
 
@@ -356,7 +369,7 @@ module.exports = (baseProvider, options, app) => {
 					temporary: temporary,
 					transient: transient,
 					tableOptions: addOptions(
-						[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants],
+						[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants, tagsStatement],
 						comment,
 					),
 
@@ -803,6 +816,7 @@ module.exports = (baseProvider, options, app) => {
 						isCaseSensitive: firstTab.isCaseSensitive,
 					}),
 				),
+				tableTags: firstTab.tableTags ?? [],
 			};
 		},
 

@@ -9,7 +9,7 @@ module.exports = ({ getName, toString }) => {
 	 * @param {{ tags: Tag[], isCaseSensitive: boolean, indent: string }}
 	 * @returns {string}
 	 */
-	const getTagStatement = ({ tags, isCaseSensitive, indent }) => {
+	const getTagStatement = ({ tags, isCaseSensitive, indent = ' ' }) => {
 		if (isEmpty(tags)) {
 			return '';
 		}
@@ -19,7 +19,7 @@ module.exports = ({ getName, toString }) => {
 			.map(tag => `${getName(isCaseSensitive, tag.tagName)} = ${toString(tag.tagValue)}`)
 			.join(', ');
 
-		return `${indent}WITH TAG ${tagStatements}`;
+		return `${indent}WITH TAG ( ${tagStatements} )`;
 	};
 
 	/**
