@@ -25,7 +25,7 @@ module.exports = {
 	createView:
 		'CREATE${secure}${materialized} VIEW IF NOT EXISTS ${name} (\n' +
 		'\t${column_list}\n' +
-		')\n${copy_grants}${comment}AS ${select_statement};\n',
+		')\n${copy_grants}${comment}${tag}AS ${select_statement};\n',
 	createUDF:
 		'CREATE${orReplace} FUNCTION ${name}(${arguments})\n\tRETURNS ${returnType}${notNull}\n\tLANGUAGE ${language}${parameters}${comment}\n\tAS ${body};\n',
 	createProcedure:

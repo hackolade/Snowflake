@@ -492,6 +492,12 @@ module.exports = (baseProvider, options, app) => {
 				viewData.selectStatement ||
 				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')}`;
 
+			const tagStatement = getTagStatement({
+				tags: viewData.viewTags,
+				isCaseSensitive: viewData.isCaseSensitive,
+				indent: '',
+			});
+
 			return assignTemplates(templates.createView, {
 				secure: viewData.secure ? ' SECURE' : '',
 				materialized: viewData.materialized ? ' MATERIALIZED' : '',
@@ -500,6 +506,7 @@ module.exports = (baseProvider, options, app) => {
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
 				comment: viewData.comment ? 'COMMENT=$$' + viewData.comment + '$$\n' : '',
 				select_statement: selectStatement,
+				tag: tagStatement ? tagStatement + '\n' : '',
 			});
 		},
 
@@ -836,6 +843,7 @@ module.exports = (baseProvider, options, app) => {
 				secure: firstTab.secure,
 				materialized: firstTab.materialized,
 				fullName,
+				viewTags: firstTab.viewTags ?? [],
 			};
 		},
 
