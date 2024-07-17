@@ -17,7 +17,7 @@ module.exports = {
 		'\t\t${column_definitions}${out_of_line_constraints}\n' +
 		'\t)${tableOptions};\n',
 	columnDefinition:
-		'${name} ${type}${collation}${default}${identity}${autoincrement}${not_nul}${inline_constraint}${comment}',
+		'${name} ${type}${collation}${default}${identity}${autoincrement}${not_nul}${inline_constraint}${comment}${tag}',
 	externalColumnDefinition: '${name} ${type} as ${expression}${comment}',
 	createTableForeignKey: '${constraint}FOREIGN KEY (${columns}) REFERENCES ${primary_table} (${primary_columns})',
 	alterTableForeignKey:

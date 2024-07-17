@@ -397,6 +397,10 @@ module.exports = (baseProvider, options, app) => {
 				not_nul: !columnDefinition.nullable ? ' NOT NULL' : '',
 				inline_constraint: getInlineConstraint(columnDefinition),
 				comment: columnDefinition.comment ? ` COMMENT $$${columnDefinition.comment}$$` : '',
+				tag: getTagStatement({
+					tags: columnDefinition.columnTags,
+					isCaseSensitive: columnDefinition.isCaseSensitive,
+				}),
 			});
 			return { statement: columnStatement, isActivated: columnDefinition.isActivated };
 		},
@@ -523,7 +527,8 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateColumn({ columnDefinition, jsonSchema, dbData }) {
-			return Object.assign({}, columnDefinition, {
+			return {
+				...columnDefinition,
 				name: getName(jsonSchema.isCaseSensitive, columnDefinition.name),
 				isCaseSensitive: jsonSchema.isCaseSensitive,
 				timePrecision: Number(jsonSchema.tPrecision),
@@ -562,7 +567,8 @@ module.exports = (baseProvider, options, app) => {
 				uniqueKeyConstraintName: jsonSchema.uniqueKeyConstraintName,
 				primaryKey: jsonSchema.primaryKeyConstraintName ? false : columnDefinition.primaryKey,
 				expression: jsonSchema.expression,
-			});
+				columnTags: jsonSchema.columnTags ?? [],
+			};
 		},
 
 		hydrateSchema(containerData, { udfs, procedures, sequences, fileFormats, stages, tags } = {}) {
