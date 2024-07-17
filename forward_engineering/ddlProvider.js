@@ -64,6 +64,8 @@ module.exports = (baseProvider, options, app) => {
 		tab,
 	});
 
+	const { getTagStatement, getTagAllowedValues } = require('./helpers/tagHelper')({ getName, toString });
+
 	const getOutOfLineConstraints = (
 		foreignKeyConstraints,
 		primaryKeyConstraints,
@@ -95,6 +97,8 @@ module.exports = (baseProvider, options, app) => {
 			fileFormats,
 			stages,
 			isCaseSensitive,
+			tags,
+			schemaTags,
 		}) {
 			const transientStatement = transient ? ' TRANSIENT' : '';
 			const dataRetentionStatement =
@@ -104,12 +108,14 @@ module.exports = (baseProvider, options, app) => {
 			const currentSchemaName = getName(isCaseSensitive, schemaName);
 			const currentDatabaseName = getName(isCaseSensitive, databaseName);
 			const fullName = getFullName(currentDatabaseName, currentSchemaName);
+			const tagStatement = getTagStatement({ tags: schemaTags, isCaseSensitive, indent: '\n\t' });
 			const schemaStatement = assignTemplates(templates.createSchema, {
 				name: fullName,
 				transient: transientStatement,
 				managed_access: managedAccessStatement,
 				data_retention: dataRetentionStatement,
 				comment: commentStatement,
+				tag: tagStatement,
 			});
 
 			const getParameters = payload => {
@@ -137,6 +143,7 @@ module.exports = (baseProvider, options, app) => {
 			const getBodyStatement = body => (body ? `\n\t$$\n${body}\n\t$$` : '');
 			const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
 			const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
+			const getIfNotExistStatement = ifNotExist => (ifNotExist ? ' IF NOT EXISTS' : '');
 
 			const userDefinedFunctions = udfs.map(udf =>
 				assignTemplates(templates.createUDF, {
@@ -209,6 +216,16 @@ module.exports = (baseProvider, options, app) => {
 				}),
 			);
 
+			const tagsStatements = tags.map(tag =>
+				assignTemplates(templates.createTag, {
+					orReplace: getOrReplaceStatement(tag.orReplace),
+					ifNotExist: getIfNotExistStatement(tag.ifNotExist),
+					allowedValues: getTagAllowedValues(tag.allowedValues),
+					name: getName(isCaseSensitive, tag.name),
+					comment: getCommentsStatement(tag.description),
+				}),
+			);
+
 			const statements = [];
 
 			if (databaseName) {
@@ -216,7 +233,7 @@ module.exports = (baseProvider, options, app) => {
 					assignTemplates(templates.createDatabase, { name: getName(isCaseSensitive, databaseName) }),
 				);
 			}
-
+			statements.push(...tagsStatements);
 			statements.push(schemaStatement);
 
 			return [
@@ -528,7 +545,7 @@ module.exports = (baseProvider, options, app) => {
 			});
 		},
 
-		hydrateSchema(containerData, { udfs, procedures, sequences, fileFormats, stages } = {}) {
+		hydrateSchema(containerData, { udfs, procedures, sequences, fileFormats, stages, tags } = {}) {
 			return {
 				schemaName: getName(containerData.isCaseSensitive, containerData.name),
 				isCaseSensitive: containerData.isCaseSensitive,
@@ -537,6 +554,7 @@ module.exports = (baseProvider, options, app) => {
 				transient: containerData.transient,
 				managedAccess: containerData.managedAccess,
 				dataRetention: containerData.DATA_RETENTION_TIME_IN_DAYS,
+				schemaTags: containerData.schemaTags,
 				udfs: Array.isArray(udfs)
 					? udfs
 							.map(udf =>
@@ -624,6 +642,19 @@ module.exports = (baseProvider, options, app) => {
 								}),
 							)
 							.filter(stage => stage.name)
+					: [],
+				tags: Array.isArray(tags)
+					? tags
+							.map(tag =>
+								clean({
+									name: tag.name || undefined,
+									orReplace: tag.orReplace || undefined,
+									ifNotExist: tag.ifNotExist || undefined,
+									allowedValues: tag.allowedValues || undefined,
+									description: tag.description || undefined,
+								}),
+							)
+							.filter(tag => tag.name)
 					: [],
 			};
 		},
