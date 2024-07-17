@@ -229,6 +229,14 @@ module.exports = (baseProvider, options, app) => {
 			].join('\n');
 		},
 
+		hydrateJsonSchemaColumn(jsonSchema, definitionJsonSchema) {
+			if (jsonSchema.type === 'variant') {
+				return _.omit(jsonSchema, ['subtype', 'mode']);
+			}
+
+			return jsonSchema;
+		},
+
 		createTable(tableData, isActivated) {
 			const schemaName = _.get(tableData, 'schemaData.schemaName');
 			const temporary = tableData.temporary ? ' TEMPORARY' : '';
