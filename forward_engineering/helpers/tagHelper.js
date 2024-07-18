@@ -14,12 +14,9 @@ module.exports = ({ getName, toString }) => {
 			return '';
 		}
 
-		const tagStatements = tags
-			.filter(tag => tag.tagName)
-			.map(tag => `${getName(isCaseSensitive, tag.tagName)} = ${toString(tag.tagValue)}`)
-			.join(', ');
+		const keyValues = getTagKeyValues({ tags, isCaseSensitive });
 
-		return `${indent}WITH TAG ( ${tagStatements} )`;
+		return `${indent}WITH TAG ( ${keyValues} )`;
 	};
 
 	/**
@@ -36,8 +33,20 @@ module.exports = ({ getName, toString }) => {
 		return ` ALLOWED_VALUES ${values}`;
 	};
 
+	/**
+	 * @param {{ tags: Tag[], isCaseSensitive: boolean }}
+	 * @returns {string}
+	 */
+	const getTagKeyValues = ({ tags, isCaseSensitive }) => {
+		return tags
+			.filter(tag => tag.tagName)
+			.map(tag => `${getName(isCaseSensitive, tag.tagName)} = ${toString(tag.tagValue)}`)
+			.join(', ');
+	};
+
 	return {
 		getTagStatement,
 		getTagAllowedValues,
+		getTagKeyValues,
 	};
 };

@@ -64,7 +64,10 @@ module.exports = (baseProvider, options, app) => {
 		tab,
 	});
 
-	const { getTagStatement, getTagAllowedValues } = require('./helpers/tagHelper')({ getName, toString });
+	const { getTagStatement, getTagAllowedValues, getTagKeyValues } = require('./helpers/tagHelper')({
+		getName,
+		toString,
+	});
 
 	const getOutOfLineConstraints = (
 		foreignKeyConstraints,
@@ -108,14 +111,12 @@ module.exports = (baseProvider, options, app) => {
 			const currentSchemaName = getName(isCaseSensitive, schemaName);
 			const currentDatabaseName = getName(isCaseSensitive, databaseName);
 			const fullName = getFullName(currentDatabaseName, currentSchemaName);
-			const tagStatement = getTagStatement({ tags: schemaTags, isCaseSensitive, indent: '\n\t' });
 			const schemaStatement = assignTemplates(templates.createSchema, {
 				name: fullName,
 				transient: transientStatement,
 				managed_access: managedAccessStatement,
 				data_retention: dataRetentionStatement,
 				comment: commentStatement,
-				tag: tagStatement,
 			});
 
 			const getParameters = payload => {
@@ -221,10 +222,20 @@ module.exports = (baseProvider, options, app) => {
 					orReplace: getOrReplaceStatement(tag.orReplace),
 					ifNotExist: getIfNotExistStatement(tag.ifNotExist),
 					allowedValues: getTagAllowedValues(tag.allowedValues),
-					name: getName(isCaseSensitive, tag.name),
+					name: getFullName(currentSchemaName, getName(isCaseSensitive, tag.name)),
 					comment: getCommentsStatement(tag.description),
 				}),
 			);
+
+			if (!_.isEmpty(schemaTags)) {
+				const schemaTagStatement = assignTemplates(templates.alterSchema, {
+					name: fullName,
+					operation: 'SET TAG',
+					options: getTagKeyValues({ tags: schemaTags, isCaseSensitive }),
+				});
+
+				tagsStatements.push(schemaTagStatement);
+			}
 
 			const statements = [];
 
@@ -233,7 +244,7 @@ module.exports = (baseProvider, options, app) => {
 					assignTemplates(templates.createDatabase, { name: getName(isCaseSensitive, databaseName) }),
 				);
 			}
-			statements.push(...tagsStatements);
+
 			statements.push(schemaStatement);
 
 			return [
@@ -243,6 +254,7 @@ module.exports = (baseProvider, options, app) => {
 				...sequencesStatements,
 				...fileFormatsStatements,
 				...stagesStatements,
+				...tagsStatements,
 			].join('\n');
 		},
 
