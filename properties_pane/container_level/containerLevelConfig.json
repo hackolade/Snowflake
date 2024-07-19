@@ -157,6 +157,29 @@ making sure that you maintain a proper JSON format.
 				"maxValue": 90
 			},
 			{
+				"propertyName": "Schema Tags",
+				"propertyKeyword": "schemaTags",
+				"propertyTooltip": "",
+				"propertyType": "group",
+				"groupItemLimit": 50,
+				"structure": [
+					{
+						"propertyName": "Tag name",
+						"propertyKeyword": "tagName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
+					}
+				]
+			},
+			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -913,6 +936,62 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "encryption",
 						"propertyTooltip": "",
 						"propertyType": "text"
+					}
+				]
+			}
+		]
+	},
+	{
+		"lowerTab": "Tags",
+		"structure": [
+			{
+				"propertyName": "Tag",
+				"propertyType": "group",
+				"propertyKeyword": "tags",
+				"propertyTooltip": "Creates a new stored tag or replaces an existing tag for the current database.",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyTooltip": "The name of the tag.",
+						"propertyType": "text",
+						"validation": {
+							"required": true
+						}
+					},
+					{
+						"propertyName": "Or replace",
+						"propertyKeyword": "orReplace",
+						"propertyType": "checkbox",
+						"propertyTooltip": "Specifies that if a tag with the same name as this one already exists, the existing tag is replaced. You can only replace a tag with a new tag."
+					},
+					{
+						"propertyName": "If not exist",
+						"propertyKeyword": "ifNotExist",
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Allowed values",
+						"propertyKeyword": "allowedValues",
+						"propertyType": "group",
+						"parentType": "tags",
+						"structure": [
+							{
+								"propertyName": "Value",
+								"propertyKeyword": "value",
+								"propertyTooltip": "",
+								"propertyType": "details",
+								"template": "textarea",
+								"markdown": false
+							}
+						]
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "description",
+						"propertyType": "details",
+						"template": "textarea",
+						"markdown": false
 					}
 				]
 			}

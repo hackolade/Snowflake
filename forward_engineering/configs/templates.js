@@ -17,7 +17,7 @@ module.exports = {
 		'\t\t${column_definitions}${out_of_line_constraints}\n' +
 		'\t)${tableOptions};\n',
 	columnDefinition:
-		'${name} ${type}${collation}${default}${identity}${autoincrement}${not_nul}${inline_constraint}${comment}',
+		'${name} ${type}${collation}${default}${identity}${autoincrement}${not_nul}${inline_constraint}${comment}${tag}',
 	externalColumnDefinition: '${name} ${type} as ${expression}${comment}',
 	createTableForeignKey: '${constraint}FOREIGN KEY (${columns}) REFERENCES ${primary_table} (${primary_columns})',
 	alterTableForeignKey:
@@ -25,7 +25,7 @@ module.exports = {
 	createView:
 		'CREATE${secure}${materialized} VIEW IF NOT EXISTS ${name} (\n' +
 		'\t${column_list}\n' +
-		')\n${copy_grants}${comment}AS ${select_statement};\n',
+		')\n${copy_grants}${comment}${tag}AS ${select_statement};\n',
 	createUDF:
 		'CREATE${orReplace} FUNCTION ${name}(${arguments})\n\tRETURNS ${returnType}${notNull}\n\tLANGUAGE ${language}${parameters}${comment}\n\tAS ${body};\n',
 	createProcedure:
@@ -48,4 +48,5 @@ module.exports = {
 	setPropertyTable: 'SET ${property};\n',
 	alterViewScript: 'ALTER VIEW IF EXISTS ${name} ',
 	alterMaterializedViewScript: 'ALTER MATERIALIZED VIEW ${name} ',
+	createTag: 'CREATE${orReplace} TAG${ifNotExist} ${name}${allowedValues}${comment};\n',
 };
