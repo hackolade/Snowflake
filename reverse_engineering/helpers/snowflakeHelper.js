@@ -1318,6 +1318,8 @@ const getContainerData = async schema => {
 		const stages = await getStages(dbName, schemaName);
 		const sequences = await getSequences(dbName, schemaName);
 		const fileFormats = await getFileFormats(dbName, schemaName);
+		const tags = await getTags(dbName, schemaName);
+		const schemaTags = await getSchemaTags(dbName, schemaName);
 
 		const data = {
 			transient: Boolean(_.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO'),
@@ -1329,6 +1331,8 @@ const getContainerData = async schema => {
 			sequences,
 			fileFormats,
 			isCaseSensitive,
+			tags,
+			schemaTags,
 		};
 		containers[schema] = data;
 
@@ -1336,6 +1340,39 @@ const getContainerData = async schema => {
 	} catch (err) {
 		return {};
 	}
+};
+
+const getTagAllowedValues = value => {
+	try {
+		if (typeof value !== 'string') {
+			return [];
+		}
+		const allowedValues = JSON.parse(value);
+		return allowedValues.map(value => ({ value }));
+	} catch (e) {
+		return [];
+	}
+};
+
+const getTags = async (dbName, schemaName) => {
+	const rows = await execute(`SHOW TAGS IN SCHEMA ${dbName}.${schemaName};`);
+
+	return rows.map(row => ({
+		name: row.name,
+		description: row.comment,
+		allowedValues: getTagAllowedValues(row.allowed_values),
+	}));
+};
+
+const getSchemaTags = async (dbName, schemaName) => {
+	const rows = await execute(
+		`SELECT TAG_NAME, TAG_VALUE FROM TABLE(${dbName}.information_schema.tag_references('${dbName}.${schemaName}', 'SCHEMA'));`,
+	);
+
+	return rows.map(row => ({
+		tagName: row['TAG_NAME'],
+		tagValue: row['TAG_VALUE'],
+	}));
 };
 
 const hasCloudPlatform = accountName => {
