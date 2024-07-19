@@ -84,7 +84,7 @@
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
-						"propertyTooltip": "The value of the tag.",
+						"propertyTooltip": "",
 						"propertyType": "details",
 						"template": "textarea",
 						"markdown": false

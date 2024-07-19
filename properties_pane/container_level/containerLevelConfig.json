@@ -172,7 +172,7 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
-						"propertyTooltip": "The value of the tag.",
+						"propertyTooltip": "",
 						"propertyType": "details",
 						"template": "textarea",
 						"markdown": false
