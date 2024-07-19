@@ -40,8 +40,18 @@ module.exports = ({ getName, toString }) => {
 	const getTagKeyValues = ({ tags, isCaseSensitive }) => {
 		return tags
 			.filter(tag => tag.tagName)
-			.map(tag => `${getName(isCaseSensitive, tag.tagName)} = ${toString(tag.tagValue)}`)
+			.map(tag => `${getTagName({ tagName: tag.tagName, isCaseSensitive })} = ${toString(tag.tagValue)}`)
 			.join(', ');
+	};
+
+	/**
+	 * @param {{ tagName: string, isCaseSensitive: boolean }}
+	 * @returns {string}
+	 */
+	const getTagName = ({ tagName, isCaseSensitive }) => {
+		const hasSpace = /\s/.test(tagName);
+
+		return hasSpace ? getName(isCaseSensitive, tagName) : tagName;
 	};
 
 	return {
