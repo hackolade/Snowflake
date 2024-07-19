@@ -221,7 +221,7 @@ module.exports = (baseProvider, options, app) => {
 				assignTemplates(templates.createTag, {
 					orReplace: getOrReplaceStatement(tag.orReplace),
 					ifNotExist: getIfNotExistStatement(tag.ifNotExist),
-					allowedValues: getTagAllowedValues(tag.allowedValues),
+					allowedValues: getTagAllowedValues({ allowedValues: tag.allowedValues }),
 					name: getFullName(currentSchemaName, getName(isCaseSensitive, tag.name)),
 					comment: getCommentsStatement(tag.description),
 				}),

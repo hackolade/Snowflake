@@ -20,10 +20,10 @@ module.exports = ({ getName, toString }) => {
 	};
 
 	/**
-	 * @param {string[]} allowedValues
+	 * @param {{ allowedValues: string[] }}
 	 * @returns {string}
 	 */
-	const getTagAllowedValues = allowedValues => {
+	const getTagAllowedValues = ({ allowedValues }) => {
 		if (isEmpty(allowedValues)) {
 			return '';
 		}
