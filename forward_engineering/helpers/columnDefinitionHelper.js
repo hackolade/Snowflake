@@ -1,7 +1,8 @@
+const _ = require('lodash');
+const templates = require('../configs/templates');
+
 module.exports = app => {
-	const templates = require('../configs/templates');
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
-	const _ = app.require('lodash');
 
 	const decorateType = (type, columnDefinition) => {
 		type = _.toUpper(type);
