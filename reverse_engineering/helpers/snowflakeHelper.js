@@ -1296,7 +1296,7 @@ const getFileFormats = async (dbName, schemaName) => {
 	);
 };
 
-const getContainerData = async schema => {
+const getContainerData = async ({ schema, logger }) => {
 	if (containers[schema]) {
 		return containers[schema];
 	}
@@ -1318,8 +1318,8 @@ const getContainerData = async schema => {
 		const stages = await getStages(dbName, schemaName);
 		const sequences = await getSequences(dbName, schemaName);
 		const fileFormats = await getFileFormats(dbName, schemaName);
-		const tags = await getTags(dbName, schemaName);
-		const schemaTags = await getSchemaTags(dbName, schemaName);
+		const tags = await getTags({ dbName, schemaName, logger });
+		const schemaTags = await getSchemaTags({ dbName, schemaName });
 
 		const data = {
 			transient: Boolean(_.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO'),
@@ -1337,34 +1337,38 @@ const getContainerData = async schema => {
 		containers[schema] = data;
 
 		return data;
-	} catch (err) {
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error');
+
 		return {};
 	}
 };
 
-const getTagAllowedValues = value => {
+const getTagAllowedValues = ({ values, logger }) => {
 	try {
-		if (typeof value !== 'string') {
+		if (typeof values !== 'string') {
 			return [];
 		}
-		const allowedValues = JSON.parse(value);
+		const allowedValues = JSON.parse(values);
 		return allowedValues.map(value => ({ value }));
-	} catch (e) {
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error');
+
 		return [];
 	}
 };
 
-const getTags = async (dbName, schemaName) => {
+const getTags = async ({ dbName, schemaName, logger }) => {
 	const rows = await execute(`SHOW TAGS IN SCHEMA ${dbName}.${schemaName};`);
 
 	return rows.map(row => ({
 		name: row.name,
 		description: row.comment,
-		allowedValues: getTagAllowedValues(row.allowed_values),
+		allowedValues: getTagAllowedValues({ values: row.allowed_values, logger }),
 	}));
 };
 
-const getSchemaTags = async (dbName, schemaName) => {
+const getSchemaTags = async ({ dbName, schemaName }) => {
 	const rows = await execute(
 		`SELECT TAG_NAME, TAG_VALUE FROM TABLE(${dbName}.information_schema.tag_references('${dbName}.${schemaName}', 'SCHEMA'));`,
 	);
