@@ -1370,11 +1370,11 @@ const getTags = async ({ dbName, schemaName, logger }) => {
 
 const getSchemaTags = async ({ dbName, schemaName }) => {
 	const rows = await execute(
-		`SELECT TAG_NAME, TAG_VALUE FROM TABLE(${dbName}.information_schema.tag_references('${dbName}.${schemaName}', 'SCHEMA'));`,
+		`SELECT TAG_DATABASE, TAG_SCHEMA, TAG_NAME, TAG_VALUE FROM TABLE(${dbName}.information_schema.tag_references('${dbName}.${schemaName}', 'SCHEMA'));`,
 	);
 
 	return rows.map(row => ({
-		tagName: row['TAG_NAME'],
+		tagName: [row['TAG_DATABASE'], row['TAG_SCHEMA'], row['TAG_NAME']].join('.'),
 		tagValue: row['TAG_VALUE'],
 	}));
 };
