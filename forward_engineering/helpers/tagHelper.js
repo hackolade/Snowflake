@@ -103,17 +103,11 @@ module.exports = ({ getName, toString }) => {
 	const prepareObjectTagsData =
 		tagPropertyKeyword =>
 		({ collection, data }) => {
-			const tags = collection?.role?.compMod?.[tagPropertyKeyword] ?? {};
-			const set = getSetTagValue({
-				tags: tags.new,
-				oldTags: tags.old,
-				isCaseSensitive: collection?.role?.isCaseSensitive,
-			});
-			const unset = getUnsetTagValue({
-				tags: tags.new,
-				oldTags: tags.old,
-				isCaseSensitive: data.isCaseSensitive,
-			});
+			const isCaseSensitive = collection?.role?.isCaseSensitive;
+			const compMode = collection?.role?.compMod?.[tagPropertyKeyword] ?? {};
+			const { new: tags, old: oldTags } = compMode;
+			const set = getSetTagValue({ tags, oldTags, isCaseSensitive });
+			const unset = getUnsetTagValue({ tags, oldTags, isCaseSensitive });
 
 			return {
 				collection,
