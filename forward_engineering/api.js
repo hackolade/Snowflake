@@ -3,6 +3,7 @@
 const _ = require('lodash');
 const { commentDropStatements } = require('./helpers/commentDropStatements');
 const { DROP_STATEMENTS } = require('./helpers/constants');
+const { buildContainerLevelAlterScript } = require('./alterScript/alterScriptBuilder');
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
@@ -34,8 +35,10 @@ module.exports = {
 
 	generateContainerScript(data, logger, callback, app) {
 		try {
-			data.jsonSchema = data.collections[0];
-			this.generateScript(data, logger, callback, app);
+			const ddlProvider = require('./ddlProvider')(_, data.options, app);
+			const script = buildContainerLevelAlterScript({ data, app, ddlProvider });
+
+			callback(null, script);
 		} catch (error) {
 			logger.log('error', { message: error.message, stack: error.stack }, 'Snowflake Forward-Engineering Error');
 
