@@ -1338,7 +1338,7 @@ const getContainerData = async ({ schema, logger }) => {
 
 		return data;
 	} catch (error) {
-		logger.log('error', { error }, 'Reverse Engineering error');
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving schema data');
 
 		return {};
 	}
@@ -1352,7 +1352,7 @@ const getTagAllowedValues = ({ values, logger }) => {
 		const allowedValues = JSON.parse(values);
 		return allowedValues.map(value => ({ value }));
 	} catch (error) {
-		logger.log('error', { error }, 'Reverse Engineering error');
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving tag allowed values');
 
 		return [];
 	}
