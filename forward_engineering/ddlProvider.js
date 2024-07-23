@@ -64,6 +64,11 @@ module.exports = (baseProvider, options, app) => {
 		tab,
 	});
 
+	const { getTagStatement, getTagAllowedValues, getTagKeyValues } = require('./helpers/tagHelper')({
+		getName,
+		toString,
+	});
+
 	const getOutOfLineConstraints = (
 		foreignKeyConstraints,
 		primaryKeyConstraints,
@@ -95,6 +100,8 @@ module.exports = (baseProvider, options, app) => {
 			fileFormats,
 			stages,
 			isCaseSensitive,
+			tags,
+			schemaTags,
 		}) {
 			const transientStatement = transient ? ' TRANSIENT' : '';
 			const dataRetentionStatement =
@@ -137,6 +144,7 @@ module.exports = (baseProvider, options, app) => {
 			const getBodyStatement = body => (body ? `\n\t$$\n${body}\n\t$$` : '');
 			const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
 			const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
+			const getIfNotExistStatement = ifNotExist => (ifNotExist ? ' IF NOT EXISTS' : '');
 
 			const userDefinedFunctions = udfs.map(udf =>
 				assignTemplates(templates.createUDF, {
@@ -209,6 +217,26 @@ module.exports = (baseProvider, options, app) => {
 				}),
 			);
 
+			const tagsStatements = tags.map(tag =>
+				assignTemplates(templates.createTag, {
+					orReplace: getOrReplaceStatement(tag.orReplace),
+					ifNotExist: getIfNotExistStatement(tag.ifNotExist),
+					allowedValues: getTagAllowedValues({ allowedValues: tag.allowedValues }),
+					name: getFullName(currentSchemaName, getName(isCaseSensitive, tag.name)),
+					comment: getCommentsStatement(tag.description),
+				}),
+			);
+
+			if (!_.isEmpty(schemaTags)) {
+				const schemaTagStatement = assignTemplates(templates.alterSchema, {
+					name: fullName,
+					operation: 'SET TAG',
+					options: getTagKeyValues({ tags: schemaTags, isCaseSensitive }),
+				});
+
+				tagsStatements.push(schemaTagStatement);
+			}
+
 			const statements = [];
 
 			if (databaseName) {
@@ -226,6 +254,7 @@ module.exports = (baseProvider, options, app) => {
 				...sequencesStatements,
 				...fileFormatsStatements,
 				...stagesStatements,
+				...tagsStatements,
 			].join('\n');
 		},
 
@@ -285,24 +314,28 @@ module.exports = (baseProvider, options, app) => {
 			const columnDefinitions = tableData.columns
 				.map(column => commentIfDeactivated(column.statement, column))
 				.join(',\n\t\t');
+			const tagsStatement = getTagStatement({
+				tags: tableData.tableTags,
+				isCaseSensitive: tableData.isCaseSensitive,
+			});
 
 			if (tableData.selectStatement) {
 				return assignTemplates(templates.createAsSelect, {
 					name: tableData.fullName,
 					selectStatement: tableData.selectStatement,
-					tableOptions: addOptions([clusterKeys, copyGrants]),
+					tableOptions: addOptions([clusterKeys, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.cloneTableName) {
 				return assignTemplates(templates.createCloneTable, {
 					name: tableData.fullName,
 					source_table: getFullName(schemaName, tableData.cloneTableName),
-					tableOptions: addOptions([atOrBefore, copyGrants]),
+					tableOptions: addOptions([atOrBefore, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.likeTableName) {
 				return assignTemplates(templates.createLikeTable, {
 					name: tableData.fullName,
 					source_table: getFullName(schemaName, tableData.likeTableName),
-					tableOptions: addOptions([clusterKeys, copyGrants]),
+					tableOptions: addOptions([clusterKeys, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.external) {
 				const location = tableData.externalOptions.location
@@ -321,7 +354,16 @@ module.exports = (baseProvider, options, app) => {
 				return assignTemplates(templates.createExternalTable, {
 					name: tableData.fullName,
 					tableOptions: addOptions(
-						[partitionKeys, fileFormat, location, refreshOnCreate, autoRefresh, pattern, copyGrants],
+						[
+							partitionKeys,
+							fileFormat,
+							location,
+							refreshOnCreate,
+							autoRefresh,
+							pattern,
+							copyGrants,
+							tagsStatement,
+						],
 						comment,
 					),
 
@@ -339,7 +381,7 @@ module.exports = (baseProvider, options, app) => {
 					temporary: temporary,
 					transient: transient,
 					tableOptions: addOptions(
-						[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants],
+						[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants, tagsStatement],
 						comment,
 					),
 
@@ -367,6 +409,10 @@ module.exports = (baseProvider, options, app) => {
 				not_nul: !columnDefinition.nullable ? ' NOT NULL' : '',
 				inline_constraint: getInlineConstraint(columnDefinition),
 				comment: columnDefinition.comment ? ` COMMENT $$${columnDefinition.comment}$$` : '',
+				tag: getTagStatement({
+					tags: columnDefinition.columnTags,
+					isCaseSensitive: columnDefinition.isCaseSensitive,
+				}),
 			});
 			return { statement: columnStatement, isActivated: columnDefinition.isActivated };
 		},
@@ -462,6 +508,12 @@ module.exports = (baseProvider, options, app) => {
 				viewData.selectStatement ||
 				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')}`;
 
+			const tagStatement = getTagStatement({
+				tags: viewData.viewTags,
+				isCaseSensitive: viewData.isCaseSensitive,
+				indent: '',
+			});
+
 			return assignTemplates(templates.createView, {
 				secure: viewData.secure ? ' SECURE' : '',
 				materialized: viewData.materialized ? ' MATERIALIZED' : '',
@@ -470,6 +522,7 @@ module.exports = (baseProvider, options, app) => {
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
 				comment: viewData.comment ? 'COMMENT=$$' + viewData.comment + '$$\n' : '',
 				select_statement: selectStatement,
+				tag: tagStatement ? tagStatement + '\n' : '',
 			});
 		},
 
@@ -486,7 +539,8 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateColumn({ columnDefinition, jsonSchema, dbData }) {
-			return Object.assign({}, columnDefinition, {
+			return {
+				...columnDefinition,
 				name: getName(jsonSchema.isCaseSensitive, columnDefinition.name),
 				isCaseSensitive: jsonSchema.isCaseSensitive,
 				timePrecision: Number(jsonSchema.tPrecision),
@@ -525,10 +579,11 @@ module.exports = (baseProvider, options, app) => {
 				uniqueKeyConstraintName: jsonSchema.uniqueKeyConstraintName,
 				primaryKey: jsonSchema.primaryKeyConstraintName ? false : columnDefinition.primaryKey,
 				expression: jsonSchema.expression,
-			});
+				columnTags: jsonSchema.columnTags ?? [],
+			};
 		},
 
-		hydrateSchema(containerData, { udfs, procedures, sequences, fileFormats, stages } = {}) {
+		hydrateSchema(containerData, { udfs, procedures, sequences, fileFormats, stages, tags } = {}) {
 			return {
 				schemaName: getName(containerData.isCaseSensitive, containerData.name),
 				isCaseSensitive: containerData.isCaseSensitive,
@@ -537,6 +592,7 @@ module.exports = (baseProvider, options, app) => {
 				transient: containerData.transient,
 				managedAccess: containerData.managedAccess,
 				dataRetention: containerData.DATA_RETENTION_TIME_IN_DAYS,
+				schemaTags: containerData.schemaTags,
 				udfs: Array.isArray(udfs)
 					? udfs
 							.map(udf =>
@@ -624,6 +680,19 @@ module.exports = (baseProvider, options, app) => {
 								}),
 							)
 							.filter(stage => stage.name)
+					: [],
+				tags: Array.isArray(tags)
+					? tags
+							.map(tag =>
+								clean({
+									name: tag.name || undefined,
+									orReplace: tag.orReplace || undefined,
+									ifNotExist: tag.ifNotExist || undefined,
+									allowedValues: tag.allowedValues || undefined,
+									description: tag.description || undefined,
+								}),
+							)
+							.filter(tag => tag.name)
 					: [],
 			};
 		},
@@ -772,6 +841,7 @@ module.exports = (baseProvider, options, app) => {
 						isCaseSensitive: firstTab.isCaseSensitive,
 					}),
 				),
+				tableTags: firstTab.tableTags ?? [],
 			};
 		},
 
@@ -791,6 +861,7 @@ module.exports = (baseProvider, options, app) => {
 				secure: firstTab.secure,
 				materialized: firstTab.materialized,
 				fullName,
+				viewTags: firstTab.viewTags ?? [],
 			};
 		},
 
