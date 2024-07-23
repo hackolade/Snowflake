@@ -20,7 +20,7 @@ const getAddContainerScriptDto = ({ container, app, ddlProvider }) => {
  * */
 const getDeleteContainerScriptDto = ({ container, app, ddlProvider }) => {
 	const { name } = ddlProvider.hydrateForDeleteSchema({ ...container, ...container.role });
-	const dropContainerStatement = `DROP SCHEMA IF EXISTS ${name};`; //TODO: move to templates
+	const dropContainerStatement = ddlProvider.dropSchema({ name });
 
 	return AlterScriptDto.getInstance([dropContainerStatement], true, true);
 };

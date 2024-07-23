@@ -962,6 +962,12 @@ module.exports = (baseProvider, options, app) => {
 			return { name };
 		},
 
+		dropSchema({ name }) {
+			return assignTemplates(templates.dropSchema, {
+				name,
+			});
+		},
+
 		createTag({ tag, schemaName, isCaseSensitive }) {
 			return assignTemplates(templates.createTag, {
 				orReplace: getOrReplaceStatement(tag.orReplace),

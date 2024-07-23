@@ -2,6 +2,7 @@ module.exports = {
 	createDatabase: 'CREATE DATABASE IF NOT EXISTS ${name};\nUSE DATABASE ${name};\n',
 	createSchema:
 		'CREATE${transient} SCHEMA IF NOT EXISTS ${name}${managed_access}${data_retention}${comment};\nUSE SCHEMA ${name};\n',
+	dropSchema: 'DROP SCHEMA IF EXISTS ${name};\n',
 	createTable:
 		'CREATE${temporary}${transient} TABLE IF NOT EXISTS\n' +
 		'\t${name} (\n' +
