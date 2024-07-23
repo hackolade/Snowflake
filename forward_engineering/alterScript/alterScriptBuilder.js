@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const { getAlterScriptDtos } = require('./alterScriptFromDeltaHelper');
 const { AlterScriptDto } = require('./types/AlterScriptDto');
-const { CoreData, App } = require('forward_engineering/types/coreApplicationTypes');
+const { CoreData, App } = require('../types/coreApplicationTypes');
 
 /**
  * @return {({ dtos, shouldApplyDropStatements }: { dtos: AlterScriptDto[], shouldApplyDropStatements: boolean }) => string}

@@ -49,4 +49,6 @@ module.exports = {
 	alterViewScript: 'ALTER VIEW IF EXISTS ${name} ',
 	alterMaterializedViewScript: 'ALTER MATERIALIZED VIEW ${name} ',
 	createTag: 'CREATE${orReplace} TAG${ifNotExist} ${name}${allowedValues}${comment};\n',
+	dropTag: 'DROP TAG IF EXISTS ${name};\n',
+	alterTag: 'ALTER TAG${ifExists} ${name} ${option}${optionValue};\n',
 };

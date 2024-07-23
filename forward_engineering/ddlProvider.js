@@ -86,6 +86,12 @@ module.exports = (baseProvider, options, app) => {
 		return !_.isEmpty(constraints) ? ',\n\t\t' + constraints.join(',\n\t\t') : '';
 	};
 
+	const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
+	const getBodyStatement = body => (body ? `\n\t$$\n${body}\n\t$$` : '');
+	const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
+	const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
+	const getIfNotExistStatement = ifNotExist => (ifNotExist ? ' IF NOT EXISTS' : '');
+
 	return {
 		createSchema({
 			schemaName,
@@ -139,12 +145,6 @@ module.exports = (baseProvider, options, app) => {
 
 				return `${runtimeVersionStatement}${handlerStatement}${packagesStatement}`;
 			};
-
-			const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
-			const getBodyStatement = body => (body ? `\n\t$$\n${body}\n\t$$` : '');
-			const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
-			const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
-			const getIfNotExistStatement = ifNotExist => (ifNotExist ? ' IF NOT EXISTS' : '');
 
 			const userDefinedFunctions = udfs.map(udf =>
 				assignTemplates(templates.createUDF, {
@@ -218,13 +218,7 @@ module.exports = (baseProvider, options, app) => {
 			);
 
 			const tagsStatements = tags.map(tag =>
-				assignTemplates(templates.createTag, {
-					orReplace: getOrReplaceStatement(tag.orReplace),
-					ifNotExist: getIfNotExistStatement(tag.ifNotExist),
-					allowedValues: getTagAllowedValues({ allowedValues: tag.allowedValues }),
-					name: getFullName(currentSchemaName, getName(isCaseSensitive, tag.name)),
-					comment: getCommentsStatement(tag.description),
-				}),
+				this.createTag({ tag, schemaName: currentSchemaName, isCaseSensitive }),
 			);
 
 			if (!_.isEmpty(schemaTags)) {
@@ -966,6 +960,103 @@ module.exports = (baseProvider, options, app) => {
 			const name = getFullName(databaseName, containerName);
 
 			return { name };
+		},
+
+		createTag({ tag, schemaName, isCaseSensitive }) {
+			return assignTemplates(templates.createTag, {
+				orReplace: getOrReplaceStatement(tag.orReplace),
+				ifNotExist: getIfNotExistStatement(tag.ifNotExist),
+				allowedValues: getTagAllowedValues({ allowedValues: tag.allowedValues }),
+				name: getFullName(schemaName, getName(isCaseSensitive, tag.name)),
+				comment: getCommentsStatement(tag.description),
+			});
+		},
+
+		dropTag({ tag, schemaName, isCaseSensitive }) {
+			return assignTemplates(templates.dropTag, {
+				name: getFullName(schemaName, getName(isCaseSensitive, tag.name)),
+			});
+		},
+
+		alterTag({ tag, oldTag, schemaName, isCaseSensitive }) {
+			const oldName = getFullName(schemaName, getName(isCaseSensitive, oldTag.name));
+			const newName = getFullName(schemaName, getName(isCaseSensitive, tag.name));
+			const flattenAllowedValues = _.flatMap(tag.allowedValues, ({ value }) => value).filter(Boolean);
+			const flattenOldAllowedValues = _.flatMap(tag.allowedValues, ({ value }) => value).filter(Boolean);
+			const newAllowedValues = _.differenceBy(oldTag.allowedValues, tag.allowedValues, ({ value }) => value);
+			const droppedAllowedValues = _.differenceBy(tag.allowedValues, oldTag.allowedValues, ({ value }) => value);
+
+			const isNameChanged = oldName !== newName;
+			const isCommentDropped = oldTag.description && !tag.description;
+			const isCommentChanged = !isCommentDropped && tag.description !== oldTag.description;
+			const isAllowedValuesDropped = flattenOldAllowedValues.length && !flattenAllowedValues.length;
+
+			const statements = [];
+
+			if (isNameChanged) {
+				const statement = assignTemplates(templates.alterTag, {
+					ifExists: ' IF EXISTS',
+					name: oldName,
+					option: 'RENAME TO ',
+					optionValue: newName,
+				});
+
+				statements.push(statement);
+			}
+
+			if (isAllowedValuesDropped) {
+				const statement = assignTemplates(templates.alterTag, {
+					name: newName,
+					option: 'UNSET ALLOWED_VALUES',
+				});
+
+				statements.push(statement);
+			}
+
+			if (!_.isEmpty(droppedAllowedValues)) {
+				const statement = assignTemplates(templates.alterTag, {
+					ifExists: ' IF EXISTS',
+					name: newName,
+					option: 'DROP',
+					optionValue: getTagAllowedValues({ allowedValues: droppedAllowedValues }),
+				});
+
+				statements.push(statement);
+			}
+
+			if (!_.isEmpty(newAllowedValues)) {
+				const statement = assignTemplates(templates.alterTag, {
+					ifExists: ' IF EXISTS',
+					name: newName,
+					option: 'ADD',
+					optionValue: getTagAllowedValues({ allowedValues: newAllowedValues }),
+				});
+
+				statements.push(statement);
+			}
+
+			if (isCommentDropped) {
+				const statement = assignTemplates(templates.alterTag, {
+					ifExists: ' IF EXISTS',
+					name: newName,
+					option: 'UNSET COMMENT',
+				});
+
+				statements.push(statement);
+			}
+
+			if (isCommentChanged) {
+				const statement = assignTemplates(templates.alterTag, {
+					ifExists: ' IF EXISTS',
+					name: newName,
+					option: 'SET COMMENT = ',
+					optionValue: toString(tag.description),
+				});
+
+				statements.push(statement);
+			}
+
+			return statements.join('');
 		},
 	};
 };
