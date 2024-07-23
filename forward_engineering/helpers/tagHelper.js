@@ -52,7 +52,14 @@ module.exports = ({ getName, toString }) => {
 	const getTagName = ({ tagName, isCaseSensitive }) => {
 		const hasSpace = /\s/.test(tagName);
 
-		return hasSpace ? getName(isCaseSensitive, tagName) : tagName;
+		if (!hasSpace) {
+			return tagName;
+		}
+
+		return tagName
+			.split('.')
+			.map(name => getName(isCaseSensitive, name))
+			.join('.');
 	};
 
 	/**
