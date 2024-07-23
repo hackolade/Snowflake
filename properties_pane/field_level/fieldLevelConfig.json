@@ -500,29 +500,6 @@ making sure that you maintain a proper JSON format.
 			},
 			"sample",
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -928,29 +905,6 @@ making sure that you maintain a proper JSON format.
 			"enum",
 			"sample",
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -1337,29 +1291,6 @@ making sure that you maintain a proper JSON format.
 			"pattern",
 			"enum",
 			"sample",
-			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
 			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
@@ -1748,29 +1679,6 @@ making sure that you maintain a proper JSON format.
 			"enum",
 			"sample",
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -2158,29 +2066,6 @@ making sure that you maintain a proper JSON format.
 			"enum",
 			"sample",
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -2472,29 +2357,6 @@ making sure that you maintain a proper JSON format.
 			},
 			"default",
 			"sample",
-			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
 			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
@@ -2801,29 +2663,6 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -3120,29 +2959,6 @@ making sure that you maintain a proper JSON format.
 			"default",
 			"enum",
 			"sample",
-			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
 			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
@@ -3449,29 +3265,6 @@ making sure that you maintain a proper JSON format.
 			"default",
 			"enum",
 			"sample",
-			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
 			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
@@ -3787,29 +3580,6 @@ making sure that you maintain a proper JSON format.
 			"enum",
 			"sample",
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -4124,29 +3894,6 @@ making sure that you maintain a proper JSON format.
 			"enum",
 			"sample",
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -4460,29 +4207,6 @@ making sure that you maintain a proper JSON format.
 			"default",
 			"enum",
 			"sample",
-			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
 			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
@@ -4880,29 +4604,6 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			"additionalProperties",
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -5211,29 +4912,6 @@ making sure that you maintain a proper JSON format.
 			"dependencies",
 			"additionalProperties",
 			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			},
-			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"propertyTooltip": "remarks",
@@ -5296,30 +4974,7 @@ making sure that you maintain a proper JSON format.
 				"template": "textarea"
 			},
 			"minProperties",
-			"maxProperties",
-			{
-				"propertyName": "Column Tags",
-				"propertyKeyword": "columnTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
-					}
-				]
-			}
+			"maxProperties"
 		]
 	}
 }
