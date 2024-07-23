@@ -56,6 +56,7 @@ module.exports = (baseProvider, options, app) => {
 		getAlterTableFormat,
 		getAlterTableStageCopyOptions,
 		getAlterEntityScript,
+		getAlterObjectTagsScript,
 	} = require('./helpers/alterScriptHelpers/commonScript')({
 		getName,
 		getFullName,
@@ -64,10 +65,11 @@ module.exports = (baseProvider, options, app) => {
 		tab,
 	});
 
-	const { getTagStatement, getTagAllowedValues, getTagKeyValues } = require('./helpers/tagHelper')({
-		getName,
-		toString,
-	});
+	const { getTagStatement, getTagAllowedValues, getTagKeyValues, prepareObjectTagsData } =
+		require('./helpers/tagHelper')({
+			getName,
+			toString,
+		});
 
 	const getOutOfLineConstraints = (
 		foreignKeyConstraints,
@@ -938,6 +940,7 @@ module.exports = (baseProvider, options, app) => {
 				getSetCollectionProperty(alterSchemaScript),
 				getUnsetCollectionProperty(alterSchemaScript),
 				getSchemaMenageAccess(alterSchemaScript),
+				getAlterObjectTagsScript(alterSchemaScript),
 			)({ data, script: [] });
 
 			return script.join('\n');
@@ -949,6 +952,7 @@ module.exports = (baseProvider, options, app) => {
 				prepareContainerName,
 				prepareAlterSetUnsetData,
 				prepareMenageContainerData,
+				prepareObjectTagsData('schemaTags'),
 			)({ collection: schema, data: {} });
 
 			return preparedData.data;

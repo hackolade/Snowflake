@@ -1,3 +1,4 @@
+const { differenceBy, some, partition } = require('lodash');
 /**
  * @typedef {{ id: string, tagName?: string, tagValue?: string }} Tag
  */
@@ -54,9 +55,75 @@ module.exports = ({ getName, toString }) => {
 		return hasSpace ? getName(isCaseSensitive, tagName) : tagName;
 	};
 
+	/**
+	 * @param {{ tags: Tag[], oldTags: Tag[], isCaseSensitive: boolean }}
+	 * @returns {string}
+	 */
+	const getSetTagValue = ({ tags = [], oldTags = [], isCaseSensitive = false }) => {
+		const [newTags, restTags] = partition(tags, ({ tagName }) => !some(oldTags, { tagName }));
+		const tagsWithNewValues = differenceBy(restTags, oldTags, ({ tagName, tagValue }) => tagName && tagValue);
+
+		if (isEmpty(newTags) && isEmpty(tagsWithNewValues)) {
+			return '';
+		}
+
+		const tagKeyValues = getTagKeyValues({ tags: [...newTags, ...tagsWithNewValues], isCaseSensitive });
+
+		return `TAG ${tagKeyValues}`;
+	};
+
+	/**
+	 * @param {{tags: Tag[], oldTags: Tag[], isCaseSensitive: boolean }}
+	 * @returns {string}
+	 */
+	const getUnsetTagValue = ({ tags = [], oldTags = [], isCaseSensitive = false }) => {
+		const [droppedTags] = partition(oldTags, ({ tagName }) => !some(tags, { tagName }));
+
+		if (isEmpty(droppedTags)) {
+			return '';
+		}
+
+		const tagNames = droppedTags.map(({ tagName }) => tagName).join(', ');
+
+		return `TAG ${tagNames}`;
+	};
+
+	/**
+	 * @typedef {{ collection: object, data: object }} AlterData
+	 * @param {'schemaTags' | 'tableTags' | 'viewTags' | 'columnTags'} tagPropertyKeyword
+	 * @returns {({ collection, data }: AlterData) => AlterData}
+	 */
+	const prepareObjectTagsData =
+		tagPropertyKeyword =>
+		({ collection, data }) => {
+			const tags = collection?.role?.compMod?.[tagPropertyKeyword] ?? {};
+			const set = getSetTagValue({
+				tags: tags.new,
+				oldTags: tags.old,
+				isCaseSensitive: collection?.role?.isCaseSensitive,
+			});
+			const unset = getUnsetTagValue({
+				tags: tags.new,
+				oldTags: tags.old,
+				isCaseSensitive: data.isCaseSensitive,
+			});
+
+			return {
+				collection,
+				data: {
+					...data,
+					tags: {
+						set,
+						unset,
+					},
+				},
+			};
+		};
+
 	return {
 		getTagStatement,
 		getTagAllowedValues,
 		getTagKeyValues,
+		prepareObjectTagsData,
 	};
 };

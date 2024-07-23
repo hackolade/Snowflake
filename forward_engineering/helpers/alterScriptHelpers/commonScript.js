@@ -100,6 +100,33 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 			return { script, data };
 		};
 
+	/**
+	 * @typedef {{ script: string[], data: object }} AlterData
+	 * @param {string} alterScript
+	 * @returns {({ script, data }: AlterData) => AlterData}
+	 */
+	const getAlterObjectTagsScript =
+		alterScript =>
+		({ script, data }) => {
+			const { tags } = data;
+
+			if (tags.set) {
+				script = [
+					...script,
+					alterScript + assignTemplates(templates.setPropertySchema, { property: tags.set }),
+				];
+			}
+
+			if (tags.unset) {
+				script = [
+					...script,
+					alterScript + assignTemplates(templates.unsetPropertySchema, { property: tags.unset }),
+				];
+			}
+
+			return { script, data };
+		};
+
 	const getAlterEntityRename =
 		(alterEntityTemplate, alterEntityRename) =>
 		({ script, data }) => {
@@ -178,5 +205,6 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		getAlterEntityScript,
 		getAlterEntityRename,
 		getAlterTableStageCopyOptions,
+		getAlterObjectTagsScript,
 	};
 };
