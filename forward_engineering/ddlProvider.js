@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('./types').Tag} Tag
+ */
+
 const _ = require('lodash');
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
@@ -974,12 +978,20 @@ module.exports = (baseProvider, options, app) => {
 			return { name };
 		},
 
+		/**
+		 * @param {{ name: string }}
+		 * @returns {string}
+		 */
 		dropSchema({ name }) {
 			return assignTemplates(templates.dropSchema, {
 				name,
 			});
 		},
 
+		/**
+		 * @param {{ tag: Tag, schemaName: string, isCaseSensitive: boolean }}
+		 * @returns {string}
+		 */
 		createTag({ tag, schemaName, isCaseSensitive }) {
 			return assignTemplates(templates.createTag, {
 				orReplace: getOrReplaceStatement(tag.orReplace),
@@ -990,12 +1002,20 @@ module.exports = (baseProvider, options, app) => {
 			});
 		},
 
+		/**
+		 * @param {{ tag: Tag, schemaName: string, isCaseSensitive: boolean }}
+		 * @returns {string}
+		 */
 		dropTag({ tag, schemaName, isCaseSensitive }) {
 			return assignTemplates(templates.dropTag, {
 				name: getFullName(schemaName, getName(isCaseSensitive, tag.name)),
 			});
 		},
 
+		/**
+		 * @param {{tag: Tag, oldTag: Tag, schemaName: string, isCaseSensitive: boolean }}
+		 * @returns {string}
+		 */
 		alterTag({ tag, oldTag, schemaName, isCaseSensitive }) {
 			const oldName = getFullName(schemaName, getName(isCaseSensitive, oldTag.name));
 			const newName = getFullName(schemaName, getName(isCaseSensitive, tag.name));

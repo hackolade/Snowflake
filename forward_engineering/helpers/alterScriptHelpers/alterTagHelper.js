@@ -1,6 +1,9 @@
 const _ = require('lodash');
 const { prepareContainerLevelData } = require('./common');
 
+/**
+ * @returns {(container: object) => string[]}
+ */
 const getAddTagScript =
 	({ ddlProvider, app }) =>
 	container => {
@@ -14,6 +17,9 @@ const getAddTagScript =
 			.filter(Boolean);
 	};
 
+/**
+ * @returns {(container: object) => string[]}
+ */
 const getDeleteTagScript =
 	({ ddlProvider, app }) =>
 	container => {
@@ -27,6 +33,9 @@ const getDeleteTagScript =
 			.filter(Boolean);
 	};
 
+/**
+ * @returns {(container: object) => string[]}
+ */
 const getModifyTagScript =
 	({ ddlProvider, app }) =>
 	container => {

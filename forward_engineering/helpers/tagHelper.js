@@ -1,13 +1,12 @@
-const { differenceBy, some, partition } = require('lodash');
 /**
- * @typedef {{ id: string, tagName?: string, tagValue?: string }} Tag
+ * @typedef {import('../types').ObjectTag} ObjectTag
  */
 
-const { isEmpty } = require('lodash');
+const { differenceBy, some, partition, isEmpty } = require('lodash');
 
 module.exports = ({ getName, toString }) => {
 	/**
-	 * @param {{ tags: Tag[], isCaseSensitive: boolean, indent: string }}
+	 * @param {{ tags: ObjectTag[], isCaseSensitive: boolean, indent: string }}
 	 * @returns {string}
 	 */
 	const getTagStatement = ({ tags, isCaseSensitive, indent = ' ' }) => {
@@ -35,7 +34,7 @@ module.exports = ({ getName, toString }) => {
 	};
 
 	/**
-	 * @param {{ tags: Tag[], isCaseSensitive: boolean }}
+	 * @param {{ tags: ObjectTag[], isCaseSensitive: boolean }}
 	 * @returns {string}
 	 */
 	const getTagKeyValues = ({ tags, isCaseSensitive }) => {
@@ -63,7 +62,7 @@ module.exports = ({ getName, toString }) => {
 	};
 
 	/**
-	 * @param {{ tags: Tag[], oldTags: Tag[], isCaseSensitive: boolean }}
+	 * @param {{ tags: ObjectTag[], oldTags: ObjectTag[], isCaseSensitive: boolean }}
 	 * @returns {string}
 	 */
 	const getSetTagValue = ({ tags = [], oldTags = [], isCaseSensitive = false }) => {
@@ -80,7 +79,7 @@ module.exports = ({ getName, toString }) => {
 	};
 
 	/**
-	 * @param {{tags: Tag[], oldTags: Tag[], isCaseSensitive: boolean }}
+	 * @param {{ tags: ObjectTag[], oldTags: ObjectTag[], isCaseSensitive: boolean }}
 	 * @returns {string}
 	 */
 	const getUnsetTagValue = ({ tags = [], oldTags = [], isCaseSensitive = false }) => {

@@ -115,6 +115,9 @@ const getAlterViewsScripts = ({ schema, ddlProvider, app }) => {
 	};
 };
 
+/**
+ * @returns {{ addedTagsScripts: string[], deletedTagsScripts: string[], modifiedTagsScripts: string[] }}
+ */
 const getAlterTagsScripts = ({ collection, ddlProvider, app }) => {
 	const addedTagsScripts = getItems(collection, 'containers', 'added', 'values').flatMap(
 		getAddTagScript({ ddlProvider, app }),

@@ -212,6 +212,11 @@ module.exports = app => {
 		return _.get(containerData, 'code') || _.get(containerData, 'name', '');
 	};
 
+	/**
+	 * @template T
+	 * @param {{ newItems: T[], oldItems: T[] }}
+	 * @returns {{ addedItems: T[], removedItems: T[], modifiedItems: T[] }}
+	 */
 	const getGroupItemsByCompMode = ({ newItems = [], oldItems = [] }) => {
 		const addedItems = newItems.filter(newItem => !oldItems.some(item => item.id === newItem.id));
 		const removedItems = [];
