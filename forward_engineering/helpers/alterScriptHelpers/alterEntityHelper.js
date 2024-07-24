@@ -97,7 +97,8 @@ const getDeleteColumnScript = app => collection => {
 };
 
 const getModifyColumnScript = app => collection => {
-	const { getEntityName, getFullName, getName } = require('../general')(app);
+	const { getEntityName, getFullName, getName, toString } = require('../general')(app);
+	const { getSetTagValue, getUnsetTagValue } = require('../../helpers/tagHelper')({ getName, toString });
 
 	const collectionSchema = {
 		...collection,
@@ -122,7 +123,24 @@ const getModifyColumnScript = app => collection => {
 				};`,
 		);
 
-	return [...renameColumnScripts, ...changeTypeScripts];
+	const changeTagScripts = _.toPairs(collection.properties).reduce((result, [name, jsonSchema]) => {
+		const tags = jsonSchema.compMod?.newField?.columnTags;
+		const oldTags = jsonSchema.compMod?.newField?.columnTags;
+		const tagsToSet = getSetTagValue({ tags, oldTags });
+		const tagsToUnset = getUnsetTagValue({ tags, oldTags });
+
+		if (tagsToSet) {
+			result.push(`ALTER TABLE IF EXISTS ${fullName} MODIFY COLUMN ${name} SET ${tagsToSet};`);
+		}
+
+		if (tagsToUnset) {
+			result.push(`ALTER TABLE IF EXISTS ${fullName} MODIFY COLUMN ${name} UNSET ${tagsToUnset};`);
+		}
+
+		return result;
+	}, []);
+
+	return [...renameColumnScripts, ...changeTypeScripts, ...changeTagScripts];
 };
 
 module.exports = {

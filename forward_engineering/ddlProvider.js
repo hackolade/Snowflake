@@ -886,6 +886,7 @@ module.exports = (baseProvider, options, app) => {
 				getUnsetCollectionProperty(alterTableScript),
 				getAlterTableFormat(alterTableScript, getFileFormat),
 				getAlterTableStageCopyOptions(alterTableScript, getCopyOptions, _),
+				getAlterObjectTagsScript(alterTableScript),
 			)({ data, script: [] });
 
 			return script.join('\n');
@@ -899,6 +900,7 @@ module.exports = (baseProvider, options, app) => {
 				prepareCollectionFormatTypeOptions,
 				prepareAlterSetUnsetData,
 				prepareCollectionStageCopyOptions(clean, getStageCopyOptions, _),
+				prepareObjectTagsData('tableTags'),
 			)({ collection, data: {} });
 
 			const formatTypeOptions = clean(
@@ -922,13 +924,19 @@ module.exports = (baseProvider, options, app) => {
 				getAlterEntityRename(templates[alterTableTemplateName], templates.alterEntityRename),
 				getSetCollectionProperty(alterTableScript),
 				getUnsetCollectionProperty(alterTableScript),
+				getAlterObjectTagsScript(alterTableScript),
 			)({ data, script: [] });
 
 			return script.join('\n');
 		},
 
 		hydrateAlterView(collection) {
-			const { data } = _.flow(prepareName, prepareTableName, prepareAlterSetUnsetData)({ collection, data: {} });
+			const { data } = _.flow(
+				prepareName,
+				prepareTableName,
+				prepareAlterSetUnsetData,
+				prepareObjectTagsData('viewTags'),
+			)({ collection, data: {} });
 
 			return data;
 		},

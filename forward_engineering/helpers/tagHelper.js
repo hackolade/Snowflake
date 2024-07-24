@@ -126,5 +126,7 @@ module.exports = ({ getName, toString }) => {
 		getTagAllowedValues,
 		getTagKeyValues,
 		prepareObjectTagsData,
+		getSetTagValue,
+		getUnsetTagValue,
 	};
 };

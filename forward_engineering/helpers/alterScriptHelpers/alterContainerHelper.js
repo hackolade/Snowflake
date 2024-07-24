@@ -12,7 +12,7 @@ const getAddContainerScript = (ddlProvider, app) => container => {
 
 const getDeleteContainerScript = ddlProvider => container => {
 	const { name } = ddlProvider.hydrateForDeleteSchema({ ...container, ...container.role });
-	return `DROP SCHEMA IF EXISTS ${name};`;
+	return ddlProvider.dropSchema({ name });
 };
 
 const getModifyContainerScript = ddlProvider => container => {
