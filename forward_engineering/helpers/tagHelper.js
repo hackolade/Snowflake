@@ -106,16 +106,16 @@ module.exports = ({ getName, toString }) => {
 			const isCaseSensitive = collection?.role?.isCaseSensitive;
 			const compMode = collection?.role?.compMod?.[tagPropertyKeyword] ?? {};
 			const { new: tags, old: oldTags } = compMode;
-			const set = getSetTagValue({ tags, oldTags, isCaseSensitive });
-			const unset = getUnsetTagValue({ tags, oldTags, isCaseSensitive });
+			const tagsToSet = getSetTagValue({ tags, oldTags, isCaseSensitive });
+			const tagsToUnset = getUnsetTagValue({ tags, oldTags, isCaseSensitive });
 
 			return {
 				collection,
 				data: {
 					...data,
 					tags: {
-						set,
-						unset,
+						tagsToSet,
+						tagsToUnset,
 					},
 				},
 			};

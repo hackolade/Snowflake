@@ -110,14 +110,14 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		({ script, data }) => {
 			const { tags } = data;
 
-			if (tags.set) {
+			if (tags?.tagsToSet) {
 				script = [
 					...script,
 					alterScript + assignTemplates(templates.setPropertySchema, { property: tags.set }),
 				];
 			}
 
-			if (tags.unset) {
+			if (tags?.tagsToUnset) {
 				script = [
 					...script,
 					alterScript + assignTemplates(templates.unsetPropertySchema, { property: tags.unset }),

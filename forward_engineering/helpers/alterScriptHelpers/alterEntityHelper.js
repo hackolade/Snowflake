@@ -124,10 +124,11 @@ const getModifyColumnScript = app => collection => {
 		);
 
 	const changeTagScripts = _.toPairs(collection.properties).reduce((result, [name, jsonSchema]) => {
-		const tags = jsonSchema.compMod?.newField?.columnTags;
-		const oldTags = jsonSchema.compMod?.newField?.columnTags;
-		const tagsToSet = getSetTagValue({ tags, oldTags });
-		const tagsToUnset = getUnsetTagValue({ tags, oldTags });
+		const tags = jsonSchema.columnTags;
+		const oldTags = collection.role?.properties?.[name]?.columnTags;
+		const isCaseSensitive = collection.role?.isCaseSensitive;
+		const tagsToSet = getSetTagValue({ tags, oldTags, isCaseSensitive });
+		const tagsToUnset = getUnsetTagValue({ tags, oldTags, isCaseSensitive });
 
 		if (tagsToSet) {
 			result.push(`ALTER TABLE IF EXISTS ${fullName} MODIFY COLUMN ${name} SET ${tagsToSet};`);
