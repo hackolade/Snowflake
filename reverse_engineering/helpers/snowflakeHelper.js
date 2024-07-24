@@ -1359,7 +1359,7 @@ const getTagAllowedValues = ({ values, logger }) => {
 };
 
 const getTags = async ({ dbName, schemaName, logger }) => {
-	const rows = await execute(`SHOW TAGS IN SCHEMA ${dbName}.${schemaName};`);
+	const rows = await execute(`SHOW TAGS IN SCHEMA "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}";`);
 
 	return rows.map(row => ({
 		name: row.name,
@@ -1370,7 +1370,7 @@ const getTags = async ({ dbName, schemaName, logger }) => {
 
 const getSchemaTags = async ({ dbName, schemaName }) => {
 	const rows = await execute(
-		`SELECT TAG_DATABASE, TAG_SCHEMA, TAG_NAME, TAG_VALUE FROM TABLE(${dbName}.information_schema.tag_references('${dbName}.${schemaName}', 'SCHEMA'));`,
+		`SELECT TAG_DATABASE, TAG_SCHEMA, TAG_NAME, TAG_VALUE FROM TABLE("${removeQuotes(dbName)}".information_schema.tag_references('"${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"', 'SCHEMA'));`,
 	);
 
 	return rows.map(row => ({
