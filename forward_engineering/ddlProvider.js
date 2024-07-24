@@ -1000,9 +1000,9 @@ module.exports = (baseProvider, options, app) => {
 			const oldName = getFullName(schemaName, getName(isCaseSensitive, oldTag.name));
 			const newName = getFullName(schemaName, getName(isCaseSensitive, tag.name));
 			const flattenAllowedValues = _.flatMap(tag.allowedValues, ({ value }) => value).filter(Boolean);
-			const flattenOldAllowedValues = _.flatMap(tag.allowedValues, ({ value }) => value).filter(Boolean);
-			const newAllowedValues = _.differenceBy(oldTag.allowedValues, tag.allowedValues, ({ value }) => value);
-			const droppedAllowedValues = _.differenceBy(tag.allowedValues, oldTag.allowedValues, ({ value }) => value);
+			const flattenOldAllowedValues = _.flatMap(oldTag.allowedValues, ({ value }) => value).filter(Boolean);
+			const newAllowedValues = _.differenceBy(tag.allowedValues, oldTag.allowedValues, ({ value }) => value);
+			const droppedAllowedValues = _.differenceBy(oldTag.allowedValues, tag.allowedValues, ({ value }) => value);
 
 			const isNameChanged = oldName !== newName;
 			const isCommentDropped = oldTag.description && !tag.description;
@@ -1016,7 +1016,7 @@ module.exports = (baseProvider, options, app) => {
 					ifExists: ' IF EXISTS',
 					name: oldName,
 					option: 'RENAME TO ',
-					optionValue: newName,
+					optionValue: getName(isCaseSensitive, tag.name),
 				});
 
 				statements.push(statement);
@@ -1029,9 +1029,7 @@ module.exports = (baseProvider, options, app) => {
 				});
 
 				statements.push(statement);
-			}
-
-			if (!_.isEmpty(droppedAllowedValues)) {
+			} else if (!_.isEmpty(droppedAllowedValues)) {
 				const statement = assignTemplates(templates.alterTag, {
 					ifExists: ' IF EXISTS',
 					name: newName,
