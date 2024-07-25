@@ -1296,7 +1296,7 @@ const getFileFormats = async (dbName, schemaName) => {
 	);
 };
 
-const getContainerData = async schema => {
+const getContainerData = async ({ schema, logger }) => {
 	if (containers[schema]) {
 		return containers[schema];
 	}
@@ -1318,6 +1318,8 @@ const getContainerData = async schema => {
 		const stages = await getStages(dbName, schemaName);
 		const sequences = await getSequences(dbName, schemaName);
 		const fileFormats = await getFileFormats(dbName, schemaName);
+		const tags = await getTags({ dbName, schemaName, logger });
+		const schemaTags = await getSchemaTags({ dbName, schemaName, logger });
 
 		const data = {
 			transient: Boolean(_.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO'),
@@ -1329,12 +1331,63 @@ const getContainerData = async schema => {
 			sequences,
 			fileFormats,
 			isCaseSensitive,
+			tags,
+			schemaTags,
 		};
 		containers[schema] = data;
 
 		return data;
-	} catch (err) {
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving schema data');
+
 		return {};
+	}
+};
+
+const getTagAllowedValues = ({ values, logger }) => {
+	try {
+		if (typeof values !== 'string') {
+			return [];
+		}
+		const allowedValues = JSON.parse(values);
+		return allowedValues.map(value => ({ value }));
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving tag allowed values');
+
+		return [];
+	}
+};
+
+const getTags = async ({ dbName, schemaName, logger }) => {
+	try {
+		const rows = await execute(`SHOW TAGS IN SCHEMA "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}";`);
+
+		return rows.map(row => ({
+			name: row.name,
+			description: row.comment,
+			allowedValues: getTagAllowedValues({ values: row.allowed_values, logger }),
+		}));
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving tags');
+
+		return [];
+	}
+};
+
+const getSchemaTags = async ({ dbName, schemaName, logger }) => {
+	try {
+		const rows = await execute(
+			`SELECT TAG_DATABASE, TAG_SCHEMA, TAG_NAME, TAG_VALUE FROM TABLE("${removeQuotes(dbName)}".information_schema.tag_references('"${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"', 'SCHEMA'));`,
+		);
+
+		return rows.map(row => ({
+			tagName: [row['TAG_DATABASE'], row['TAG_SCHEMA'], row['TAG_NAME']].join('.'),
+			tagValue: row['TAG_VALUE'],
+		}));
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving schema tags');
+
+		return [];
 	}
 };
 

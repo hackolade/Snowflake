@@ -81,7 +81,7 @@ const getDbCollectionsData = async (data, logger, cb) => {
 			const packages = await packagesPromise;
 			const entities = snowflakeHelper.splitEntityNames(collections[schema]);
 
-			const containerData = await snowflakeHelper.getContainerData(schema);
+			const containerData = await snowflakeHelper.getContainerData({ schema, logger });
 			const [database, schemaName] = schema.split('.');
 
 			const tablesPackages = entities.tables.map(async table => {
