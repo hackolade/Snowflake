@@ -1319,7 +1319,7 @@ const getContainerData = async ({ schema, logger }) => {
 		const sequences = await getSequences(dbName, schemaName);
 		const fileFormats = await getFileFormats(dbName, schemaName);
 		const tags = await getTags({ dbName, schemaName, logger });
-		const schemaTags = await getSchemaTags({ dbName, schemaName });
+		const schemaTags = await getSchemaTags({ dbName, schemaName, logger });
 
 		const data = {
 			transient: Boolean(_.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO'),
@@ -1359,24 +1359,36 @@ const getTagAllowedValues = ({ values, logger }) => {
 };
 
 const getTags = async ({ dbName, schemaName, logger }) => {
-	const rows = await execute(`SHOW TAGS IN SCHEMA "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}";`);
+	try {
+		const rows = await execute(`SHOW TAGS IN SCHEMA "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}";`);
 
-	return rows.map(row => ({
-		name: row.name,
-		description: row.comment,
-		allowedValues: getTagAllowedValues({ values: row.allowed_values, logger }),
-	}));
+		return rows.map(row => ({
+			name: row.name,
+			description: row.comment,
+			allowedValues: getTagAllowedValues({ values: row.allowed_values, logger }),
+		}));
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving tags');
+
+		return [];
+	}
 };
 
-const getSchemaTags = async ({ dbName, schemaName }) => {
-	const rows = await execute(
-		`SELECT TAG_DATABASE, TAG_SCHEMA, TAG_NAME, TAG_VALUE FROM TABLE("${removeQuotes(dbName)}".information_schema.tag_references('"${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"', 'SCHEMA'));`,
-	);
+const getSchemaTags = async ({ dbName, schemaName, logger }) => {
+	try {
+		const rows = await execute(
+			`SELECT TAG_DATABASE, TAG_SCHEMA, TAG_NAME, TAG_VALUE FROM TABLE("${removeQuotes(dbName)}".information_schema.tag_references('"${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"', 'SCHEMA'));`,
+		);
 
-	return rows.map(row => ({
-		tagName: [row['TAG_DATABASE'], row['TAG_SCHEMA'], row['TAG_NAME']].join('.'),
-		tagValue: row['TAG_VALUE'],
-	}));
+		return rows.map(row => ({
+			tagName: [row['TAG_DATABASE'], row['TAG_SCHEMA'], row['TAG_NAME']].join('.'),
+			tagValue: row['TAG_VALUE'],
+		}));
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving schema tags');
+
+		return [];
+	}
 };
 
 const hasCloudPlatform = accountName => {
