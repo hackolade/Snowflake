@@ -2,6 +2,7 @@ module.exports = {
 	createDatabase: 'CREATE DATABASE IF NOT EXISTS ${name};\nUSE DATABASE ${name};\n',
 	createSchema:
 		'CREATE${transient} SCHEMA IF NOT EXISTS ${name}${managed_access}${data_retention}${comment};\nUSE SCHEMA ${name};\n',
+	dropSchema: 'DROP SCHEMA IF EXISTS ${name};\n',
 	createTable:
 		'CREATE${temporary}${transient} TABLE IF NOT EXISTS\n' +
 		'\t${name} (\n' +
@@ -49,4 +50,6 @@ module.exports = {
 	alterViewScript: 'ALTER VIEW IF EXISTS ${name} ',
 	alterMaterializedViewScript: 'ALTER MATERIALIZED VIEW ${name} ',
 	createTag: 'CREATE${orReplace} TAG${ifNotExist} ${name}${allowedValues}${comment};\n',
+	dropTag: 'DROP TAG IF EXISTS ${name};\n',
+	alterTag: 'ALTER TAG${ifExists} ${name} ${option}${optionValue};\n',
 };

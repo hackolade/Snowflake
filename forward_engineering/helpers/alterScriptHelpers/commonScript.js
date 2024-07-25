@@ -100,6 +100,38 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 			return { script, data };
 		};
 
+	/**
+	 * @typedef {{ script: string[], data: object }} AlterData
+	 * @param {string} alterScript
+	 * @returns {({ script, data }: AlterData) => AlterData}
+	 */
+	const getAlterObjectTagsScript =
+		alterScript =>
+		({ script, data }) => {
+			const config = {
+				tagsToSet: templates.setPropertySchema,
+				tagsToUnset: templates.unsetPropertySchema,
+			};
+
+			return Object.entries(config).reduce(
+				(result, [keyword, template]) => {
+					const property = result.data.tags?.[keyword];
+
+					if (!property) {
+						return result;
+					}
+
+					const script = alterScript + assignTemplates(template, { property });
+
+					return {
+						...result,
+						script: [...result.script, script],
+					};
+				},
+				{ script, data },
+			);
+		};
+
 	const getAlterEntityRename =
 		(alterEntityTemplate, alterEntityRename) =>
 		({ script, data }) => {
@@ -178,5 +210,6 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		getAlterEntityScript,
 		getAlterEntityRename,
 		getAlterTableStageCopyOptions,
+		getAlterObjectTagsScript,
 	};
 };

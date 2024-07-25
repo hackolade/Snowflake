@@ -13,6 +13,7 @@ const {
 	getModifyColumnScript,
 } = require('./alterScriptHelpers/alterEntityHelper');
 const { getAddViewScript, getDeleteViewScript, getModifyViewScript } = require('./alterScriptHelpers/alterViewHelper');
+const { getAddTagScript, getDeleteTagScript, getModifyTagScript } = require('./alterScriptHelpers/alterTagHelper');
 
 const getItems = (collection, nameProperty, modify, objectMethod) =>
 	[]
@@ -114,13 +115,32 @@ const getAlterViewsScripts = ({ schema, ddlProvider, app }) => {
 	};
 };
 
+/**
+ * @returns {{ addedTagsScripts: string[], deletedTagsScripts: string[], modifiedTagsScripts: string[] }}
+ */
+const getAlterTagsScripts = ({ collection, ddlProvider, app }) => {
+	const addedTagsScripts = getItems(collection, 'containers', 'added', 'values').flatMap(
+		getAddTagScript({ ddlProvider, app }),
+	);
+	const deletedTagsScripts = getItems(collection, 'containers', 'deleted', 'values').flatMap(
+		getDeleteTagScript({ ddlProvider, app }),
+	);
+	const modifiedTagsScripts = getItems(collection, 'containers', 'modified', 'values').flatMap(
+		getModifyTagScript({ ddlProvider, app }),
+	);
+	return { addedTagsScripts, deletedTagsScripts, modifiedTagsScripts };
+};
+
 const getAlterScript = ({ collection, ddlProvider, app }) => {
 	const script = {
 		...getAlterCollectionsScripts(collection, ddlProvider, app),
 		...getAlterContainersScripts(collection, ddlProvider, app),
 		...getAlterViewsScripts({ schema: collection, ddlProvider, app }),
+		...getAlterTagsScripts({ collection, ddlProvider, app }),
 	};
 	return [
+		'addedTagsScripts',
+		'modifiedTagsScripts',
 		'addedContainerScripts',
 		'modifiedContainerScripts',
 		'deletedViewScripts',
@@ -132,6 +152,7 @@ const getAlterScript = ({ collection, ddlProvider, app }) => {
 		'modifiedColumnScripts',
 		'addedViewScripts',
 		'modifiedViewScripts',
+		'deletedTagsScripts',
 		'deletedContainerScripts',
 	]
 		.flatMap(name => script[name] || [])
@@ -144,4 +165,5 @@ module.exports = {
 	getAlterContainersScripts,
 	getAlterCollectionsScripts,
 	getAlterScript,
+	getAlterTagsScripts,
 };
