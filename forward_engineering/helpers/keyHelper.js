@@ -12,9 +12,9 @@ module.exports = app => {
 			return false;
 		} else if (!column.unique) {
 			return false;
-		} else {
-			return true;
 		}
+
+		return true;
 	};
 
 	const isPrimaryKey = column => {
@@ -24,9 +24,9 @@ module.exports = app => {
 			return false;
 		} else if (!column.primaryKey) {
 			return false;
-		} else {
-			return true;
 		}
+
+		return true;
 	};
 
 	const hydrateUniqueOptions = (options, columnName, isActivated, jsonSchema) =>

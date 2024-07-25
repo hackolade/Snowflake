@@ -33,7 +33,7 @@ const getAlterContainersScripts = (collection, ddlProvider, app) => {
 	return { addedContainerScripts, deletedContainerScripts, modifiedContainerScripts };
 };
 
-const getAlterCollectionsScripts = (collection, ddlProvider, app) => {
+const getAlterCollectionsScripts = ({ collection, ddlProvider, app, targetSchemaRegistry }) => {
 	const getCollectionScripts = (items, compMode, getScript) =>
 		items.filter(item => item.compMod?.[compMode]).map(getScript);
 
@@ -42,7 +42,7 @@ const getAlterCollectionsScripts = (collection, ddlProvider, app) => {
 	const addedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'added', 'values'),
 		'created',
-		getAddCollectionScript(ddlProvider, app),
+		getAddCollectionScript({ ddlProvider, app, targetSchemaRegistry }),
 	);
 	const deletedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
@@ -58,7 +58,7 @@ const getAlterCollectionsScripts = (collection, ddlProvider, app) => {
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
-		getAddColumnScript(ddlProvider, app),
+		getAddColumnScript({ ddlProvider, app, targetSchemaRegistry }),
 	);
 	const deletedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
@@ -114,9 +114,9 @@ const getAlterViewsScripts = ({ schema, ddlProvider, app }) => {
 	};
 };
 
-const getAlterScript = ({ collection, ddlProvider, app }) => {
+const getAlterScript = ({ targetSchemaRegistry, collection, ddlProvider, app }) => {
 	const script = {
-		...getAlterCollectionsScripts(collection, ddlProvider, app),
+		...getAlterCollectionsScripts({ collection, ddlProvider, app, targetSchemaRegistry }),
 		...getAlterContainersScripts(collection, ddlProvider, app),
 		...getAlterViewsScripts({ schema: collection, ddlProvider, app }),
 	};

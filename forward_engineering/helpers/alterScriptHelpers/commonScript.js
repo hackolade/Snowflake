@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { escapeString } = require('../../utils/escapeString');
 
 module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => {
 	const getSchemaFullName = (database, schemaName, isCaseSensitive) => {
@@ -10,6 +11,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 
 	const getAlterSchemaScript = ({ database, isCaseSensitive, newName } = {}) => {
 		const schemaFullName = getSchemaFullName(database, newName, isCaseSensitive);
+
 		return assignTemplates(templates.alterSchemaScript, { name: schemaFullName });
 	};
 
@@ -17,6 +19,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		const schemaFullName = getSchemaFullName(database, schemaName, isCaseSensitive);
 		const tableName = getName(isCaseSensitive, newName);
 		const tableFullName = getFullName(schemaFullName, tableName);
+
 		return assignTemplates(template, { name: tableFullName });
 	};
 
@@ -47,7 +50,10 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 			}
 
 			const setPropertyData = Object.keys(setProperty).map((key, index) => {
-				const value = key === 'description' ? `$$${setProperty[key]}$$` : setProperty[key];
+				const propValue = setProperty[key];
+				const targetSchemaRegistry = _.get(data, 'options.targetScriptOptions.keyword');
+
+				const value = key === 'description' ? escapeString(targetSchemaRegistry, propValue) : propValue;
 				key = key === 'description' ? 'COMMENT' : key;
 				const statement = `${key} = ${value}`;
 

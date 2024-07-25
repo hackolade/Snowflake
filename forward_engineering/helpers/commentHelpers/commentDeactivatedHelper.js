@@ -6,13 +6,16 @@ const STARTS_QUERY = ['//', '--'];
 const commentIfDeactivated = (statement, data, isPartOfLine) => {
 	if (_.has(data, 'isActivated') && !data.isActivated) {
 		if (isPartOfLine) {
-			return '/* ' + statement + ' */';
-		} else if (statement.includes('\n')) {
-			return '/*\n' + statement + ' */\n';
-		} else {
 			return '// ' + statement;
+		} else if (statement.includes('\n')) {
+			return statement
+				.split('\n')
+				.filter(line => line.trim())
+				.map(line => '// ' + line)
+				.join('\n');
 		}
 	}
+
 	return statement;
 };
 

@@ -1,7 +1,7 @@
 'use strict';
 
 const _ = require('lodash');
-const { commentDropStatements } = require('./helpers/commentDropStatements');
+const { commentDropStatements } = require('./helpers/commentHelpers/commentDropStatements');
 const { DROP_STATEMENTS } = require('./helpers/constants');
 
 module.exports = {
@@ -18,7 +18,8 @@ module.exports = {
 				);
 			}
 
-			const script = getAlterScript({ collection, _, ddlProvider, app });
+			const targetSchemaRegistry = _.get(data, 'options.targetScriptOptions.keyword');
+			const script = getAlterScript({ targetSchemaRegistry, collection, ddlProvider, app });
 
 			const applyDropStatements = data.options?.additionalOptions?.some(
 				option => option.id === 'applyDropStatements' && option.value,

@@ -40,9 +40,9 @@ module.exports = app => {
 			return `${cloneParams.atOrBefore} (offset => ${cloneParams.OFFSET})`;
 		} else if (cloneParams.STATEMENT) {
 			return `${cloneParams.atOrBefore} (statement => '${cloneParams.STATEMENT}')`;
-		} else {
-			return '';
 		}
+
+		return '';
 	};
 
 	const mergeKeys = keys => keys.map(key => `"${key.name}"`).join(', ');

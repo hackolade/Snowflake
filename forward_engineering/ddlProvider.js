@@ -13,6 +13,7 @@ const {
 	prepareCollectionFormatTypeOptions,
 	prepareCollectionStageCopyOptions,
 } = require('./helpers/alterScriptHelpers/common');
+const { escapeString } = require('./utils/escapeString');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
@@ -20,6 +21,7 @@ const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
 module.exports = (baseProvider, options, app) => {
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
 	const { tab, hasType, clean } = app.require('@hackolade/ddl-fe-utils').general;
+	const targetSchemaRegistry = options.targetScriptOptions.keyword;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
 	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys } =
@@ -44,7 +46,7 @@ module.exports = (baseProvider, options, app) => {
 		require('./helpers/columnDefinitionHelper')(app);
 
 	const { generateConstraint } = require('./helpers/constraintHelper')(app);
-	const { commentIfDeactivated } = require('./helpers/commentDeactivatedHelper');
+	const { commentIfDeactivated } = require('./helpers/commentHelpers/commentDeactivatedHelper');
 
 	const {
 		getAlterSchemaName,
@@ -100,7 +102,7 @@ module.exports = (baseProvider, options, app) => {
 			const dataRetentionStatement =
 				!isNaN(dataRetention) && dataRetention ? `\n\tDATA_RETENTION_TIME_IN_DAYS=${dataRetention}` : '';
 			const managedAccessStatement = managedAccess ? '\n\tWITH MANAGED ACCESS' : '';
-			const commentStatement = comment ? `\n\tCOMMENT=$$${comment}$$` : '';
+			const commentStatement = comment ? `\n\tCOMMENT=${escapeString(targetSchemaRegistry, comment)}` : '';
 			const currentSchemaName = getName(isCaseSensitive, schemaName);
 			const currentDatabaseName = getName(isCaseSensitive, databaseName);
 			const fullName = getFullName(currentDatabaseName, currentSchemaName);
@@ -134,7 +136,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 
 			const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
-			const getBodyStatement = body => (body ? `\n\t$$\n${body}\n\t$$` : '');
+			const getBodyStatement = body => (body ? `\n\t\n${escapeString(targetSchemaRegistry, body)}\n\t` : '');
 			const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
 			const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
 
@@ -261,7 +263,9 @@ module.exports = (baseProvider, options, app) => {
 						: mergeKeys(tableData.partitioningKey)) +
 					')'
 				: '';
-			const comment = tableData.comment ? ` COMMENT=$$${tableData.comment}$$` : '';
+			const comment = tableData.comment
+				? ` COMMENT=${escapeString(targetSchemaRegistry, tableData.comment)}`
+				: '';
 			const copyGrants = tableData.copyGrants ? ` COPY GRANTS` : '';
 			const dataRetentionTime = tableData.dataRetentionTime
 				? ` DATA_RETENTION_TIME_IN_DAYS=${tableData.dataRetentionTime}`
@@ -360,13 +364,20 @@ module.exports = (baseProvider, options, app) => {
 				type: decorateType(columnDefinition.type, columnDefinition),
 				collation: getCollation(columnDefinition.type, columnDefinition.collation),
 				default: !_.isUndefined(columnDefinition.default)
-					? ' DEFAULT ' + getDefault(columnDefinition.type, columnDefinition.default)
+					? ' DEFAULT ' +
+						getDefault({
+							targetSchemaRegistry,
+							type: columnDefinition.type,
+							defaultValue: columnDefinition.default,
+						})
 					: '',
 				autoincrement: getAutoIncrement(columnDefinition.type, 'AUTOINCREMENT', columnDefinition.autoincrement),
 				identity: getAutoIncrement(columnDefinition.type, 'IDENTITY', columnDefinition.identity),
 				not_nul: !columnDefinition.nullable ? ' NOT NULL' : '',
 				inline_constraint: getInlineConstraint(columnDefinition),
-				comment: columnDefinition.comment ? ` COMMENT $$${columnDefinition.comment}$$` : '',
+				comment: columnDefinition.comment
+					? ` COMMENT ${escapeString(targetSchemaRegistry, columnDefinition.comment)}`
+					: '',
 			});
 			return { statement: columnStatement, isActivated: columnDefinition.isActivated };
 		},
@@ -468,7 +479,9 @@ module.exports = (baseProvider, options, app) => {
 				name: getFullName(schemaName, viewData.name),
 				column_list: viewColumnsToString(columnList, isActivated),
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
-				comment: viewData.comment ? 'COMMENT=$$' + viewData.comment + '$$\n' : '',
+				comment: viewData.comment
+					? 'COMMENT=' + escapeString(targetSchemaRegistry, viewData.comment) + '\n'
+					: '',
 				select_statement: selectStatement,
 			});
 		},
@@ -589,7 +602,7 @@ module.exports = (baseProvider, options, app) => {
 									start: sequence.sequenceStart || DEFAULT_SNOWFLAKE_SEQUENCE_START,
 									increment: sequence.sequenceIncrement || DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT,
 									comment: sequence.sequenceComments
-										? ` COMMENT=$$${sequence.sequenceComments}$$`
+										? ` COMMENT=${escapeString(targetSchemaRegistry, sequence.sequenceComments)}`
 										: '',
 								}),
 							)
@@ -605,7 +618,7 @@ module.exports = (baseProvider, options, app) => {
 										getFormatTypeOptions(fileFormat.fileFormat, fileFormat.formatTypeOptions),
 									),
 									comment: fileFormat.fileFormatComments
-										? ` COMMENT=$$${fileFormat.fileFormatComments}$$`
+										? ` COMMENT=${escapeString(targetSchemaRegistry, fileFormat.fileFormatComments)}`
 										: '',
 								}),
 							)
