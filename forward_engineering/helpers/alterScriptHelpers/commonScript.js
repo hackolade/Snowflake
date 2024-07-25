@@ -108,23 +108,28 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 	const getAlterObjectTagsScript =
 		alterScript =>
 		({ script, data }) => {
-			const { tags } = data;
+			const config = {
+				tagsToSet: templates.setPropertySchema,
+				tagsToUnset: templates.unsetPropertySchema,
+			};
 
-			if (tags?.tagsToSet) {
-				script = [
-					...script,
-					alterScript + assignTemplates(templates.setPropertySchema, { property: tags.tagsToSet }),
-				];
-			}
+			return Object.entries(config).reduce(
+				(result, [keyword, template]) => {
+					const property = result.data.tags?.[keyword];
 
-			if (tags?.tagsToUnset) {
-				script = [
-					...script,
-					alterScript + assignTemplates(templates.unsetPropertySchema, { property: tags.tagsToUnset }),
-				];
-			}
+					if (!property) {
+						return result;
+					}
 
-			return { script, data };
+					const script = alterScript + assignTemplates(template, { property });
+
+					return {
+						...result,
+						script: [...result.script, script],
+					};
+				},
+				{ script, data },
+			);
 		};
 
 	const getAlterEntityRename =

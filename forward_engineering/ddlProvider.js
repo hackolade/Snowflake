@@ -1031,66 +1031,51 @@ module.exports = (baseProvider, options, app) => {
 
 			const statements = [];
 
-			if (isNameChanged) {
-				const statement = assignTemplates(templates.alterTag, {
-					ifExists: ' IF EXISTS',
-					name: oldName,
-					option: 'RENAME TO ',
-					optionValue: getName(isCaseSensitive, tag.name),
-				});
+			const createAndPushStatement = (condition, options) => {
+				if (condition) {
+					const statement = assignTemplates(templates.alterTag, options);
+					statements.push(statement);
+				}
+			};
 
-				statements.push(statement);
-			}
+			createAndPushStatement(isNameChanged, {
+				ifExists: ' IF EXISTS',
+				name: oldName,
+				option: 'RENAME TO ',
+				optionValue: getName(isCaseSensitive, tag.name),
+			});
 
-			if (isAllowedValuesDropped) {
-				const statement = assignTemplates(templates.alterTag, {
-					name: newName,
-					option: 'UNSET ALLOWED_VALUES',
-				});
+			createAndPushStatement(isAllowedValuesDropped, {
+				name: newName,
+				option: 'UNSET ALLOWED_VALUES',
+			});
 
-				statements.push(statement);
-			} else if (!_.isEmpty(droppedAllowedValues)) {
-				const statement = assignTemplates(templates.alterTag, {
-					ifExists: ' IF EXISTS',
-					name: newName,
-					option: 'DROP',
-					optionValue: getTagAllowedValues({ allowedValues: droppedAllowedValues }),
-				});
+			createAndPushStatement(!isAllowedValuesDropped && !_.isEmpty(droppedAllowedValues), {
+				ifExists: ' IF EXISTS',
+				name: newName,
+				option: 'DROP',
+				optionValue: getTagAllowedValues({ allowedValues: droppedAllowedValues }),
+			});
 
-				statements.push(statement);
-			}
+			createAndPushStatement(!_.isEmpty(newAllowedValues), {
+				ifExists: ' IF EXISTS',
+				name: newName,
+				option: 'ADD',
+				optionValue: getTagAllowedValues({ allowedValues: newAllowedValues }),
+			});
 
-			if (!_.isEmpty(newAllowedValues)) {
-				const statement = assignTemplates(templates.alterTag, {
-					ifExists: ' IF EXISTS',
-					name: newName,
-					option: 'ADD',
-					optionValue: getTagAllowedValues({ allowedValues: newAllowedValues }),
-				});
+			createAndPushStatement(isCommentDropped, {
+				ifExists: ' IF EXISTS',
+				name: newName,
+				option: 'UNSET COMMENT',
+			});
 
-				statements.push(statement);
-			}
-
-			if (isCommentDropped) {
-				const statement = assignTemplates(templates.alterTag, {
-					ifExists: ' IF EXISTS',
-					name: newName,
-					option: 'UNSET COMMENT',
-				});
-
-				statements.push(statement);
-			}
-
-			if (isCommentChanged) {
-				const statement = assignTemplates(templates.alterTag, {
-					ifExists: ' IF EXISTS',
-					name: newName,
-					option: 'SET COMMENT = ',
-					optionValue: toString(tag.description),
-				});
-
-				statements.push(statement);
-			}
+			createAndPushStatement(isCommentChanged, {
+				ifExists: ' IF EXISTS',
+				name: newName,
+				option: 'SET COMMENT = ',
+				optionValue: toString(tag.description),
+			});
 
 			return statements.join('');
 		},
