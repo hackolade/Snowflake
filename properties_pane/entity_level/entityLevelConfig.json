@@ -899,6 +899,31 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox"
 			},
 			{
+				"propertyName": "Table Tags",
+				"propertyKeyword": "tableTags",
+				"propertyTooltip": "",
+				"propertyType": "group",
+				"groupItemLimit": 50,
+				"structure": [
+					{
+						"propertyName": "Tag name",
+						"propertyKeyword": "tagName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "text",
+						"shouldValidate": true,
+						"validation": {
+							"regex": "^.{0,256}$"
+						}
+					}
+				]
+			},
+			{
 				"propertyName": "Remarks",
 				"propertyKeyword": "comments",
 				"shouldValidate": false,
