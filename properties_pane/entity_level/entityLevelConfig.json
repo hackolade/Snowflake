@@ -915,9 +915,11 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
-						"propertyType": "details",
-						"template": "textarea",
-						"markdown": false
+						"propertyType": "text",
+						"shouldValidate": true,
+						"validation": {
+							"regex": "^.{0,256}$"
+						}
 					}
 				]
 			},
