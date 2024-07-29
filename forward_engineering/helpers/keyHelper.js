@@ -8,25 +8,11 @@ module.exports = app => {
 	};
 
 	const isUniqueKey = column => {
-		if (column.compositeUniqueKey) {
-			return false;
-		} else if (!column.unique) {
-			return false;
-		}
-
-		return true;
+		return !(column.compositeUniqueKey || !column.unique);
 	};
 
 	const isPrimaryKey = column => {
-		if (column.compositeUniqueKey) {
-			return false;
-		} else if (column.compositePrimaryKey) {
-			return false;
-		} else if (!column.primaryKey) {
-			return false;
-		}
-
-		return true;
+		return !(column.compositeUniqueKey || column.compositePrimaryKey || !column.primaryKey);
 	};
 
 	const hydrateUniqueOptions = (options, columnName, isActivated, jsonSchema) =>
