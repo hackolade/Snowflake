@@ -212,6 +212,33 @@ module.exports = app => {
 		return _.get(containerData, 'code') || _.get(containerData, 'name', '');
 	};
 
+	/**
+	 * @template T
+	 * @param {{ newItems: T[], oldItems: T[] }}
+	 * @returns {{ addedItems: T[], removedItems: T[], modifiedItems: T[] }}
+	 */
+	const getGroupItemsByCompMode = ({ newItems = [], oldItems = [] }) => {
+		const addedItems = newItems.filter(newItem => !oldItems.some(item => item.id === newItem.id));
+		const removedItems = [];
+		const modifiedItems = [];
+
+		oldItems.forEach(oldItem => {
+			const newItem = newItems.find(item => item.id === oldItem.id);
+
+			if (!newItem) {
+				removedItems.push(oldItem);
+			} else if (!_.isEqual(newItem, oldItem)) {
+				modifiedItems.push(newItem);
+			}
+		});
+
+		return {
+			added: addedItems,
+			removed: removedItems,
+			modified: modifiedItems,
+		};
+	};
+
 	return {
 		escape,
 		toString,
@@ -231,5 +258,6 @@ module.exports = app => {
 		getEntityName,
 		getFullName,
 		getDbName,
+		getGroupItemsByCompMode,
 	};
 };

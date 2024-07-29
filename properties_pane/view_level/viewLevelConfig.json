@@ -67,6 +67,31 @@
 				"propertyKeyword": "copyGrants",
 				"shouldValidate": false,
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "View Tags",
+				"propertyKeyword": "viewTags",
+				"propertyTooltip": "",
+				"propertyType": "group",
+				"groupItemLimit": 50,
+				"structure": [
+					{
+						"propertyName": "Tag name",
+						"propertyKeyword": "tagName",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "text",
+						"shouldValidate": true,
+						"validation": {
+							"regex": "^.{0,256}$"
+						}
+					}
+				]
 			}
 		]
 	}

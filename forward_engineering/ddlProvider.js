@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('./types').Tag} Tag
+ */
+
 const _ = require('lodash');
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
@@ -58,6 +62,7 @@ module.exports = (baseProvider, options, app) => {
 		getAlterTableFormat,
 		getAlterTableStageCopyOptions,
 		getAlterEntityScript,
+		getAlterObjectTagsScript,
 	} = require('./helpers/alterScriptHelpers/commonScript')({
 		getName,
 		getFullName,
@@ -65,6 +70,12 @@ module.exports = (baseProvider, options, app) => {
 		assignTemplates,
 		tab,
 	});
+
+	const { getTagStatement, getTagAllowedValues, getTagKeyValues, prepareObjectTagsData } =
+		require('./helpers/tagHelper')({
+			getName,
+			toString,
+		});
 
 	const getOutOfLineConstraints = (
 		foreignKeyConstraints,
@@ -83,6 +94,13 @@ module.exports = (baseProvider, options, app) => {
 		return !_.isEmpty(constraints) ? ',\n\t\t' + constraints.join(',\n\t\t') : '';
 	};
 
+	const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
+	const getBodyStatement = body => (body ? `\n\t$$\n${body}\n\t$$` : '');
+	// const getBodyStatement = body => (body ? `\n\t\n${escapeString(targetSchemaRegistry, body)}\n\t` : '');
+	const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
+	const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
+	const getIfNotExistStatement = ifNotExist => (ifNotExist ? ' IF NOT EXISTS' : '');
+
 	return {
 		createSchema({
 			schemaName,
@@ -97,6 +115,8 @@ module.exports = (baseProvider, options, app) => {
 			fileFormats,
 			stages,
 			isCaseSensitive,
+			tags,
+			schemaTags,
 		}) {
 			const transientStatement = transient ? ' TRANSIENT' : '';
 			const dataRetentionStatement =
@@ -134,11 +154,6 @@ module.exports = (baseProvider, options, app) => {
 
 				return `${runtimeVersionStatement}${handlerStatement}${packagesStatement}`;
 			};
-
-			const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
-			const getBodyStatement = body => (body ? `\n\t\n${escapeString(targetSchemaRegistry, body)}\n\t` : '');
-			const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
-			const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
 
 			const userDefinedFunctions = udfs.map(udf =>
 				assignTemplates(templates.createUDF, {
@@ -211,6 +226,20 @@ module.exports = (baseProvider, options, app) => {
 				}),
 			);
 
+			const tagsStatements = tags.map(tag =>
+				this.createTag({ tag, schemaName: currentSchemaName, isCaseSensitive }),
+			);
+
+			if (!_.isEmpty(schemaTags)) {
+				const schemaTagStatement = assignTemplates(templates.alterSchema, {
+					name: fullName,
+					operation: 'SET TAG',
+					options: getTagKeyValues({ tags: schemaTags, isCaseSensitive }),
+				});
+
+				tagsStatements.push(schemaTagStatement);
+			}
+
 			const statements = [];
 
 			if (databaseName) {
@@ -228,6 +257,7 @@ module.exports = (baseProvider, options, app) => {
 				...sequencesStatements,
 				...fileFormatsStatements,
 				...stagesStatements,
+				...tagsStatements,
 			].join('\n');
 		},
 
@@ -289,24 +319,28 @@ module.exports = (baseProvider, options, app) => {
 			const columnDefinitions = tableData.columns
 				.map(column => commentIfDeactivated(column.statement, column))
 				.join(',\n\t\t');
+			const tagsStatement = getTagStatement({
+				tags: tableData.tableTags,
+				isCaseSensitive: tableData.isCaseSensitive,
+			});
 
 			if (tableData.selectStatement) {
 				return assignTemplates(templates.createAsSelect, {
 					name: tableData.fullName,
 					selectStatement: tableData.selectStatement,
-					tableOptions: addOptions([clusterKeys, copyGrants]),
+					tableOptions: addOptions([clusterKeys, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.cloneTableName) {
 				return assignTemplates(templates.createCloneTable, {
 					name: tableData.fullName,
 					source_table: getFullName(schemaName, tableData.cloneTableName),
-					tableOptions: addOptions([atOrBefore, copyGrants]),
+					tableOptions: addOptions([atOrBefore, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.likeTableName) {
 				return assignTemplates(templates.createLikeTable, {
 					name: tableData.fullName,
 					source_table: getFullName(schemaName, tableData.likeTableName),
-					tableOptions: addOptions([clusterKeys, copyGrants]),
+					tableOptions: addOptions([clusterKeys, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.external) {
 				const location = tableData.externalOptions.location
@@ -325,7 +359,16 @@ module.exports = (baseProvider, options, app) => {
 				return assignTemplates(templates.createExternalTable, {
 					name: tableData.fullName,
 					tableOptions: addOptions(
-						[partitionKeys, fileFormat, location, refreshOnCreate, autoRefresh, pattern, copyGrants],
+						[
+							partitionKeys,
+							fileFormat,
+							location,
+							refreshOnCreate,
+							autoRefresh,
+							pattern,
+							copyGrants,
+							tagsStatement,
+						],
 						comment,
 					),
 
@@ -343,7 +386,7 @@ module.exports = (baseProvider, options, app) => {
 					temporary: temporary,
 					transient: transient,
 					tableOptions: addOptions(
-						[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants],
+						[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants, tagsStatement],
 						comment,
 					),
 
@@ -378,6 +421,10 @@ module.exports = (baseProvider, options, app) => {
 				comment: columnDefinition.comment
 					? ` COMMENT ${escapeString(targetSchemaRegistry, columnDefinition.comment)}`
 					: '',
+				tag: getTagStatement({
+					tags: columnDefinition.columnTags,
+					isCaseSensitive: columnDefinition.isCaseSensitive,
+				}),
 			});
 			return { statement: columnStatement, isActivated: columnDefinition.isActivated };
 		},
@@ -473,6 +520,12 @@ module.exports = (baseProvider, options, app) => {
 				viewData.selectStatement ||
 				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')}`;
 
+			const tagStatement = getTagStatement({
+				tags: viewData.viewTags,
+				isCaseSensitive: viewData.isCaseSensitive,
+				indent: '',
+			});
+
 			return assignTemplates(templates.createView, {
 				secure: viewData.secure ? ' SECURE' : '',
 				materialized: viewData.materialized ? ' MATERIALIZED' : '',
@@ -483,6 +536,7 @@ module.exports = (baseProvider, options, app) => {
 					? 'COMMENT=' + escapeString(targetSchemaRegistry, viewData.comment) + '\n'
 					: '',
 				select_statement: selectStatement,
+				tag: tagStatement ? tagStatement + '\n' : '',
 			});
 		},
 
@@ -499,7 +553,8 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateColumn({ columnDefinition, jsonSchema, dbData }) {
-			return Object.assign({}, columnDefinition, {
+			return {
+				...columnDefinition,
 				name: getName(jsonSchema.isCaseSensitive, columnDefinition.name),
 				isCaseSensitive: jsonSchema.isCaseSensitive,
 				timePrecision: Number(jsonSchema.tPrecision),
@@ -538,10 +593,11 @@ module.exports = (baseProvider, options, app) => {
 				uniqueKeyConstraintName: jsonSchema.uniqueKeyConstraintName,
 				primaryKey: jsonSchema.primaryKeyConstraintName ? false : columnDefinition.primaryKey,
 				expression: jsonSchema.expression,
-			});
+				columnTags: jsonSchema.columnTags ?? [],
+			};
 		},
 
-		hydrateSchema(containerData, { udfs, procedures, sequences, fileFormats, stages } = {}) {
+		hydrateSchema(containerData, { udfs, procedures, sequences, fileFormats, stages, tags } = {}) {
 			return {
 				schemaName: getName(containerData.isCaseSensitive, containerData.name),
 				isCaseSensitive: containerData.isCaseSensitive,
@@ -550,6 +606,7 @@ module.exports = (baseProvider, options, app) => {
 				transient: containerData.transient,
 				managedAccess: containerData.managedAccess,
 				dataRetention: containerData.DATA_RETENTION_TIME_IN_DAYS,
+				schemaTags: containerData.schemaTags,
 				udfs: Array.isArray(udfs)
 					? udfs
 							.map(udf =>
@@ -637,6 +694,19 @@ module.exports = (baseProvider, options, app) => {
 								}),
 							)
 							.filter(stage => stage.name)
+					: [],
+				tags: Array.isArray(tags)
+					? tags
+							.map(tag =>
+								clean({
+									name: tag.name || undefined,
+									orReplace: tag.orReplace || undefined,
+									ifNotExist: tag.ifNotExist || undefined,
+									allowedValues: tag.allowedValues || undefined,
+									description: tag.description || undefined,
+								}),
+							)
+							.filter(tag => tag.name)
 					: [],
 			};
 		},
@@ -785,6 +855,7 @@ module.exports = (baseProvider, options, app) => {
 						isCaseSensitive: firstTab.isCaseSensitive,
 					}),
 				),
+				tableTags: firstTab.tableTags ?? [],
 			};
 		},
 
@@ -804,6 +875,7 @@ module.exports = (baseProvider, options, app) => {
 				secure: firstTab.secure,
 				materialized: firstTab.materialized,
 				fullName,
+				viewTags: firstTab.viewTags ?? [],
 			};
 		},
 
@@ -832,6 +904,7 @@ module.exports = (baseProvider, options, app) => {
 				getUnsetCollectionProperty(alterTableScript),
 				getAlterTableFormat(alterTableScript, getFileFormat),
 				getAlterTableStageCopyOptions(alterTableScript, getCopyOptions, _),
+				getAlterObjectTagsScript(alterTableScript),
 			)({ data, script: [] });
 
 			return script.join('\n');
@@ -845,6 +918,7 @@ module.exports = (baseProvider, options, app) => {
 				prepareCollectionFormatTypeOptions,
 				prepareAlterSetUnsetData,
 				prepareCollectionStageCopyOptions(clean, getStageCopyOptions, _),
+				prepareObjectTagsData('tableTags'),
 			)({ collection, data: {} });
 
 			const formatTypeOptions = clean(
@@ -868,13 +942,19 @@ module.exports = (baseProvider, options, app) => {
 				getAlterEntityRename(templates[alterTableTemplateName], templates.alterEntityRename),
 				getSetCollectionProperty(alterTableScript),
 				getUnsetCollectionProperty(alterTableScript),
+				getAlterObjectTagsScript(alterTableScript),
 			)({ data, script: [] });
 
 			return script.join('\n');
 		},
 
 		hydrateAlterView(collection) {
-			const { data } = _.flow(prepareName, prepareTableName, prepareAlterSetUnsetData)({ collection, data: {} });
+			const { data } = _.flow(
+				prepareName,
+				prepareTableName,
+				prepareAlterSetUnsetData,
+				prepareObjectTagsData('viewTags'),
+			)({ collection, data: {} });
 
 			return data;
 		},
@@ -886,6 +966,7 @@ module.exports = (baseProvider, options, app) => {
 				getSetCollectionProperty(alterSchemaScript),
 				getUnsetCollectionProperty(alterSchemaScript),
 				getSchemaMenageAccess(alterSchemaScript),
+				getAlterObjectTagsScript(alterSchemaScript),
 			)({ data, script: [] });
 
 			return script.join('\n');
@@ -897,6 +978,7 @@ module.exports = (baseProvider, options, app) => {
 				prepareContainerName,
 				prepareAlterSetUnsetData,
 				prepareMenageContainerData,
+				prepareObjectTagsData('schemaTags'),
 			)({ collection: schema, data: {} });
 
 			return preparedData.data;
@@ -908,6 +990,108 @@ module.exports = (baseProvider, options, app) => {
 			const name = getFullName(databaseName, containerName);
 
 			return { name };
+		},
+
+		/**
+		 * @param {{ name: string }}
+		 * @returns {string}
+		 */
+		dropSchema({ name }) {
+			return assignTemplates(templates.dropSchema, {
+				name,
+			});
+		},
+
+		/**
+		 * @param {{ tag: Tag, schemaName: string, isCaseSensitive: boolean }}
+		 * @returns {string}
+		 */
+		createTag({ tag, schemaName, isCaseSensitive }) {
+			return assignTemplates(templates.createTag, {
+				orReplace: getOrReplaceStatement(tag.orReplace),
+				ifNotExist: getIfNotExistStatement(tag.ifNotExist),
+				allowedValues: getTagAllowedValues({ allowedValues: tag.allowedValues }),
+				name: getFullName(schemaName, getName(isCaseSensitive, tag.name)),
+				comment: getCommentsStatement(tag.description),
+			});
+		},
+
+		/**
+		 * @param {{ tag: Tag, schemaName: string, isCaseSensitive: boolean }}
+		 * @returns {string}
+		 */
+		dropTag({ tag, schemaName, isCaseSensitive }) {
+			return assignTemplates(templates.dropTag, {
+				name: getFullName(schemaName, getName(isCaseSensitive, tag.name)),
+			});
+		},
+
+		/**
+		 * @param {{tag: Tag, oldTag: Tag, schemaName: string, isCaseSensitive: boolean }}
+		 * @returns {string}
+		 */
+		alterTag({ tag, oldTag, schemaName, isCaseSensitive }) {
+			const oldName = getFullName(schemaName, getName(isCaseSensitive, oldTag.name));
+			const newName = getFullName(schemaName, getName(isCaseSensitive, tag.name));
+			const flattenAllowedValues = _.flatMap(tag.allowedValues, ({ value }) => value).filter(Boolean);
+			const flattenOldAllowedValues = _.flatMap(oldTag.allowedValues, ({ value }) => value).filter(Boolean);
+			const newAllowedValues = _.differenceBy(tag.allowedValues, oldTag.allowedValues, ({ value }) => value);
+			const droppedAllowedValues = _.differenceBy(oldTag.allowedValues, tag.allowedValues, ({ value }) => value);
+
+			const isNameChanged = oldName !== newName;
+			const isCommentDropped = oldTag.description && !tag.description;
+			const isCommentChanged = !isCommentDropped && tag.description !== oldTag.description;
+			const isAllowedValuesDropped = flattenOldAllowedValues.length && !flattenAllowedValues.length;
+
+			const statements = [];
+
+			const createAndPushStatement = (condition, options) => {
+				if (condition) {
+					const statement = assignTemplates(templates.alterTag, options);
+					statements.push(statement);
+				}
+			};
+
+			createAndPushStatement(isNameChanged, {
+				ifExists: ' IF EXISTS',
+				name: oldName,
+				option: 'RENAME TO ',
+				optionValue: getName(isCaseSensitive, tag.name),
+			});
+
+			createAndPushStatement(isAllowedValuesDropped, {
+				name: newName,
+				option: 'UNSET ALLOWED_VALUES',
+			});
+
+			createAndPushStatement(!isAllowedValuesDropped && !_.isEmpty(droppedAllowedValues), {
+				ifExists: ' IF EXISTS',
+				name: newName,
+				option: 'DROP',
+				optionValue: getTagAllowedValues({ allowedValues: droppedAllowedValues }),
+			});
+
+			createAndPushStatement(!_.isEmpty(newAllowedValues), {
+				ifExists: ' IF EXISTS',
+				name: newName,
+				option: 'ADD',
+				optionValue: getTagAllowedValues({ allowedValues: newAllowedValues }),
+			});
+
+			createAndPushStatement(isCommentDropped, {
+				ifExists: ' IF EXISTS',
+				name: newName,
+				option: 'UNSET COMMENT',
+			});
+
+			createAndPushStatement(isCommentChanged, {
+				ifExists: ' IF EXISTS',
+				name: newName,
+				option: 'SET COMMENT = ',
+				optionValue: toString(tag.description),
+			});
+
+			return statements.join('');
 		},
 	};
 };
