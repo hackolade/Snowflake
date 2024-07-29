@@ -4,7 +4,7 @@ const { createColumnDefinitionBySchema } = require('./createColumnDefinition');
 const { commentIfDeactivated } = require('../commentHelpers/commentDeactivatedHelper');
 
 const getAddCollectionScript =
-	({ ddlProvider, app, targetSchemaRegistry }) =>
+	({ ddlProvider, app, scriptFormat }) =>
 	collection => {
 		const { getEntityName, getName } = require('../general')(app);
 
@@ -19,7 +19,7 @@ const getAddCollectionScript =
 				jsonSchema: column,
 				parentJsonSchema: jsonSchema,
 				ddlProvider,
-				targetSchemaRegistry,
+				scriptFormat,
 			}),
 		);
 
@@ -59,7 +59,7 @@ const getModifyCollectionScript = ddlProvider => collection => {
 };
 
 const getAddColumnScript =
-	({ ddlProvider, app, targetSchemaRegistry }) =>
+	({ ddlProvider, app, scriptFormat }) =>
 	collection => {
 		const { getEntityName, getFullName, getName } = require('../general')(app);
 
@@ -78,7 +78,7 @@ const getAddColumnScript =
 					jsonSchema,
 					parentJsonSchema: collectionSchema,
 					ddlProvider,
-					targetSchemaRegistry,
+					scriptFormat,
 				}),
 			)
 			.map(ddlProvider.convertColumnDefinition)

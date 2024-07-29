@@ -64,9 +64,9 @@ module.exports = app => {
 
 	const localEscapeString = str => str.replace(/^'([\S\s]+)'$/, '$1');
 
-	const getDefault = ({ type, defaultValue, targetSchemaRegistry }) => {
+	const getDefault = ({ type, defaultValue, scriptFormat }) => {
 		if (isString(type)) {
-			return escapeString(targetSchemaRegistry, localEscapeString(String(defaultValue)));
+			return escapeString(scriptFormat, localEscapeString(String(defaultValue)));
 		} else if (_.toUpper(type) === 'BOOLEAN') {
 			return _.toUpper(defaultValue);
 		}

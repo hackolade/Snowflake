@@ -51,9 +51,9 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 
 			const setPropertyData = Object.keys(setProperty).map((key, index) => {
 				const propValue = setProperty[key];
-				const targetSchemaRegistry = _.get(data, 'options.targetScriptOptions.keyword');
+				const scriptFormat = _.get(data, 'options.targetScriptOptions.keyword');
 
-				const value = key === 'description' ? escapeString(targetSchemaRegistry, propValue) : propValue;
+				const value = key === 'description' ? escapeString(scriptFormat, propValue) : propValue;
 				key = key === 'description' ? 'COMMENT' : key;
 				const statement = `${key} = ${value}`;
 

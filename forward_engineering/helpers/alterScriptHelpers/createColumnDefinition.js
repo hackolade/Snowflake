@@ -74,12 +74,12 @@ const getType = jsonSchema => {
 	return jsonSchema.mode || jsonSchema.childType || jsonSchema.type;
 };
 
-const createColumnDefinitionBySchema = ({ name, jsonSchema, parentJsonSchema, ddlProvider, targetSchemaRegistry }) => {
+const createColumnDefinitionBySchema = ({ name, jsonSchema, parentJsonSchema, ddlProvider, scriptFormat }) => {
 	const columnDefinition = createColumnDefinition({
 		name: name,
 		type: getType(jsonSchema),
 		nullable: isNullable(parentJsonSchema, name),
-		default: getDefault({ targetSchemaRegistry, type: jsonSchema }),
+		default: getDefault({ scriptFormat, type: jsonSchema }),
 		primaryKey: jsonSchema.primaryKey,
 		length: getLength(jsonSchema),
 		scale: getScale(jsonSchema),

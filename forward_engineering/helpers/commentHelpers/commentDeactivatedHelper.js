@@ -12,8 +12,11 @@ const commentIfDeactivated = (statement, data, isPartOfLine) => {
 				.split('\n')
 				.filter(line => line.trim())
 				.map(line => '// ' + line)
-				.join('\n');
+				.join('\n')
+				.concat('\n');
 		}
+
+		return !statement ? '' : '// ' + statement;
 	}
 
 	return statement;

@@ -18,8 +18,8 @@ module.exports = {
 				);
 			}
 
-			const targetSchemaRegistry = _.get(data, 'options.targetScriptOptions.keyword');
-			const script = getAlterScript({ targetSchemaRegistry, collection, ddlProvider, app });
+			const scriptFormat = _.get(data, 'options.targetScriptOptions.keyword');
+			const script = getAlterScript({ scriptFormat, collection, ddlProvider, app });
 
 			const applyDropStatements = data.options?.additionalOptions?.some(
 				option => option.id === 'applyDropStatements' && option.value,

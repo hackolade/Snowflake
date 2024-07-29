@@ -1,5 +1,5 @@
-const escapeString = (targetSchemaRegistry, value) =>
-	targetSchemaRegistry === 'snowSight' ? `'${value.replace(/'/g, "''")}'` : `$$${value}$$`;
+const escapeString = (scriptFormat, value) =>
+	scriptFormat === 'snowSight' ? `'${value.replace(/'/g, "''")}'` : `$$${value}$$`;
 
 module.exports = {
 	escapeString,
