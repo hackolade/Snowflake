@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const { prepareContainerLevelData } = require('./common');
 
 const getAddContainerScript = (ddlProvider, app) => container => {
