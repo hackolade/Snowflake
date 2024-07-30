@@ -8,7 +8,13 @@ const LANGUAGES = {
 	SQL: 'sql',
 };
 
+const FORMATS = {
+	SNOWSIGHT: 'snowSight',
+	CLASSIC_UI: 'classicUI',
+};
+
 module.exports = {
 	DROP_STATEMENTS,
 	LANGUAGES,
+	FORMATS,
 };

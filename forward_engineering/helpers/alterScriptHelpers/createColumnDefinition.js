@@ -63,7 +63,11 @@ const getPrecision = jsonSchema => {
 };
 
 const hasMaxLength = jsonSchema => {
-	return !!jsonSchema.hasMaxLength;
+	if (jsonSchema.hasMaxLength) {
+		return jsonSchema.hasMaxLength;
+	}
+
+	return '';
 };
 
 const getType = jsonSchema => {
@@ -79,7 +83,7 @@ const createColumnDefinitionBySchema = ({ name, jsonSchema, parentJsonSchema, dd
 		name: name,
 		type: getType(jsonSchema),
 		nullable: isNullable(parentJsonSchema, name),
-		default: getDefault({ scriptFormat, type: jsonSchema }),
+		default: getDefault(jsonSchema),
 		primaryKey: jsonSchema.primaryKey,
 		length: getLength(jsonSchema),
 		scale: getScale(jsonSchema),

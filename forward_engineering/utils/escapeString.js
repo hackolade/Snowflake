@@ -1,5 +1,7 @@
+const { FORMATS } = require('../helpers/constants');
+
 const escapeString = (scriptFormat, value) =>
-	scriptFormat === 'snowSight' ? `'${value.replace(/'/g, "''")}'` : `$$${value}$$`;
+	scriptFormat === FORMATS.SNOWSIGHT ? `'${value.replace(/'/g, "''")}'` : `$$${value}$$`;
 
 module.exports = {
 	escapeString,

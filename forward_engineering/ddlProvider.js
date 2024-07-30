@@ -6,7 +6,7 @@ const _ = require('lodash');
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
-const { LANGUAGES } = require('./helpers/constants');
+const { LANGUAGES, FORMATS } = require('./helpers/constants');
 const {
 	prepareAlterSetUnsetData,
 	prepareContainerName,
@@ -25,7 +25,7 @@ const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
 module.exports = (baseProvider, options, app) => {
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
 	const { tab, hasType, clean } = app.require('@hackolade/ddl-fe-utils').general;
-	const scriptFormat = options.targetScriptOptions.keyword;
+	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
 	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys } =
@@ -96,13 +96,13 @@ module.exports = (baseProvider, options, app) => {
 
 	function insertNewlinesAtEdges(input) {
 		input = input.replace(/^(\$\$|')/, match => match + '\n');
-		input = input.replace(/(\$\$|')$/, match => '\n' + match);
+		input = input.replace(/(\$\$|')$/, match => '\n\t' + match);
 
 		return input;
 	}
 
 	const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
-	const getBodyStatement = body => (body ? `\n\t${insertNewlinesAtEdges(escapeString(scriptFormat, body))}\n\t` : '');
+	const getBodyStatement = body => (body ? `\n\t${insertNewlinesAtEdges(escapeString(scriptFormat, body))}` : '');
 	const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
 	const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
 	const getIfNotExistStatement = ifNotExist => (ifNotExist ? ' IF NOT EXISTS' : '');
