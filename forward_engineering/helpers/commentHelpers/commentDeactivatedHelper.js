@@ -10,7 +10,7 @@ const commentIfDeactivated = (statement, data, isPartOfLine) => {
 		} else if (statement.includes('\n')) {
 			return statement
 				.split('\n')
-				.filter(line => line.trim())
+				.filter(Boolean)
 				.map(line => '// ' + line)
 				.join('\n')
 				.concat('\n');
