@@ -6,9 +6,9 @@ module.exports = app => {
 			return `SKIP_FILE_${properties.skipFileNum}`;
 		} else if (properties.ON_ERROR === 'SKIP_FILE_<num>%') {
 			return `SKIP_FILE_${properties.skipFileNumPct}%`;
-		} else {
-			return properties.ON_ERROR;
 		}
+
+		return properties.ON_ERROR;
 	};
 
 	const getStageCopyOptions = properties => {

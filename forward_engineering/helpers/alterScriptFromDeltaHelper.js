@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const {
 	getAddContainerScript,
 	getDeleteContainerScript,
@@ -34,7 +33,7 @@ const getAlterContainersScripts = (collection, ddlProvider, app) => {
 	return { addedContainerScripts, deletedContainerScripts, modifiedContainerScripts };
 };
 
-const getAlterCollectionsScripts = (collection, ddlProvider, app) => {
+const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat }) => {
 	const getCollectionScripts = (items, compMode, getScript) =>
 		items.filter(item => item.compMod?.[compMode]).map(getScript);
 
@@ -43,7 +42,7 @@ const getAlterCollectionsScripts = (collection, ddlProvider, app) => {
 	const addedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'added', 'values'),
 		'created',
-		getAddCollectionScript(ddlProvider, app),
+		getAddCollectionScript({ ddlProvider, app, scriptFormat }),
 	);
 	const deletedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
@@ -59,7 +58,7 @@ const getAlterCollectionsScripts = (collection, ddlProvider, app) => {
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
-		getAddColumnScript(ddlProvider, app),
+		getAddColumnScript({ ddlProvider, app, scriptFormat }),
 	);
 	const deletedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
@@ -131,9 +130,9 @@ const getAlterTagsScripts = ({ collection, ddlProvider, app }) => {
 	return { addedTagsScripts, deletedTagsScripts, modifiedTagsScripts };
 };
 
-const getAlterScript = ({ collection, ddlProvider, app }) => {
+const getAlterScript = ({ scriptFormat, collection, ddlProvider, app }) => {
 	const script = {
-		...getAlterCollectionsScripts(collection, ddlProvider, app),
+		...getAlterCollectionsScripts({ collection, ddlProvider, app, scriptFormat }),
 		...getAlterContainersScripts(collection, ddlProvider, app),
 		...getAlterViewsScripts({ schema: collection, ddlProvider, app }),
 		...getAlterTagsScripts({ collection, ddlProvider, app }),

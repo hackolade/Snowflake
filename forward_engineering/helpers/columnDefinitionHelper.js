@@ -1,7 +1,9 @@
+const templates = require('../configs/templates');
+const _ = require('lodash');
+const { escapeString } = require('../utils/escapeString');
+
 module.exports = app => {
-	const templates = require('../configs/templates');
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
-	const _ = app.require('lodash');
 
 	const decorateType = (type, columnDefinition) => {
 		type = _.toUpper(type);
@@ -60,20 +62,20 @@ module.exports = app => {
 			'DATETIME',
 		].includes(_.toUpper(type));
 
-	const escapeString = str => str.replace(/^'([\S\s]+)'$/, '$1');
+	const localEscapeString = str => str.replace(/^'([\S\s]+)'$/, '$1');
 
-	const getDefault = (type, defaultValue) => {
+	const getDefault = ({ type, defaultValue, scriptFormat }) => {
 		if (isString(type)) {
-			return `$$${escapeString(String(defaultValue))}$$`;
+			return escapeString(scriptFormat, localEscapeString(String(defaultValue)));
 		} else if (_.toUpper(type) === 'BOOLEAN') {
 			return _.toUpper(defaultValue);
-		} else {
-			return defaultValue;
 		}
+
+		return defaultValue;
 	};
 
-	const getAutoIncrement = (type, keyword, autoincrement) => {
-		if (!autoincrement) {
+	const getAutoIncrement = (type, keyword, autoIncrement) => {
+		if (!autoIncrement) {
 			return '';
 		}
 
@@ -82,10 +84,10 @@ module.exports = app => {
 		}
 		let result = ` ${keyword}`;
 		result +=
-			!_.isNaN(autoincrement.step) && (autoincrement.start || autoincrement.start === 0)
-				? ' START ' + autoincrement.start
+			!_.isNaN(autoIncrement.step) && (autoIncrement.start || autoIncrement.start === 0)
+				? ' START ' + autoIncrement.start
 				: '';
-		result += !_.isNaN(autoincrement.step) && autoincrement.step ? ' INCREMENT ' + autoincrement.step : '';
+		result += !_.isNaN(autoIncrement.step) && autoIncrement.step ? ' INCREMENT ' + autoIncrement.step : '';
 
 		return result;
 	};
@@ -133,8 +135,9 @@ module.exports = app => {
 			expression: columnDefinition.expression
 				? `(${columnDefinition.expression})`
 				: `(value:${columnDefinition.name}::${columnDefinition.type})`,
-			comment: columnDefinition.comment ? ` COMMENT $$${columnDefinition.comment}$$` : '',
+			comment: columnDefinition.comment ? ` COMMENT ${escapeString(columnDefinition.comment)}` : '',
 		});
+
 		return { statement: externalColumnStatement, isActivated: columnDefinition.isActivated };
 	};
 

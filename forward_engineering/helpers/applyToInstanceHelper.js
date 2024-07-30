@@ -1,5 +1,5 @@
 const async = require('async');
-const { filterDeactivatedQuery, queryIsDeactivated } = require('./commentDeactivatedHelper');
+const { filterDeactivatedQuery, queryIsDeactivated } = require('./commentHelpers/commentDeactivatedHelper');
 const snowflakeHelper = require('../../reverse_engineering/helpers/snowflakeHelper');
 
 const createQueries = (script = '') => {
@@ -29,8 +29,8 @@ const applyToInstance = async (connectionInfo, logger) => {
 			logger.log('error', error, `Failed to apply statement:\n${query}`);
 			throw {
 				...error,
-				message: `Failed to apply statement:\n${query.substring(0, 80)}...\nReason: ${error.message}`
-			}
+				message: `Failed to apply statement:\n${query.substring(0, 80)}...\nReason: ${error.message}`,
+			};
 		}
 	});
 };

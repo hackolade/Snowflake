@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const assignTemplates = require('../utils/assignTemplates');
-const { commentIfDeactivated } = require('./commentDeactivatedHelper');
+const { commentIfDeactivated } = require('./commentHelpers/commentDeactivatedHelper');
 
 module.exports = app => {
 	const { checkAllKeysActivated } = app.require('@hackolade/ddl-fe-utils').general;
@@ -130,12 +130,12 @@ module.exports = app => {
 				return commentIfDeactivated(deactivatedKeys.join(splitter), { isActivated: false }, true);
 			} else if (deactivatedKeys.length === 0) {
 				return processedKeys.join(splitter);
-			} else {
-				return (
-					processedKeys.join(splitter) +
-					commentIfDeactivated(splitter + deactivatedKeys.join(splitter), { isActivated: false }, true)
-				);
 			}
+
+			return (
+				processedKeys.join(splitter) +
+				commentIfDeactivated(splitter + deactivatedKeys.join(splitter), { isActivated: false }, true)
+			);
 		}
 		return keys;
 	};

@@ -7,6 +7,20 @@
 	"namePrefix": "Snowflake",
 	"resolvedDefinitions": true,
 	"combinedContainers": true,
+	"options": [
+		{
+			"name": "SnowSight",
+			"keyword": "snowSight",
+			"disableApplyScriptToInstance": false,
+			"supportsDeltaModel": true
+		},
+		{
+			"name": "Classic UI",
+			"keyword": "classicUI",
+			"disableApplyScriptToInstance": false,
+			"supportsDeltaModel": true
+		}
+	],
 	"level": {
 		"container": true,
 		"entity": true,

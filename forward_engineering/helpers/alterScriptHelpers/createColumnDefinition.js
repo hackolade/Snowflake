@@ -1,22 +1,18 @@
 const _ = require('lodash');
 
-const createColumnDefinition = data => {
-	return Object.assign(
-		{
-			name: '',
-			type: '',
-			nullable: true,
-			primaryKey: false,
-			default: '',
-			length: '',
-			scale: '',
-			precision: '',
-			hasMaxLength: false,
-			expression: '',
-		},
-		data,
-	);
-};
+const createColumnDefinition = data => ({
+	name: '',
+	type: '',
+	nullable: true,
+	primaryKey: false,
+	default: '',
+	length: '',
+	scale: '',
+	precision: '',
+	hasMaxLength: false,
+	expression: '',
+	...data,
+});
 
 const isNullable = (parentSchema, propertyName) => {
 	if (!Array.isArray(parentSchema.required)) {
@@ -33,9 +29,9 @@ const getDefault = jsonSchema => {
 		return defaultValue;
 	} else if (jsonSchema.default === null) {
 		return 'NULL';
-	} else {
-		return defaultValue;
 	}
+
+	return defaultValue;
 };
 
 const getLength = jsonSchema => {
@@ -43,17 +39,17 @@ const getLength = jsonSchema => {
 		return jsonSchema.length;
 	} else if (_.isNumber(jsonSchema.maxLength)) {
 		return jsonSchema.maxLength;
-	} else {
-		return '';
 	}
+
+	return '';
 };
 
 const getScale = jsonSchema => {
 	if (_.isNumber(jsonSchema.scale)) {
 		return jsonSchema.scale;
-	} else {
-		return '';
 	}
+
+	return '';
 };
 
 const getPrecision = jsonSchema => {
@@ -61,17 +57,17 @@ const getPrecision = jsonSchema => {
 		return jsonSchema.precision;
 	} else if (_.isNumber(jsonSchema.fractSecPrecision)) {
 		return jsonSchema.fractSecPrecision;
-	} else {
-		return '';
 	}
+
+	return '';
 };
 
 const hasMaxLength = jsonSchema => {
 	if (jsonSchema.hasMaxLength) {
 		return jsonSchema.hasMaxLength;
-	} else {
-		return '';
 	}
+
+	return '';
 };
 
 const getType = jsonSchema => {
@@ -82,7 +78,7 @@ const getType = jsonSchema => {
 	return jsonSchema.mode || jsonSchema.childType || jsonSchema.type;
 };
 
-const createColumnDefinitionBySchema = ({ name, jsonSchema, parentJsonSchema, ddlProvider }) => {
+const createColumnDefinitionBySchema = ({ name, jsonSchema, parentJsonSchema, ddlProvider, scriptFormat }) => {
 	const columnDefinition = createColumnDefinition({
 		name: name,
 		type: getType(jsonSchema),

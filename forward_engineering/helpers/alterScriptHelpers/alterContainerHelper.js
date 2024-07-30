@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const { prepareContainerLevelData } = require('./common');
 
 const getAddContainerScript = (ddlProvider, app) => container => {
@@ -6,12 +5,13 @@ const getAddContainerScript = (ddlProvider, app) => container => {
 	const containerData = { ...container.role, name: getDbName(container.role) };
 	const containerLevelData = prepareContainerLevelData(containerData);
 	const hydratedContainer = ddlProvider.hydrateSchema(containerData, containerLevelData);
-	const script = ddlProvider.createSchema(hydratedContainer);
-	return script;
+
+	return ddlProvider.createSchema(hydratedContainer);
 };
 
 const getDeleteContainerScript = ddlProvider => container => {
 	const { name } = ddlProvider.hydrateForDeleteSchema({ ...container, ...container.role });
+
 	return ddlProvider.dropSchema({ name });
 };
 

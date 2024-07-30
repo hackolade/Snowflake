@@ -6,7 +6,7 @@ const _ = require('lodash');
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
-const { LANGUAGES } = require('./helpers/constants');
+const { LANGUAGES, FORMATS } = require('./helpers/constants');
 const {
 	prepareAlterSetUnsetData,
 	prepareContainerName,
@@ -17,6 +17,7 @@ const {
 	prepareCollectionFormatTypeOptions,
 	prepareCollectionStageCopyOptions,
 } = require('./helpers/alterScriptHelpers/common');
+const { escapeString } = require('./utils/escapeString');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
@@ -24,6 +25,7 @@ const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
 module.exports = (baseProvider, options, app) => {
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
 	const { tab, hasType, clean } = app.require('@hackolade/ddl-fe-utils').general;
+	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
 	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys } =
@@ -48,7 +50,7 @@ module.exports = (baseProvider, options, app) => {
 		require('./helpers/columnDefinitionHelper')(app);
 
 	const { generateConstraint } = require('./helpers/constraintHelper')(app);
-	const { commentIfDeactivated } = require('./helpers/commentDeactivatedHelper');
+	const { commentIfDeactivated } = require('./helpers/commentHelpers/commentDeactivatedHelper');
 
 	const {
 		getAlterSchemaName,
@@ -92,8 +94,15 @@ module.exports = (baseProvider, options, app) => {
 		return !_.isEmpty(constraints) ? ',\n\t\t' + constraints.join(',\n\t\t') : '';
 	};
 
+	function insertNewlinesAtEdges(input) {
+		input = input.replace(/^(\$\$|')/, match => match + '\n');
+		input = input.replace(/(\$\$|')$/, match => '\n\t' + match);
+
+		return input;
+	}
+
 	const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
-	const getBodyStatement = body => (body ? `\n\t$$\n${body}\n\t$$` : '');
+	const getBodyStatement = body => (body ? `\n\t${insertNewlinesAtEdges(escapeString(scriptFormat, body))}` : '');
 	const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
 	const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
 	const getIfNotExistStatement = ifNotExist => (ifNotExist ? ' IF NOT EXISTS' : '');
@@ -119,7 +128,7 @@ module.exports = (baseProvider, options, app) => {
 			const dataRetentionStatement =
 				!isNaN(dataRetention) && dataRetention ? `\n\tDATA_RETENTION_TIME_IN_DAYS=${dataRetention}` : '';
 			const managedAccessStatement = managedAccess ? '\n\tWITH MANAGED ACCESS' : '';
-			const commentStatement = comment ? `\n\tCOMMENT=$$${comment}$$` : '';
+			const commentStatement = comment ? `\n\tCOMMENT=${escapeString(scriptFormat, comment)}` : '';
 			const currentSchemaName = getName(isCaseSensitive, schemaName);
 			const currentDatabaseName = getName(isCaseSensitive, databaseName);
 			const fullName = getFullName(currentDatabaseName, currentSchemaName);
@@ -290,7 +299,7 @@ module.exports = (baseProvider, options, app) => {
 						: mergeKeys(tableData.partitioningKey)) +
 					')'
 				: '';
-			const comment = tableData.comment ? ` COMMENT=$$${tableData.comment}$$` : '';
+			const comment = tableData.comment ? ` COMMENT=${escapeString(scriptFormat, tableData.comment)}` : '';
 			const copyGrants = tableData.copyGrants ? ` COPY GRANTS` : '';
 			const dataRetentionTime = tableData.dataRetentionTime
 				? ` DATA_RETENTION_TIME_IN_DAYS=${tableData.dataRetentionTime}`
@@ -402,13 +411,20 @@ module.exports = (baseProvider, options, app) => {
 				type: decorateType(columnDefinition.type, columnDefinition),
 				collation: getCollation(columnDefinition.type, columnDefinition.collation),
 				default: !_.isUndefined(columnDefinition.default)
-					? ' DEFAULT ' + getDefault(columnDefinition.type, columnDefinition.default)
+					? ' DEFAULT ' +
+						getDefault({
+							scriptFormat,
+							type: columnDefinition.type,
+							defaultValue: columnDefinition.default,
+						})
 					: '',
 				autoincrement: getAutoIncrement(columnDefinition.type, 'AUTOINCREMENT', columnDefinition.autoincrement),
 				identity: getAutoIncrement(columnDefinition.type, 'IDENTITY', columnDefinition.identity),
 				not_nul: !columnDefinition.nullable ? ' NOT NULL' : '',
 				inline_constraint: getInlineConstraint(columnDefinition),
-				comment: columnDefinition.comment ? ` COMMENT $$${columnDefinition.comment}$$` : '',
+				comment: columnDefinition.comment
+					? ` COMMENT ${escapeString(scriptFormat, columnDefinition.comment)}`
+					: '',
 				tag: getTagStatement({
 					tags: columnDefinition.columnTags,
 					isCaseSensitive: columnDefinition.isCaseSensitive,
@@ -520,7 +536,7 @@ module.exports = (baseProvider, options, app) => {
 				name: getFullName(schemaName, viewData.name),
 				column_list: viewColumnsToString(columnList, isActivated),
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
-				comment: viewData.comment ? 'COMMENT=$$' + viewData.comment + '$$\n' : '',
+				comment: viewData.comment ? 'COMMENT=' + escapeString(scriptFormat, viewData.comment) + '\n' : '',
 				select_statement: selectStatement,
 				tag: tagStatement ? tagStatement + '\n' : '',
 			});
@@ -645,7 +661,7 @@ module.exports = (baseProvider, options, app) => {
 									start: sequence.sequenceStart || DEFAULT_SNOWFLAKE_SEQUENCE_START,
 									increment: sequence.sequenceIncrement || DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT,
 									comment: sequence.sequenceComments
-										? ` COMMENT=$$${sequence.sequenceComments}$$`
+										? ` COMMENT=${escapeString(scriptFormat, sequence.sequenceComments)}`
 										: '',
 								}),
 							)
@@ -661,7 +677,7 @@ module.exports = (baseProvider, options, app) => {
 										getFormatTypeOptions(fileFormat.fileFormat, fileFormat.formatTypeOptions),
 									),
 									comment: fileFormat.fileFormatComments
-										? ` COMMENT=$$${fileFormat.fileFormatComments}$$`
+										? ` COMMENT=${escapeString(scriptFormat, fileFormat.fileFormatComments)}`
 										: '',
 								}),
 							)
