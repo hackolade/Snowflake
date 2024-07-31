@@ -470,12 +470,12 @@ module.exports = (baseProvider, options, app) => {
 			const foreignKeyStatement = assignTemplates(templates.alterTableForeignKey, {
 				constraint: fkData.name ? `CONSTRAINT ${getName(schemaData.isCaseSensitive, fkData.name)} ` : '',
 				table_name: getFullName(
-					schemaData.schemaName,
+					fkData.foreignSchemaName,
 					getName(fkData.foreignTableIsCaseSensitive, fkData.foreignTable),
 				),
 				columns: foreignKeys,
 				primary_table: getFullName(
-					schemaData.schemaName,
+					fkData.primarySchemaName,
 					getName(fkData.primaryTableIsCaseSensitive, fkData.primaryTable),
 				),
 				primary_columns: primaryKeys,
