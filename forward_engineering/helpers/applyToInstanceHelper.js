@@ -1,9 +1,8 @@
 const async = require('async');
-const { filterDeactivatedQuery, queryIsDeactivated } = require('./commentHelpers/commentDeactivatedHelper');
+const { queryIsDeactivated } = require('./commentHelpers/commentDeactivatedHelper');
 const snowflakeHelper = require('../../reverse_engineering/helpers/snowflakeHelper');
 
 const createQueries = (script = '') => {
-	script = filterDeactivatedQuery(script);
 	return script
 		.split(';')
 		.filter(Boolean)
