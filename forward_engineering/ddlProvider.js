@@ -18,6 +18,7 @@ const {
 	prepareCollectionStageCopyOptions,
 } = require('./helpers/alterScriptHelpers/common');
 const { escapeString } = require('./utils/escapeString');
+const { getClusteringKey } = require('./utils/getClusteringKey');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
@@ -530,15 +531,23 @@ module.exports = (baseProvider, options, app) => {
 				indent: '',
 			});
 
+			const clustering = viewData.materialized
+				? getClusteringKey({
+						clusteringKey: viewData.clusteringKey,
+						isParentActivated: isActivated,
+					})
+				: undefined;
+
 			return assignTemplates(templates.createView, {
 				secure: viewData.secure ? ' SECURE' : '',
 				materialized: viewData.materialized ? ' MATERIALIZED' : '',
 				name: getFullName(schemaName, viewData.name),
 				column_list: viewColumnsToString(columnList, isActivated),
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
-				comment: viewData.comment ? 'COMMENT=' + escapeString(scriptFormat, viewData.comment) + '\n' : '',
+				comment: viewData.comment ? 'COMMENT=' + escapeString(scriptFormat, viewData.comment) : '',
 				select_statement: selectStatement,
 				tag: tagStatement ? tagStatement + '\n' : '',
+				clustering,
 			});
 		},
 
@@ -877,6 +886,7 @@ module.exports = (baseProvider, options, app) => {
 				secure: firstTab.secure,
 				materialized: firstTab.materialized,
 				fullName,
+				clusteringKey: firstTab.clusteringKey,
 				viewTags: firstTab.viewTags ?? [],
 			};
 		},
