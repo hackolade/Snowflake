@@ -530,15 +530,23 @@ module.exports = (baseProvider, options, app) => {
 				indent: '',
 			});
 
+			const clustering = viewData.materialized
+				? keyHelper.getClusteringKey({
+						clusteringKey: viewData.clusteringKey,
+						isParentActivated: isActivated,
+					})
+				: undefined;
+
 			return assignTemplates(templates.createView, {
 				secure: viewData.secure ? ' SECURE' : '',
 				materialized: viewData.materialized ? ' MATERIALIZED' : '',
 				name: getFullName(schemaName, viewData.name),
 				column_list: viewColumnsToString(columnList, isActivated),
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
-				comment: viewData.comment ? 'COMMENT=' + escapeString(scriptFormat, viewData.comment) + '\n' : '',
+				comment: viewData.comment ? `COMMENT=${escapeString(scriptFormat, viewData.comment)}\n` : '',
 				select_statement: selectStatement,
 				tag: tagStatement ? tagStatement + '\n' : '',
+				clustering,
 			});
 		},
 
@@ -877,6 +885,7 @@ module.exports = (baseProvider, options, app) => {
 				secure: firstTab.secure,
 				materialized: firstTab.materialized,
 				fullName,
+				clusteringKey: firstTab.clusteringKey,
 				viewTags: firstTab.viewTags ?? [],
 			};
 		},
