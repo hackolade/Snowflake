@@ -1,5 +1,10 @@
-const mapName = key => `"${key.name}"`;
+const mapName = ({ name }) => `"${name}"`;
 
+/**
+ * @typedef {{ isActivated: boolean, name: string }} ClusteringKey
+ * @param {{ clusteringKey: ClusteringKey[], isParentActivated: boolean }} clusteringKeyArgs
+ * @returns {string}
+ */
 const getClusteringKey = ({ clusteringKey, isParentActivated }) => {
 	if (!Array.isArray(clusteringKey) || clusteringKey.length === 0) {
 		return '';
@@ -15,18 +20,18 @@ const getClusteringKey = ({ clusteringKey, isParentActivated }) => {
 		.join(', ');
 
 	if (!isParentActivated) {
-		return `\nCLUSTER BY (${clusteringKey.map(mapName).join(', ')})`;
+		return `CLUSTER BY (${clusteringKey.map(mapName).join(', ')})\n`;
 	}
 
 	if (activated.length === 0) {
-		return `\n// CLUSTER BY (${deActivated})`;
+		return `// CLUSTER BY (${deActivated})\n`;
 	}
 
 	if (deActivated.length === 0) {
-		return `\nCLUSTER BY (${activated})`;
+		return `CLUSTER BY (${activated})\n`;
 	}
 
-	return `\nCLUSTER BY (${activated}) //${deActivated}`;
+	return `CLUSTER BY (${activated}) //${deActivated}\n`;
 };
 
 module.exports = {

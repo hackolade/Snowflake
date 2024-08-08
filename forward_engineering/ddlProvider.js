@@ -544,7 +544,7 @@ module.exports = (baseProvider, options, app) => {
 				name: getFullName(schemaName, viewData.name),
 				column_list: viewColumnsToString(columnList, isActivated),
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
-				comment: viewData.comment ? 'COMMENT=' + escapeString(scriptFormat, viewData.comment) : '',
+				comment: viewData.comment ? `COMMENT=${escapeString(scriptFormat, viewData.comment)}\n` : '',
 				select_statement: selectStatement,
 				tag: tagStatement ? tagStatement + '\n' : '',
 				clustering,
