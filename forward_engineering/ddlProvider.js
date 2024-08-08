@@ -18,7 +18,6 @@ const {
 	prepareCollectionStageCopyOptions,
 } = require('./helpers/alterScriptHelpers/common');
 const { escapeString } = require('./utils/escapeString');
-const { getClusteringKey } = require('./utils/getClusteringKey');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
@@ -532,7 +531,7 @@ module.exports = (baseProvider, options, app) => {
 			});
 
 			const clustering = viewData.materialized
-				? getClusteringKey({
+				? keyHelper.getClusteringKey({
 						clusteringKey: viewData.clusteringKey,
 						isParentActivated: isActivated,
 					})

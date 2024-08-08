@@ -2,6 +2,7 @@ const _ = require('lodash');
 
 module.exports = app => {
 	const { clean } = app.require('@hackolade/ddl-fe-utils').general;
+	const { addQuotes } = require('./general')(app);
 
 	const mapProperties = (jsonSchema, iteratee) => {
 		return Object.entries(jsonSchema.properties).map(iteratee);
@@ -131,7 +132,44 @@ module.exports = app => {
 		];
 	};
 
+	/**
+	 * @typedef {{ isActivated: boolean, name: string }} ClusteringKey
+	 * @param {{ clusteringKey: ClusteringKey[], isParentActivated: boolean }} clusteringKeyArgs
+	 * @returns {string}
+	 */
+	const getClusteringKey = ({ clusteringKey, isParentActivated }) => {
+		if (!Array.isArray(clusteringKey) || clusteringKey.length === 0) {
+			return '';
+		}
+
+		const mapName = ({ name }) => addQuotes(name);
+
+		const activated = clusteringKey
+			.filter(key => key.isActivated)
+			.map(mapName)
+			.join(', ');
+		const deactivated = clusteringKey
+			.filter(key => !key.isActivated)
+			.map(mapName)
+			.join(', ');
+
+		if (!isParentActivated) {
+			return `CLUSTER BY (${clusteringKey.map(mapName).join(', ')})\n`;
+		}
+
+		if (activated.length === 0) {
+			return `// CLUSTER BY (${deactivated})\n`;
+		}
+
+		if (deactivated.length === 0) {
+			return `CLUSTER BY (${activated})\n`;
+		}
+
+		return `CLUSTER BY (${activated}) //${deactivated}\n`;
+	};
+
 	return {
 		getTableKeyConstraints,
+		getClusteringKey,
 	};
 };

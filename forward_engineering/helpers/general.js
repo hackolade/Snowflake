@@ -258,6 +258,7 @@ module.exports = app => {
 		getEntityName,
 		getFullName,
 		getDbName,
+		addQuotes,
 		getGroupItemsByCompMode,
 	};
 };
