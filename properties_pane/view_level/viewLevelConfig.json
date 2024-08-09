@@ -57,6 +57,23 @@
 				"propertyType": "checkbox"
 			},
 			{
+				"propertyName": "Cluster by",
+				"propertyKeyword": "clusteringKey",
+				"dependency": {
+					"key": "materialized",
+					"value": true
+				},
+				"propertyType": "fieldList",
+				"disabledItemStrategy": "default",
+				"abbr": "CK",
+				"setPrimaryKey": false,
+				"template": "orderedList",
+				"isCompositeKey": true,
+				"templateOptions": {
+					"maxFields": 4
+				}
+			},
+			{
 				"propertyName": "Secure",
 				"propertyKeyword": "secure",
 				"shouldValidate": false,
