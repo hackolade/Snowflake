@@ -96,13 +96,77 @@
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"isEmpty": true
+								},
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"exist": true
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
 							"regex": "^.{0,256}$"
