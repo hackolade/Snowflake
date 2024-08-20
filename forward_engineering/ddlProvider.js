@@ -28,7 +28,7 @@ module.exports = (baseProvider, options, app) => {
 	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
-	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys } =
+	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys, getDynamicTableProps } =
 		require('./helpers/tableHelper')(app);
 	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(app);
 	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(app);
@@ -78,18 +78,15 @@ module.exports = (baseProvider, options, app) => {
 		});
 
 	const getOutOfLineConstraints = (
-		foreignKeyConstraints,
-		primaryKeyConstraints,
-		uniqueKeyConstraints,
+		foreignKeyConstraints = [],
+		primaryKeyConstraints = [],
+		uniqueKeyConstraints = [],
 		isParentActivated,
 	) => {
-		const constraints = []
-			.concat(foreignKeyConstraints || [])
-			.concat(primaryKeyConstraints)
-			.concat(uniqueKeyConstraints)
-			.map(constraint =>
+		const constraints = [...foreignKeyConstraints, ...primaryKeyConstraints, ...uniqueKeyConstraints].map(
+			constraint =>
 				isParentActivated ? commentIfDeactivated(constraint.statement, constraint) : constraint.statement,
-			);
+		);
 
 		return !_.isEmpty(constraints) ? ',\n\t\t' + constraints.join(',\n\t\t') : '';
 	};
@@ -328,7 +325,27 @@ module.exports = (baseProvider, options, app) => {
 				isCaseSensitive: tableData.isCaseSensitive,
 			});
 
-			if (tableData.selectStatement) {
+			if (!!tableData.dynamic) {
+				const dynamicTableOptions = getDynamicTableProps({
+					tableData,
+					tagsStatement,
+					clusterKeys,
+					comment,
+					dataRetentionTime,
+					copyGrants,
+					columnDefinitions,
+				});
+
+				const template = tableData.dynamicTableProps.iceberg
+					? templates.createDynamicIcebergTable
+					: templates.createDynamicTable;
+
+				return assignTemplates(template, {
+					name: tableData.fullName,
+					transient,
+					...dynamicTableOptions,
+				});
+			} else if (tableData.selectStatement) {
 				return assignTemplates(templates.createAsSelect, {
 					name: tableData.fullName,
 					selectStatement: tableData.selectStatement,
@@ -384,25 +401,24 @@ module.exports = (baseProvider, options, app) => {
 						isActivated,
 					),
 				});
-			} else {
-				return assignTemplates(templates.createTable, {
-					name: tableData.fullName,
-					temporary: temporary,
-					transient: transient,
-					tableOptions: addOptions(
-						[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants, tagsStatement],
-						comment,
-					),
-
-					column_definitions: columnDefinitions,
-					out_of_line_constraints: getOutOfLineConstraints(
-						tableData.foreignKeyConstraints,
-						tableData.compositePrimaryKeys,
-						tableData.compositeUniqueKeys,
-						isActivated,
-					),
-				});
 			}
+
+			return assignTemplates(templates.createTable, {
+				name: tableData.fullName,
+				temporary,
+				transient,
+				tableOptions: addOptions(
+					[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants, tagsStatement],
+					comment,
+				),
+				column_definitions: columnDefinitions,
+				out_of_line_constraints: getOutOfLineConstraints(
+					tableData.foreignKeyConstraints,
+					tableData.compositePrimaryKeys,
+					tableData.compositeUniqueKeys,
+					isActivated,
+				),
+			});
 		},
 
 		convertColumnDefinition(columnDefinition) {
@@ -803,6 +819,21 @@ module.exports = (baseProvider, options, app) => {
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
 				external: firstTab.external,
+				dynamic: firstTab.dynamic,
+				dynamicTableProps: {
+					iceberg: firstTab.iceberg,
+					warehouse: firstTab.warehouse,
+					targetLag: firstTab.targetLag,
+					refreshMode: firstTab.refreshMode,
+					initialize: firstTab.initialize,
+					query: firstTab.query,
+					externalVolume: firstTab.externalVolume,
+					catalog: firstTab.catalog,
+					baseLocation: firstTab.baseLocation,
+					maxDataExtensionTime: !isNaN(firstTab.MAX_DATA_EXTENSION_TIME_IN_DAYS)
+						? firstTab.MAX_DATA_EXTENSION_TIME_IN_DAYS
+						: '',
+				},
 				selectStatement: firstTab.selectStatement,
 				isCaseSensitive: firstTab.isCaseSensitive,
 				clusteringKey: Array.isArray(firstTab.clusteringKey)

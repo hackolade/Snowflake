@@ -155,6 +155,83 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
+				"propertyName": "As Dynamic",
+				"propertyKeyword": "dynamic",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Iceberg",
+				"propertyKeyword": "iceberg",
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "dynamic",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "External volume",
+				"propertyKeyword": "externalVolume",
+				"propertyType": "text",
+				"dependency": {
+					"key": "iceberg",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Catalog",
+				"propertyKeyword": "catalog",
+				"propertyType": "text",
+				"dependency": {
+					"key": "iceberg",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Base location",
+				"propertyKeyword": "baseLocation",
+				"propertyType": "text",
+				"dependency": {
+					"key": "iceberg",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Target Lag",
+				"propertyKeyword": "targetLag",
+				"propertyType": "group",
+				"structure": [
+					{
+						"propertyName": "Type",
+						"propertyKeyword": "targetLagType",
+						"propertyType": "select",
+						"options": ["seconds", "minutes", "hours", "days"]
+					},
+					{
+						"propertyName": "Amount",
+						"propertyKeyword": "targetLagAmount",
+						"propertyType": "numeric"
+					},
+					{
+						"propertyName": "Downstream",
+						"propertyKeyword": "targetLagDownstream",
+						"propertyType": "checkbox"
+					}
+				],
+				"dependency": {
+					"key": "dynamic",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Warehouse",
+				"propertyKeyword": "warehouse",
+				"propertyType": "text",
+				"dependency": {
+					"key": "dynamic",
+					"value": true
+				}
+			},
+			{
 				"propertyName": "Temporary",
 				"propertyKeyword": "temporary",
 				"propertyType": "checkbox"
@@ -163,6 +240,26 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Transient",
 				"propertyKeyword": "transient",
 				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Refresh Mode",
+				"propertyKeyword": "refreshMode",
+				"propertyType": "select",
+				"options": ["", "auto", "full", "incremental"],
+				"dependency": {
+					"key": "dynamic",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Initialize",
+				"propertyKeyword": "initialize",
+				"propertyType": "select",
+				"options": ["", "on_create", "on_schedule"],
+				"dependency": {
+					"key": "dynamic",
+					"value": true
+				}
 			},
 			{
 				"propertyName": "External",
@@ -782,6 +879,20 @@ making sure that you maintain a proper JSON format.
 						"key": "external",
 						"value": true
 					}
+				}
+			},
+			{
+				"propertyName": "Max data extension in days",
+				"propertyKeyword": "MAX_DATA_EXTENSION_TIME_IN_DAYS",
+				"propertyTooltip": "Number of days for which Snowflake retains historical data for performing Time Travel actions (SELECT, CLONE, UNDROP) on the object. A value of 0 effectively disables Time Travel for the specified database, schema, or table",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"minValue": 0,
+				"maxValue": 90,
+				"dependency": {
+					"key": "dynamic",
+					"value": true
 				}
 			},
 			{

@@ -47,11 +47,69 @@ module.exports = app => {
 
 	const mergeKeys = keys => keys.map(key => `"${key.name}"`).join(', ');
 
+	function getTargetLag({ targetLagType, targetLagAmount, targetLagDownstream }) {
+		return `TARGET_LAG = ${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagType}'`}\n`;
+	}
+
+	const getDynamicTableProps = ({
+		tableData,
+		transient,
+		tagsStatement,
+		clusterKeys,
+		comment,
+		dataRetentionTime,
+		copyGrants,
+		columnDefinitions,
+	}) => {
+		if (!tableData.dynamicTableProps) {
+			return {};
+		}
+
+		const { selectStatement } = tableData;
+		const {
+			iceberg,
+			targetLag,
+			warehouse,
+			refreshMode,
+			initialize,
+			maxDataExtensionTime,
+			externalVolume,
+			catalog,
+			baseLocation,
+		} = tableData.dynamicTableProps;
+
+		return {
+			targetLag: targetLag?.[0] ? getTargetLag(targetLag[0]) : '',
+			warehouse: warehouse ? `WAREHOUSE = ${warehouse}\n` : '',
+			selectStatement: selectStatement
+				? `AS\n${selectStatement
+						.split('\n')
+						.map((it, i, arr) => (i === arr.length - 1 ? `\t${it}` : `\t${it}\n`))
+						.join('')}`
+				: '',
+			externalVolume: externalVolume ? `EXTERNAL_VOLUME = ${externalVolume}\n` : '',
+			catalog: catalog ? `CATALOG = ${catalog}\n` : '',
+			baseLocation: baseLocation ? `BASE_LOCATION = ${baseLocation}\n` : '',
+			column_definitions: columnDefinitions ? `\t(\n\t\t${columnDefinitions}\n\t)\n` : '',
+			refreshMode: refreshMode ? `REFRESH_MODE = ${refreshMode}\n` : '',
+			initialize: initialize ? `INITIALIZE = ${initialize}\n` : '',
+			clusterKeys,
+			dataRetentionTime: dataRetentionTime ? `${dataRetentionTime.trim()}\n` : '',
+			maxDataExtensionTime: maxDataExtensionTime
+				? `MAX_DATA_EXTENSION_TIME_IN_DAYS = ${maxDataExtensionTime}\n`
+				: '',
+			copyGrants: copyGrants ? `${copyGrants.trim()}\n` : '',
+			comment: comment ? `${comment.trim()}\n` : '',
+			tagsStatement: tagsStatement ? `${tagsStatement.trim()}\n` : '',
+		};
+	};
+
 	return {
 		getFileFormat,
 		getCopyOptions,
 		addOptions,
 		getAtOrBefore,
 		mergeKeys,
+		getDynamicTableProps,
 	};
 };
