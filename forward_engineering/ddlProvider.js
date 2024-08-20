@@ -939,7 +939,10 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		alterTable(data) {
-			const alterTableScript = getAlterEntityScript(templates.alterTableScript, data.nameData);
+			const alterTableScript = getAlterEntityScript(templates.alterTableScript, {
+				dynamic: data.dynamic,
+				...data.nameData,
+			});
 			const { script } = _.flow(
 				getAlterEntityRename(templates.alterTableScript, templates.alterEntityRename),
 				getSetCollectionProperty(alterTableScript),
@@ -969,6 +972,7 @@ module.exports = (baseProvider, options, app) => {
 
 			return {
 				...data,
+				dynamic: collection.role.dynamic,
 				formatTypeOptions: {
 					...data.formatTypeOptions,
 					typeOptions: formatTypeOptions,

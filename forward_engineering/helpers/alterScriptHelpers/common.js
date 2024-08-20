@@ -1,7 +1,13 @@
 const _ = require('lodash');
 const { getDiffCopyOptionsByDefault } = require('./tableCopyOptionsHelper');
 
-const POSSIBLE_CHANGE_CONTAINER_DATA = ['DATA_RETENTION_TIME_IN_DAYS', 'description'];
+const POSSIBLE_CHANGE_CONTAINER_DATA = [
+	'TARGET_LAG',
+	'WAREHOUSE',
+	'DATA_RETENTION_TIME_IN_DAYS',
+	'MAX_DATA_EXTENSION_TIME_IN_DAYS',
+	'description',
+];
 const REDUNDANT_OPTIONS = ['id'];
 
 const checkFieldPropertiesChanged = (compMod, propertiesToCheck) => {

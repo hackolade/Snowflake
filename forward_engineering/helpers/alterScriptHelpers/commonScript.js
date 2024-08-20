@@ -15,12 +15,12 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		return assignTemplates(templates.alterSchemaScript, { name: schemaFullName });
 	};
 
-	const getAlterEntityScript = (template, { database, isCaseSensitive, newName, schemaName } = {}) => {
+	const getAlterEntityScript = (template, { dynamic, database, isCaseSensitive, newName, schemaName } = {}) => {
 		const schemaFullName = getSchemaFullName(database, schemaName, isCaseSensitive);
 		const tableName = getName(isCaseSensitive, newName);
 		const tableFullName = getFullName(schemaFullName, tableName);
 
-		return assignTemplates(template, { name: tableFullName });
+		return assignTemplates(template, { dynamic: dynamic ? ' DYNAMIC' : '', name: tableFullName });
 	};
 
 	const getAlterSchemaName = ({ script, data }) => {

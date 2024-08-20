@@ -67,11 +67,11 @@ module.exports = {
 		'CREATE${temporary} STAGE IF NOT EXISTS ${name} ${url}${storageIntegration}${credentials}${encryption};\n',
 
 	alterSchema: 'ALTER SCHEMA IF EXISTS ${name} ${operation} ${options};',
-	alterTable: 'ALTER TABLE IF EXISTS ${name} ${action};',
+	alterTable: 'ALTER${dynamic} TABLE IF EXISTS ${name} ${action};',
 	alterView: 'ALTER${materialized} VIEW IF EXISTS ${name} ${action};',
 
 	alterSchemaScript: 'ALTER SCHEMA IF EXISTS ${name} ',
-	alterTableScript: 'ALTER TABLE IF EXISTS ${name} ',
+	alterTableScript: 'ALTER${dynamic} TABLE IF EXISTS ${name} ',
 	alterEntityRename: 'RENAME TO ${name};\n',
 	setPropertySchema: 'SET ${property};\n',
 	unsetPropertySchema: 'UNSET ${property};\n',
