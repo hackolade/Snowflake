@@ -41,6 +41,28 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		return { script, data };
 	};
 
+	const mapKey = {
+		description: 'COMMENT',
+		targetLag: 'TARGET_LAG',
+		warehouse: 'WAREHOUSE',
+		DATA_RETENTION_TIME_IN_DAYS: 'DATA_RETENTION_TIME_IN_DAYS',
+		MAX_DATA_EXTENSION_TIME_IN_DAYS: 'MAX_DATA_EXTENSION_TIME_IN_DAYS',
+	};
+
+	const getValue = ({ key, propValue, data }, operation) => {
+		if (key === 'description') {
+			const scriptFormat = _.get(data, 'options.targetScriptOptions.keyword');
+
+			return escapeString(scriptFormat, propValue);
+		} else if (key === 'targetLag') {
+			const { targetLagAmount, targetLagType, targetLagDownstream } = data[operation].targetLag?.[0];
+
+			return `${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagType}'`}\n`;
+		}
+
+		return propValue;
+	};
+
 	const getSetCollectionProperty =
 		alterScript =>
 		({ script, data }) => {
@@ -51,11 +73,8 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 
 			const setPropertyData = Object.keys(setProperty).map((key, index) => {
 				const propValue = setProperty[key];
-				const scriptFormat = _.get(data, 'options.targetScriptOptions.keyword');
-
-				const value = key === 'description' ? escapeString(scriptFormat, propValue) : propValue;
-				key = key === 'description' ? 'COMMENT' : key;
-				const statement = `${key} = ${value}`;
+				const value = getValue({ key, data, propValue }, 'setProperty');
+				const statement = `${mapKey[key]} = ${value}`;
 
 				return Boolean(index) ? tab(statement) : statement;
 			});
@@ -79,7 +98,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 			}
 
 			const unsetPropertyData = unsetProperty.map((key, index) => {
-				key = key === 'description' ? 'COMMENT' : key;
+				key = mapKey[key];
 				return Boolean(index) ? `${key}` : `${key}`;
 			});
 
