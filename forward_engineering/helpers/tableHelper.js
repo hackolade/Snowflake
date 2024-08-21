@@ -85,7 +85,7 @@ module.exports = app => {
 		} = tableData.dynamicTableProps;
 
 		return {
-			targetLag: targetLag?.[0] ? getTargetLag(targetLag[0]) : '',
+			targetLag: targetLag ? getTargetLag(targetLag) : '',
 			warehouse: warehouse ? `WAREHOUSE = ${warehouse}\n` : '',
 			selectStatement: selectStatement ? getSelectStatement(selectStatement) : '',
 			externalVolume: externalVolume ? `EXTERNAL_VOLUME = ${externalVolume}\n` : '',
