@@ -41,7 +41,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		return { script, data };
 	};
 
-	const mapKey = {
+	const mapKeyToKeyword = {
 		description: 'COMMENT',
 		targetLag: 'TARGET_LAG',
 		warehouse: 'WAREHOUSE',
@@ -57,7 +57,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		} else if (key === 'targetLag') {
 			const { targetLagAmount, targetLagType, targetLagDownstream } = data[operation].targetLag?.[0];
 
-			return `${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagType}'`}\n`;
+			return `${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagType}'`}`;
 		}
 
 		return propValue;
@@ -74,7 +74,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 			const setPropertyData = Object.keys(setProperty).map((key, index) => {
 				const propValue = setProperty[key];
 				const value = getValue({ key, data, propValue }, 'setProperty');
-				const statement = `${mapKey[key]} = ${value}`;
+				const statement = `${mapKeyToKeyword[key]} = ${value}`;
 
 				return Boolean(index) ? tab(statement) : statement;
 			});
@@ -98,7 +98,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 			}
 
 			const unsetPropertyData = unsetProperty.map((key, index) => {
-				key = mapKey[key];
+				key = mapKeyToKeyword[key];
 				return Boolean(index) ? `${key}` : `${key}`;
 			});
 

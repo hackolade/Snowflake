@@ -939,6 +939,10 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		alterTable(data) {
+			if (data.iceberg) {
+				return '// Dynamic Iceberg tables are currently only supported for CREATE statements. Specifying DYNAMIC ICEBERG in any other command (for example, ALTER DYNAMIC ICEBERG TABLE <name>) results in an error.';
+			}
+
 			const alterTableScript = getAlterEntityScript(templates.alterTableScript, {
 				dynamic: data.dynamic,
 				...data.nameData,
@@ -973,6 +977,7 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				...data,
 				dynamic: collection.role.dynamic,
+				iceberg: collection.compMod?.iceberg?.old || collection.compMod?.iceberg?.new,
 				formatTypeOptions: {
 					...data.formatTypeOptions,
 					typeOptions: formatTypeOptions,
