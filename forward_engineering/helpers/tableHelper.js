@@ -51,6 +51,13 @@ module.exports = app => {
 		return `TARGET_LAG = ${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagType}'`}\n`;
 	}
 
+	function getSelectStatement(selectStatement) {
+		const mapStatement = (statement, index, statements) =>
+			index === statements.length - 1 ? `\t${statement}` : `\t${statement}\n`;
+
+		return `AS\n${selectStatement.split('\n').map(mapStatement).join('')}`;
+	}
+
 	const getDynamicTableProps = ({
 		tableData,
 		transient,
@@ -67,7 +74,6 @@ module.exports = app => {
 
 		const { selectStatement } = tableData;
 		const {
-			iceberg,
 			targetLag,
 			warehouse,
 			refreshMode,
@@ -81,12 +87,7 @@ module.exports = app => {
 		return {
 			targetLag: targetLag?.[0] ? getTargetLag(targetLag[0]) : '',
 			warehouse: warehouse ? `WAREHOUSE = ${warehouse}\n` : '',
-			selectStatement: selectStatement
-				? `AS\n${selectStatement
-						.split('\n')
-						.map((it, i, arr) => (i === arr.length - 1 ? `\t${it}` : `\t${it}\n`))
-						.join('')}`
-				: '',
+			selectStatement: selectStatement ? getSelectStatement(selectStatement) : '',
 			externalVolume: externalVolume ? `EXTERNAL_VOLUME = ${externalVolume}\n` : '',
 			catalog: catalog ? `CATALOG = ${catalog}\n` : '',
 			baseLocation: baseLocation ? `BASE_LOCATION = ${baseLocation}\n` : '',

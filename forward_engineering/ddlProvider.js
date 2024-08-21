@@ -78,10 +78,10 @@ module.exports = (baseProvider, options, app) => {
 		});
 
 	const getOutOfLineConstraints = (
+		isParentActivated,
 		foreignKeyConstraints = [],
 		primaryKeyConstraints = [],
 		uniqueKeyConstraints = [],
-		isParentActivated,
 	) => {
 		const constraints = [...foreignKeyConstraints, ...primaryKeyConstraints, ...uniqueKeyConstraints].map(
 			constraint =>
@@ -325,7 +325,7 @@ module.exports = (baseProvider, options, app) => {
 				isCaseSensitive: tableData.isCaseSensitive,
 			});
 
-			if (!!tableData.dynamic) {
+			if (tableData.dynamic) {
 				const dynamicTableOptions = getDynamicTableProps({
 					tableData,
 					tagsStatement,
@@ -395,10 +395,10 @@ module.exports = (baseProvider, options, app) => {
 
 					column_definitions: columnDefinitions,
 					out_of_line_constraints: getOutOfLineConstraints(
+						isActivated,
 						tableData.foreignKeyConstraints,
 						tableData.compositePrimaryKeys,
 						tableData.compositeUniqueKeys,
-						isActivated,
 					),
 				});
 			}
@@ -413,10 +413,10 @@ module.exports = (baseProvider, options, app) => {
 				),
 				column_definitions: columnDefinitions,
 				out_of_line_constraints: getOutOfLineConstraints(
+					isActivated,
 					tableData.foreignKeyConstraints,
 					tableData.compositePrimaryKeys,
 					tableData.compositeUniqueKeys,
-					isActivated,
 				),
 			});
 		},
