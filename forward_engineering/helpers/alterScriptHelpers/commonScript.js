@@ -55,9 +55,9 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 
 			return escapeString(scriptFormat, propValue);
 		} else if (key === 'targetLag') {
-			const { targetLagAmount, targetLagType, targetLagDownstream } = data[operation].targetLag ?? {};
+			const { targetLagAmount, targetLagTimeSpan, targetLagDownstream } = data[operation].targetLag ?? {};
 
-			return targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagType}'`;
+			return targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagTimeSpan}'`;
 		}
 
 		return propValue;

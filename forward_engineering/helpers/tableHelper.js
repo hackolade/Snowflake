@@ -47,8 +47,12 @@ module.exports = app => {
 
 	const mergeKeys = keys => keys.map(key => `"${key.name}"`).join(', ');
 
-	function getTargetLag({ targetLagType, targetLagAmount, targetLagDownstream }) {
-		return `TARGET_LAG = ${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagType}'`}\n`;
+	function getTargetLag({ targetLagTimeSpan, targetLagAmount, targetLagDownstream }) {
+		if (!(targetLagTimeSpan && targetLagAmount) && !targetLagDownstream) {
+			return '';
+		}
+
+		return `TARGET_LAG = ${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagTimeSpan}'`}\n`;
 	}
 
 	function getSelectStatement(selectStatement) {
@@ -85,12 +89,12 @@ module.exports = app => {
 		} = tableData.dynamicTableProps;
 
 		return {
-			targetLag: targetLag ? getTargetLag(targetLag) : '',
+			targetLag: getTargetLag(targetLag),
 			warehouse: warehouse ? `WAREHOUSE = ${warehouse}\n` : '',
 			selectStatement: selectStatement ? getSelectStatement(selectStatement) : '',
-			externalVolume: externalVolume ? `EXTERNAL_VOLUME = ${externalVolume}\n` : '',
-			catalog: catalog ? `CATALOG = ${catalog}\n` : '',
-			baseLocation: baseLocation ? `BASE_LOCATION = ${baseLocation}\n` : '',
+			externalVolume: externalVolume ? `EXTERNAL_VOLUME = '${externalVolume}'\n` : '',
+			catalog: catalog ? `CATALOG = '${catalog}'\n` : '',
+			baseLocation: baseLocation ? `BASE_LOCATION = '${baseLocation}'\n` : '',
 			column_definitions: columnDefinitions ? `\t(\n\t\t${columnDefinitions}\n\t)\n` : '',
 			refreshMode: refreshMode ? `REFRESH_MODE = ${refreshMode}\n` : '',
 			initialize: initialize ? `INITIALIZE = ${initialize}\n` : '',
