@@ -9,6 +9,36 @@ module.exports = {
 		'\t\t${column_definitions}' +
 		'${out_of_line_constraints}\n' +
 		'\t)${tableOptions};\n',
+	createDynamicTable:
+		'CREATE OR REPLACE${transient} DYNAMIC TABLE\n' +
+		'\t${name}\n' +
+		'${column_definitions}' +
+		'${targetLag}' +
+		'${refreshMode}' +
+		'${initialize}' +
+		'${clusterKeys}' +
+		'${dataRetentionTime}' +
+		'${maxDataExtensionTime}' +
+		'${comment}' +
+		'${tagsStatement}' +
+		'${selectStatement};\n',
+	createDynamicIcebergTable:
+		'CREATE DYNAMIC ICEBERG${transient} TABLE\n' +
+		'\t${name}\n' +
+		'${column_definitions}' +
+		'${targetLag}' +
+		'${warehouse}' +
+		'${externalVolume}' +
+		'${catalog}' +
+		'${baseLocation}' +
+		'${refreshMode}' +
+		'${initialize}' +
+		'${clusterKeys}' +
+		'${dataRetentionTime}' +
+		'${comment}' +
+		'${copyGrants}' +
+		'${tagsStatement}' +
+		'${selectStatement};\n',
 	createLikeTable: 'CREATE TABLE IF NOT EXISTS ${name} LIKE ${source_table}${tableOptions};\n',
 	createCloneTable: 'CREATE TABLE IF NOT EXISTS ${name} CLONE ${source_table}${tableOptions};\n',
 	createAsSelect: 'CREATE TABLE IF NOT EXISTS ${name} AS ${selectStatement}${tableOptions};\n',
@@ -37,11 +67,11 @@ module.exports = {
 		'CREATE${temporary} STAGE IF NOT EXISTS ${name} ${url}${storageIntegration}${credentials}${encryption};\n',
 
 	alterSchema: 'ALTER SCHEMA IF EXISTS ${name} ${operation} ${options};',
-	alterTable: 'ALTER TABLE IF EXISTS ${name} ${action};',
+	alterTable: 'ALTER${dynamic} TABLE IF EXISTS ${name} ${action};',
 	alterView: 'ALTER${materialized} VIEW IF EXISTS ${name} ${action};',
 
 	alterSchemaScript: 'ALTER SCHEMA IF EXISTS ${name} ',
-	alterTableScript: 'ALTER TABLE IF EXISTS ${name} ',
+	alterTableScript: 'ALTER${dynamic} TABLE IF EXISTS ${name} ',
 	alterEntityRename: 'RENAME TO ${name};\n',
 	setPropertySchema: 'SET ${property};\n',
 	unsetPropertySchema: 'UNSET ${property};\n',
