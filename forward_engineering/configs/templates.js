@@ -14,6 +14,7 @@ module.exports = {
 		'\t${name}\n' +
 		'${column_definitions}' +
 		'${targetLag}' +
+		'${warehouse}' +
 		'${refreshMode}' +
 		'${initialize}' +
 		'${clusterKeys}' +
