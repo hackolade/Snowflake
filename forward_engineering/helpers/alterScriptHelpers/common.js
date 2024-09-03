@@ -1,7 +1,15 @@
 const _ = require('lodash');
 const { getDiffCopyOptionsByDefault } = require('./tableCopyOptionsHelper');
 
-const POSSIBLE_CHANGE_CONTAINER_DATA = ['DATA_RETENTION_TIME_IN_DAYS', 'description'];
+const POSSIBLE_UNSET_PROPERTIES = ['description', 'DATA_RETENTION_TIME_IN_DAYS', 'MAX_DATA_EXTENSION_TIME_IN_DAYS'];
+const POSSIBLE_SET_PROPERTIES = [
+	'targetLag',
+	'warehouse',
+	'DATA_RETENTION_TIME_IN_DAYS',
+	'MAX_DATA_EXTENSION_TIME_IN_DAYS',
+	'description',
+];
+const POSSIBLE_CHANGE_CONTAINER_DATA = _.uniq([...POSSIBLE_UNSET_PROPERTIES, ...POSSIBLE_SET_PROPERTIES]);
 const REDUNDANT_OPTIONS = ['id'];
 
 const checkFieldPropertiesChanged = (compMod, propertiesToCheck) => {
@@ -107,7 +115,7 @@ const prepareAlterSetUnsetData = ({ collection, data }) => {
 				return acc;
 			}
 
-			if (newData) {
+			if (newData && POSSIBLE_SET_PROPERTIES.includes(property)) {
 				return {
 					...acc,
 					set: {
@@ -115,7 +123,7 @@ const prepareAlterSetUnsetData = ({ collection, data }) => {
 						[property]: newData,
 					},
 				};
-			} else if (oldData) {
+			} else if (oldData && POSSIBLE_UNSET_PROPERTIES.includes(property)) {
 				return {
 					...acc,
 					unset: [...acc.unset, property],
