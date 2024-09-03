@@ -986,6 +986,15 @@ const getEntityData = async (fullName, logger) => {
 				'',
 			),
 		);
+		const isDynamic = _.toUpper(_.get(data, 'IS_DYNAMIC', '')) === 'YES';
+
+		if (isDynamic) {
+			const dynamicTableData = await getDynamicTableData(fullName);
+			const isIceberg = _.toUpper(_.get(data, 'IS_ICEBERG', '')) === 'YES';
+
+			entityLevelData = { ...data, ...dynamicTableData, iceberg: isIceberg };
+		}
+
 		let external = _.toUpper(_.get(data, 'TABLE_TYPE', '')) === 'EXTERNAL TABLE';
 		if (!external && checkExternalMetaFields(fields)) {
 			logger.log(
@@ -1130,6 +1139,128 @@ const getMaterializedViewData = async fullName => {
 		return {
 			secure: _.get(data, 'IS_SECURE') && _.get(data, 'IS_SECURE') !== 'NO',
 			description: _.get(data, 'COMMENT') || '',
+		};
+	} catch (err) {
+		return {};
+	}
+};
+
+function getOptionValue(query, optionName) {
+	const regex = new RegExp(`${optionName}\\s*=\\s*'([^']*)'|${optionName}\\s*=\\s*(\\w+)`, 'i');
+	const match = query.match(regex);
+
+	if (match) {
+		return match[1] || match[2];
+	}
+
+	return null;
+}
+
+function convertToLargestUnit(timeString) {
+	const timePattern = /(\d+)\s*(day|hour|minute|second)s?/g;
+	let totalSeconds = 0;
+
+	const SECONDS_IN_DAY = 86400;
+	const SECONDS_IN_HOUR = 3600;
+	const SECONDS_IN_MINUTE = 60;
+
+	let match;
+	while ((match = timePattern.exec(timeString)) !== null) {
+		const value = parseInt(match[1]);
+		const unit = match[2];
+
+		switch (unit) {
+			case 'day':
+				totalSeconds += value * SECONDS_IN_DAY;
+				break;
+			case 'hour':
+				totalSeconds += value * SECONDS_IN_HOUR;
+				break;
+			case 'minute':
+				totalSeconds += value * SECONDS_IN_MINUTE;
+				break;
+			case 'second':
+				totalSeconds += value;
+				break;
+		}
+	}
+
+	let result;
+
+	if (totalSeconds >= SECONDS_IN_DAY) {
+		const days = totalSeconds / SECONDS_IN_DAY;
+		return {
+			targetLagAmount: days,
+			targetLagTimeSpan: 'days',
+		};
+	} else if (totalSeconds >= SECONDS_IN_HOUR) {
+		const hours = totalSeconds / SECONDS_IN_HOUR;
+		return {
+			targetLagAmount: hours,
+			targetLagTimeSpan: 'hours',
+		};
+	} else if (totalSeconds >= SECONDS_IN_MINUTE) {
+		const minutes = totalSeconds / SECONDS_IN_MINUTE;
+		return {
+			targetLagAmount: minutes,
+			targetLagTimeSpan: 'minutes',
+		};
+	}
+	return {
+		targetLagAmount: totalSeconds,
+		targetLagTimeSpan: 'seconds',
+	};
+}
+
+function getTargetLag(targetLag) {
+	if (targetLag === 'DOWNSTREAM') {
+		return {
+			targetLagDownstream: true,
+		};
+	}
+
+	return convertToLargestUnit(targetLag);
+}
+
+const getDynamicTableData = async fullName => {
+	const [dbName, schemaName, tableName] = fullName.split('.');
+
+	try {
+		const rows = await execute(
+			`SHOW DYNAMIC TABLES LIKE '${removeQuotes(tableName)}' IN SCHEMA "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"`,
+		);
+
+		const data = _.first(rows);
+		const refreshMode = _.get(data, 'refresh_mode', '').toLowerCase();
+		const warehouse = _.get(data, 'warehouse', '');
+		const text = _.get(data, 'text', '');
+		const description = _.get(data, 'COMMENT') || '';
+
+		const targetLag = getTargetLag(_.get(data, 'target_lag', ''));
+		const externalVolume = getOptionValue(text, 'EXTERNAL_VOLUME');
+		const catalog = getOptionValue(text, 'CATALOG');
+		const baseLocation = getOptionValue(text, 'BASE_LOCATION');
+		const DATA_RETENTION_TIME_IN_DAYS = getOptionValue(text, 'DATA_RETENTION_TIME_IN_DAYS');
+		const MAX_DATA_EXTENSION_TIME_IN_DAYS = getOptionValue(text, 'MAX_DATA_EXTENSION_TIME_IN_DAYS');
+
+		const selectStatement = text
+			.slice(text.indexOf('AS\n') + 4, -1)
+			.split('\n')
+			.filter(Boolean)
+			.map(line => (line.startsWith('\t') ? line.slice(1, -1) : line))
+			.join('\n');
+
+		return {
+			dynamic: true,
+			targetLag,
+			refreshMode,
+			warehouse,
+			selectStatement,
+			externalVolume,
+			catalog,
+			baseLocation,
+			DATA_RETENTION_TIME_IN_DAYS,
+			MAX_DATA_EXTENSION_TIME_IN_DAYS,
 		};
 	} catch (err) {
 		return {};
