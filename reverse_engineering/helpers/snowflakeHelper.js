@@ -1152,8 +1152,6 @@ function getOptionValue(query, optionName) {
 	if (match) {
 		return match[1] || match[2];
 	}
-
-	return null;
 }
 
 function convertToLargestUnit(timeString) {
@@ -1190,24 +1188,24 @@ function convertToLargestUnit(timeString) {
 	if (totalSeconds >= SECONDS_IN_DAY) {
 		const days = totalSeconds / SECONDS_IN_DAY;
 		return {
-			targetLagAmount: days,
+			targetLagAmount: Math.round(days),
 			targetLagTimeSpan: 'days',
 		};
 	} else if (totalSeconds >= SECONDS_IN_HOUR) {
 		const hours = totalSeconds / SECONDS_IN_HOUR;
 		return {
-			targetLagAmount: hours,
+			targetLagAmount: Math.round(hours),
 			targetLagTimeSpan: 'hours',
 		};
 	} else if (totalSeconds >= SECONDS_IN_MINUTE) {
 		const minutes = totalSeconds / SECONDS_IN_MINUTE;
 		return {
-			targetLagAmount: minutes,
+			targetLagAmount: Math.round(minutes),
 			targetLagTimeSpan: 'minutes',
 		};
 	}
 	return {
-		targetLagAmount: totalSeconds,
+		targetLagAmount: Math.round(totalSeconds),
 		targetLagTimeSpan: 'seconds',
 	};
 }

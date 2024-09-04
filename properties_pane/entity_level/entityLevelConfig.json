@@ -886,7 +886,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Max data extension in days",
 				"propertyKeyword": "MAX_DATA_EXTENSION_TIME_IN_DAYS",
-				"propertyTooltip": "Number of days for which Snowflake retains historical data for performing Time Travel actions (SELECT, CLONE, UNDROP) on the object. A value of 0 effectively disables Time Travel for the specified database, schema, or table",
+				"propertyTooltip": "The maximum number of days Snowflake can extend the data retention period for tables to ingest streaming data to prevent streams from becoming stale. This parameter does not apply to a database created from a share since it is read-only.",
 				"propertyValidate": true,
 				"propertyType": "numeric",
 				"valueType": "number",

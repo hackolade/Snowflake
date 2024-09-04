@@ -36,6 +36,7 @@ module.exports = {
 		'${initialize}' +
 		'${clusterKeys}' +
 		'${dataRetentionTime}' +
+		'${maxDataExtensionTime}' +
 		'${comment}' +
 		'${copyGrants}' +
 		'${tagsStatement}' +
