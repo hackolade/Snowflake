@@ -29,6 +29,10 @@ const DEFAULT_ROLE = 'PUBLIC';
 const HACKOLADE_APPLICATION = 'Hackolade';
 const CLOUD_PLATFORM_POSTFIXES = ['gcp', 'aws', 'azure'];
 
+const SECONDS_IN_DAY = 86400;
+const SECONDS_IN_HOUR = 3600;
+const SECONDS_IN_MINUTE = 60;
+
 const connect = async (
 	logger,
 	{
@@ -1154,14 +1158,9 @@ function getOptionValue(query, optionName) {
 	}
 }
 
-function convertToLargestUnit(timeString) {
+function getTargetLagStringValue(timeString) {
 	const timePattern = /(\d+)\s*(day|hour|minute|second)s?/g;
 	let totalSeconds = 0;
-
-	const SECONDS_IN_DAY = 86400;
-	const SECONDS_IN_HOUR = 3600;
-	const SECONDS_IN_MINUTE = 60;
-
 	let match;
 	while ((match = timePattern.exec(timeString)) !== null) {
 		const value = parseInt(match[1]);
@@ -1217,7 +1216,7 @@ function getTargetLag(targetLag) {
 		};
 	}
 
-	return convertToLargestUnit(targetLag);
+	return getTargetLagStringValue(targetLag);
 }
 
 const getDynamicTableData = async fullName => {
@@ -1236,6 +1235,7 @@ const getDynamicTableData = async fullName => {
 
 		const targetLag = getTargetLag(_.get(data, 'target_lag', ''));
 		const externalVolume = getOptionValue(text, 'EXTERNAL_VOLUME');
+		const initialize = getOptionValue(text, 'INITIALIZE').toLowerCase();
 		const catalog = getOptionValue(text, 'CATALOG');
 		const baseLocation = getOptionValue(text, 'BASE_LOCATION');
 		const DATA_RETENTION_TIME_IN_DAYS = getOptionValue(text, 'DATA_RETENTION_TIME_IN_DAYS');
@@ -1256,6 +1256,7 @@ const getDynamicTableData = async fullName => {
 			selectStatement,
 			externalVolume,
 			catalog,
+			initialize,
 			baseLocation,
 			DATA_RETENTION_TIME_IN_DAYS,
 			MAX_DATA_EXTENSION_TIME_IN_DAYS,
