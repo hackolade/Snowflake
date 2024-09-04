@@ -1182,8 +1182,6 @@ function getTargetLagStringValue(timeString) {
 		}
 	}
 
-	let result;
-
 	if (totalSeconds >= SECONDS_IN_DAY) {
 		const days = totalSeconds / SECONDS_IN_DAY;
 		return {
@@ -1231,7 +1229,6 @@ const getDynamicTableData = async fullName => {
 		const refreshMode = _.get(data, 'refresh_mode', '').toLowerCase();
 		const warehouse = _.get(data, 'warehouse', '');
 		const text = _.get(data, 'text', '');
-		const description = _.get(data, 'COMMENT') || '';
 
 		const targetLag = getTargetLag(_.get(data, 'target_lag', ''));
 		const externalVolume = getOptionValue(text, 'EXTERNAL_VOLUME');
