@@ -1072,22 +1072,31 @@ making sure that you maintain a proper JSON format.
 							"source": "tags.${tagName}.allowedValues.*.value"
 						},
 						"dependency": {
-							"type": "or",
+							"type": "and",
 							"values": [
 								{
-									"level": "container",
-									"source": "tags.${tagName}",
-									"key": "allowedValues",
-									"isEmpty": true
+									"key": "tagName",
+									"pattern": "^.+$"
 								},
 								{
-									"type": "not",
+									"type": "or",
 									"values": [
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
 											"key": "allowedValues",
-											"exist": true
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
 										}
 									]
 								}
@@ -1096,6 +1105,26 @@ making sure that you maintain a proper JSON format.
 						"shouldValidate": true,
 						"validation": {
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
