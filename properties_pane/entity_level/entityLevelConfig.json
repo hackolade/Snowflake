@@ -648,6 +648,9 @@ making sure that you maintain a proper JSON format.
 						}
 					]
 				},
+				"defaultValue": {
+					"NULL_IF": [{ "NULL_IF_item": "\\N" }]
+				},
 				"structure": [
 					{
 						"propertyName": "Trim space",

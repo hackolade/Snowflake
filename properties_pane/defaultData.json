@@ -10,10 +10,7 @@
 	},
 	"collection": {
 		"collectionName": "New table",
-		"external": false,
-		"formatTypeOptions": {
-			"NULL_IF": [{ "NULL_IF_item": "\\N" }]
-		}
+		"external": false
 	},
 	"field": {
 		"name": "New column",
