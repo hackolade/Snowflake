@@ -82,7 +82,7 @@ module.exports = ({ getName, toString }) => {
 			return '';
 		}
 
-		const tagNames = droppedTags.map(({ tagName }) => tagName).join(', ');
+		const tagNames = droppedTags.map(({ tagName }) => getTagName({ tagName, isCaseSensitive })).join(', ');
 
 		return `TAG ${tagNames}`;
 	};
