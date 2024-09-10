@@ -16,6 +16,10 @@ module.exports = ({ getName, toString }) => {
 
 		const keyValues = getTagKeyValues({ tags, isCaseSensitive });
 
+		if (isEmpty(keyValues)) {
+			return '';
+		}
+
 		return `${indent}WITH TAG ( ${keyValues} )`;
 	};
 
@@ -38,7 +42,7 @@ module.exports = ({ getName, toString }) => {
 	 */
 	const getTagKeyValues = ({ tags, isCaseSensitive }) => {
 		return tags
-			.filter(tag => tag.tagName)
+			.filter(tag => tag.tagName && tag.tagValue)
 			.map(tag => `${getTagName({ tagName: tag.tagName, isCaseSensitive })} = ${toString(tag.tagValue || '')}`)
 			.join(', ');
 	};
