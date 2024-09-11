@@ -91,6 +91,7 @@
 				"propertyTooltip": "",
 				"propertyType": "group",
 				"groupItemLimit": 50,
+				"helpUrl": "https://hackolade.com/help/Snowflake.html#Tags",
 				"structure": [
 					{
 						"propertyName": "Tag name",
