@@ -162,6 +162,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"propertyType": "group",
 				"groupItemLimit": 50,
+				"helpUrl": "https://hackolade.com/help/Snowflake.html#Tags",
 				"structure": [
 					{
 						"propertyName": "Tag name",
@@ -1039,6 +1040,7 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "group",
 				"propertyKeyword": "tags",
 				"propertyTooltip": "Creates a new stored tag or replaces an existing tag for the current database.",
+				"helpUrl": "https://hackolade.com/help/Snowflake.html#Tags",
 				"structure": [
 					{
 						"propertyName": "Name",
