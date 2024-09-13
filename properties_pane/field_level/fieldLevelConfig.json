@@ -549,6 +549,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -593,6 +597,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -1072,6 +1077,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -1116,6 +1125,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -1577,6 +1587,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -1621,6 +1635,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -2082,6 +2097,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -2126,6 +2145,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -2587,6 +2607,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -2631,6 +2655,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -2997,6 +3022,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -3041,6 +3070,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -3420,6 +3450,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -3464,6 +3498,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -3835,6 +3870,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -3879,6 +3918,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -4259,6 +4299,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -4303,6 +4347,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -4691,6 +4736,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -4735,6 +4784,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -5123,6 +5173,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -5167,6 +5221,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -5555,6 +5610,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -5599,6 +5658,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -6069,6 +6129,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -6113,6 +6177,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -6495,6 +6560,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -6539,6 +6608,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
@@ -6677,6 +6747,10 @@ making sure that you maintain a proper JSON format.
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -6721,6 +6795,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},

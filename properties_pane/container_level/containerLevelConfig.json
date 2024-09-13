@@ -183,6 +183,10 @@ making sure that you maintain a proper JSON format.
 						"propertySource": {
 							"source": "tags.${tagName}.allowedValues.*.value"
 						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						},
 						"dependency": {
 							"type": "and",
 							"values": [
@@ -245,6 +249,7 @@ making sure that you maintain a proper JSON format.
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
