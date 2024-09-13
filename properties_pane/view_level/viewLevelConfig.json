@@ -134,6 +134,10 @@
 									"exist": true
 								}
 							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
 						}
 					},
 					{
@@ -178,6 +182,7 @@
 						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
 						}
 					},
