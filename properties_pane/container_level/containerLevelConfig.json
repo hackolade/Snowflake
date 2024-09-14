@@ -162,21 +162,115 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"propertyType": "group",
 				"groupItemLimit": 50,
+				"helpUrl": "https://hackolade.com/help/Snowflake.html#Tags",
 				"structure": [
 					{
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -951,6 +1045,7 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "group",
 				"propertyKeyword": "tags",
 				"propertyTooltip": "Creates a new stored tag or replaces an existing tag for the current database.",
+				"helpUrl": "https://hackolade.com/help/Snowflake.html#Tags",
 				"structure": [
 					{
 						"propertyName": "Name",
