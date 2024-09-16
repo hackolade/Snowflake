@@ -315,6 +315,8 @@ module.exports = (baseProvider, options, app) => {
 						' ',
 					)
 				: '';
+			const orReplace = tableData.orReplace ? ' OR REPLACE' : '';
+			const tableIfNotExists = tableData.tableIfNotExists ? ' IF NOT EXISTS' : '';
 			const copyOptions = tab(getCopyOptions(tableData.copyOptions), ' ');
 			const atOrBefore = tab(getAtOrBefore(tableData.cloneParams), ' ');
 			const columnDefinitions = tableData.columns
@@ -327,6 +329,7 @@ module.exports = (baseProvider, options, app) => {
 
 			if (tableData.dynamic) {
 				const dynamicTableOptions = getDynamicTableProps({
+					iceberg: tableData.iceberg,
 					tableData,
 					tagsStatement,
 					clusterKeys,
@@ -336,11 +339,9 @@ module.exports = (baseProvider, options, app) => {
 					columnDefinitions,
 				});
 
-				const template = tableData.dynamicTableProps.iceberg
-					? templates.createDynamicIcebergTable
-					: templates.createDynamicTable;
-
-				return assignTemplates(template, {
+				return assignTemplates(templates.createDynamicTable, {
+					orReplace,
+					tableIfNotExists,
 					name: tableData.fullName,
 					transient,
 					...dynamicTableOptions,
@@ -820,6 +821,8 @@ module.exports = (baseProvider, options, app) => {
 				transient: firstTab.transient,
 				external: firstTab.external,
 				dynamic: firstTab.dynamic,
+				orReplace: firstTab.orReplace,
+				tableIfNotExists: firstTab.tableIfNotExists,
 				dynamicTableProps: {
 					iceberg: firstTab.iceberg,
 					warehouse: firstTab.warehouse,

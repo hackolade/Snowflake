@@ -162,6 +162,33 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox"
 			},
 			{
+				"propertyName": "Or replace",
+				"propertyKeyword": "orReplace",
+				"propertyType": "checkbox",
+				"disabledOnCondition": {
+					"key": "tableIfNotExists",
+					"value": true
+				},
+				"dependency": {
+					"key": "dynamic",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "If not exist",
+				"propertyKeyword": "tableIfNotExists",
+				"propertyTooltip": "if the specified table already exists, the command should make no changes and return a message that the table exists, rather than terminating with an error. ",
+				"propertyType": "checkbox",
+				"disabledOnCondition": {
+					"key": "orReplace",
+					"value": true
+				},
+				"dependency": {
+					"key": "dynamic",
+					"value": true
+				}
+			},
+			{
 				"propertyName": "Iceberg",
 				"propertyKeyword": "iceberg",
 				"propertyType": "checkbox",
