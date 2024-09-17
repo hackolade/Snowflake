@@ -23,6 +23,7 @@ module.exports = {
 		'${clusterKeys}' +
 		'${dataRetentionTime}' +
 		'${maxDataExtensionTime}' +
+		'${copyGrants}' +
 		'${comment}' +
 		'${tagsStatement}' +
 		'${selectStatement};\n',

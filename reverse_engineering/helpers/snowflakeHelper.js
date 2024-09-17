@@ -1263,7 +1263,7 @@ const getDynamicTableData = async ({ fullName, logger }) => {
 			MAX_DATA_EXTENSION_TIME_IN_DAYS,
 		};
 	} catch (error) {
-		logger.log('error', { error }, 'Reverse Engineering error while retrieving schema data');
+		logger.log('error', { error }, `Reverse Engineering error while retrieving schema data from table ${fullName}`);
 
 		return {};
 	}
