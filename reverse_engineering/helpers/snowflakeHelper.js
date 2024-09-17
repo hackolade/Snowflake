@@ -993,7 +993,7 @@ const getEntityData = async (fullName, logger) => {
 		const isDynamic = _.toUpper(_.get(data, 'IS_DYNAMIC', '')) === 'YES';
 
 		if (isDynamic) {
-			const dynamicTableData = await getDynamicTableData(fullName);
+			const dynamicTableData = await getDynamicTableData({ fullName, logger });
 			const isIceberg = _.toUpper(_.get(data, 'IS_ICEBERG', '')) === 'YES';
 
 			entityLevelData = { ...data, ...dynamicTableData, iceberg: isIceberg };
@@ -1149,7 +1149,7 @@ const getMaterializedViewData = async fullName => {
 	}
 };
 
-function getOptionValue(query, optionName) {
+function getOptionValue({ query, optionName }) {
 	const regex = new RegExp(`${optionName}\\s*=\\s*'([^']*)'|${optionName}\\s*=\\s*(\\w+)`, 'i');
 	const match = query.match(regex);
 
@@ -1217,7 +1217,7 @@ function getTargetLag(targetLag) {
 	return getTargetLagStringValue(targetLag);
 }
 
-const getDynamicTableData = async fullName => {
+const getDynamicTableData = async ({ fullName, logger }) => {
 	const [dbName, schemaName, tableName] = fullName.split('.');
 
 	try {
@@ -1228,18 +1228,22 @@ const getDynamicTableData = async fullName => {
 		const data = _.first(rows);
 		const refreshMode = _.get(data, 'refresh_mode', '').toLowerCase();
 		const warehouse = _.get(data, 'warehouse', '');
-		const text = _.get(data, 'text', '');
+		const query = _.get(data, 'text', '');
+		const asClauseKeyword = 'AS\n';
 
 		const targetLag = getTargetLag(_.get(data, 'target_lag', ''));
-		const externalVolume = getOptionValue(text, 'EXTERNAL_VOLUME');
-		const initialize = getOptionValue(text, 'INITIALIZE').toLowerCase();
-		const catalog = getOptionValue(text, 'CATALOG');
-		const baseLocation = getOptionValue(text, 'BASE_LOCATION');
-		const DATA_RETENTION_TIME_IN_DAYS = getOptionValue(text, 'DATA_RETENTION_TIME_IN_DAYS');
-		const MAX_DATA_EXTENSION_TIME_IN_DAYS = getOptionValue(text, 'MAX_DATA_EXTENSION_TIME_IN_DAYS');
+		const externalVolume = getOptionValue({ query, optionName: 'EXTERNAL_VOLUME' });
+		const initialize = getOptionValue({ query, optionName: 'INITIALIZE' }).toLowerCase();
+		const catalog = getOptionValue({ query, optionName: 'CATALOG' });
+		const baseLocation = getOptionValue({ query, optionName: 'BASE_LOCATION' });
+		const DATA_RETENTION_TIME_IN_DAYS = getOptionValue({ query, optionName: 'DATA_RETENTION_TIME_IN_DAYS' });
+		const MAX_DATA_EXTENSION_TIME_IN_DAYS = getOptionValue({
+			query,
+			optionName: 'MAX_DATA_EXTENSION_TIME_IN_DAYS',
+		});
 
-		const selectStatement = text
-			.slice(text.indexOf('AS\n') + 4, -1)
+		const selectStatement = query
+			.slice(query.indexOf(asClauseKeyword) + asClauseKeyword.length, -1)
 			.split('\n')
 			.filter(Boolean)
 			.map(line => (line.startsWith('\t') ? line.slice(1, -1) : line))
@@ -1258,7 +1262,9 @@ const getDynamicTableData = async fullName => {
 			DATA_RETENTION_TIME_IN_DAYS,
 			MAX_DATA_EXTENSION_TIME_IN_DAYS,
 		};
-	} catch (err) {
+	} catch (error) {
+		logger.log('error', { error }, 'Reverse Engineering error while retrieving schema data');
+
 		return {};
 	}
 };

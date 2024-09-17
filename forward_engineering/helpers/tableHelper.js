@@ -76,7 +76,7 @@ module.exports = app => {
 			return {};
 		}
 
-		const { selectStatement, orReplace, tableIfNotExists } = tableData;
+		const { selectStatement } = tableData;
 		const {
 			targetLag,
 			warehouse,

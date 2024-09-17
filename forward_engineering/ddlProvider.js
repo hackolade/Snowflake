@@ -276,6 +276,8 @@ module.exports = (baseProvider, options, app) => {
 			const schemaName = _.get(tableData, 'schemaData.schemaName');
 			const temporary = tableData.temporary ? ' TEMPORARY' : '';
 			const transient = tableData.transient && !tableData.temporary ? ' TRANSIENT' : '';
+			const orReplace = tableData.orReplace ? ' OR REPLACE' : '';
+			const tableIfNotExists = tableData.tableIfNotExists ? ' IF NOT EXISTS' : '';
 			const clusterKeys = !_.isEmpty(tableData.clusteringKey)
 				? ' CLUSTER BY (' +
 					(isActivated
@@ -315,8 +317,6 @@ module.exports = (baseProvider, options, app) => {
 						' ',
 					)
 				: '';
-			const orReplace = tableData.orReplace ? ' OR REPLACE' : '';
-			const tableIfNotExists = tableData.tableIfNotExists ? ' IF NOT EXISTS' : '';
 			const copyOptions = tab(getCopyOptions(tableData.copyOptions), ' ');
 			const atOrBefore = tab(getAtOrBefore(tableData.cloneParams), ' ');
 			const columnDefinitions = tableData.columns
@@ -748,6 +748,7 @@ module.exports = (baseProvider, options, app) => {
 			const getLocation = location => {
 				return location.namespace ? location.namespace + location.path : location.path;
 			};
+
 			const fileFormat = firstTab.external ? firstTab.externalFileFormat : firstTab.fileFormat;
 			const entityLevelCompositePrimaryKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'PRIMARY KEY')
@@ -820,9 +821,6 @@ module.exports = (baseProvider, options, app) => {
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
 				external: firstTab.external,
-				dynamic: firstTab.dynamic,
-				orReplace: firstTab.orReplace,
-				tableIfNotExists: firstTab.tableIfNotExists,
 				dynamicTableProps: {
 					iceberg: firstTab.iceberg,
 					warehouse: firstTab.warehouse,
