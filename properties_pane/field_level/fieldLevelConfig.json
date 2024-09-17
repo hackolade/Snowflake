@@ -329,7 +329,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -852,7 +879,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -1362,7 +1416,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -1872,7 +1953,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -2382,7 +2490,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -2885,7 +3020,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -3315,7 +3477,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -3731,7 +3920,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -4160,7 +4376,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -4597,7 +4840,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -5034,7 +5304,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
@@ -5471,7 +5768,34 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Not null",
 				"propertyKeyword": "required",
-				"propertyType": "checkbox"
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabled": true,
+				"defaultValue": true
+			},
+			{
+				"propertyName": "Not null",
+				"propertyKeyword": "required",
+				"enableForReference": true,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "or",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": false
+						},
+						{
+							"key": "primaryKey",
+							"exists": false
+						}
+					]
+				},
+				"defaultValue": false
 			},
 			{
 				"propertyName": "Unique",
