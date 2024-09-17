@@ -1514,7 +1514,7 @@ const getSchemaTags = async ({ dbName, schemaName, logger }) => {
 		);
 
 		return rows.map(row => ({
-			tagName: [row['TAG_DATABASE'], row['TAG_SCHEMA'], row['TAG_NAME']].join('.'),
+			tagName: row['TAG_NAME'],
 			tagValue: row['TAG_VALUE'],
 		}));
 	} catch (error) {

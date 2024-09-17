@@ -10,11 +10,15 @@ module.exports = ({ getName, toString }) => {
 	 * @returns {string}
 	 */
 	const getTagStatement = ({ tags, isCaseSensitive, indent = ' ' }) => {
-		if (isEmpty(tags)) {
+		if (isEmptyTags({ tags })) {
 			return '';
 		}
 
 		const keyValues = getTagKeyValues({ tags, isCaseSensitive });
+
+		if (isEmpty(keyValues)) {
+			return '';
+		}
 
 		return `${indent}WITH TAG ( ${keyValues} )`;
 	};
@@ -23,14 +27,13 @@ module.exports = ({ getName, toString }) => {
 	 * @param {{ allowedValues: string[] }}
 	 * @returns {string}
 	 */
-	const getTagAllowedValues = ({ allowedValues }) => {
-		if (isEmpty(allowedValues)) {
-			return '';
-		}
+	const getTagAllowedValues = ({ allowedValues = [] }) => {
+		const values = allowedValues
+			.filter(({ value }) => value)
+			.map(({ value }) => toString(value))
+			.join(', ');
 
-		const values = allowedValues.map(({ value }) => toString(value)).join(', ');
-
-		return ` ALLOWED_VALUES ${values}`;
+		return isEmpty(values) ? '' : ` ALLOWED_VALUES ${values}`;
 	};
 
 	/**
@@ -39,7 +42,7 @@ module.exports = ({ getName, toString }) => {
 	 */
 	const getTagKeyValues = ({ tags, isCaseSensitive }) => {
 		return tags
-			.filter(tag => tag.tagName)
+			.filter(tag => tag.tagName && tag.tagValue)
 			.map(tag => `${getTagName({ tagName: tag.tagName, isCaseSensitive })} = ${toString(tag.tagValue)}`)
 			.join(', ');
 	};
@@ -83,7 +86,7 @@ module.exports = ({ getName, toString }) => {
 			return '';
 		}
 
-		const tagNames = droppedTags.map(({ tagName }) => tagName).join(', ');
+		const tagNames = droppedTags.map(({ tagName }) => getTagName({ tagName, isCaseSensitive })).join(', ');
 
 		return `TAG ${tagNames}`;
 	};
@@ -114,6 +117,14 @@ module.exports = ({ getName, toString }) => {
 			};
 		};
 
+	/**
+	 * @param {{ tags: ObjectTag[] }}
+	 * @returns {boolean}
+	 */
+	const isEmptyTags = ({ tags }) => {
+		return isEmpty(tags) || tags.every(tag => !tag.tagName);
+	};
+
 	return {
 		getTagStatement,
 		getTagAllowedValues,
@@ -121,5 +132,6 @@ module.exports = ({ getName, toString }) => {
 		prepareObjectTagsData,
 		getSetTagValue,
 		getUnsetTagValue,
+		isEmptyTags,
 	};
 };

@@ -71,7 +71,7 @@ module.exports = (baseProvider, options, app) => {
 		tab,
 	});
 
-	const { getTagStatement, getTagAllowedValues, getTagKeyValues, prepareObjectTagsData } =
+	const { getTagStatement, getTagAllowedValues, getTagKeyValues, prepareObjectTagsData, isEmptyTags } =
 		require('./helpers/tagHelper')({
 			getName,
 			toString,
@@ -233,7 +233,7 @@ module.exports = (baseProvider, options, app) => {
 				this.createTag({ tag, schemaName: currentSchemaName, isCaseSensitive }),
 			);
 
-			if (!_.isEmpty(schemaTags)) {
+			if (!isEmptyTags({ tags: schemaTags })) {
 				const schemaTagStatement = assignTemplates(templates.alterSchema, {
 					name: fullName,
 					operation: 'SET TAG',

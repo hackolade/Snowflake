@@ -505,21 +505,120 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"propertyType": "group",
 				"groupItemLimit": 50,
+				"helpUrl": "https://hackolade.com/help/Snowflake.html#Tags",
 				"structure": [
 					{
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -940,16 +1039,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -1352,16 +1549,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -1764,16 +2059,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -2176,16 +2569,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -2493,16 +2984,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -2823,16 +3412,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -3145,16 +3832,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -3476,16 +4261,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -3815,16 +4698,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -4154,16 +5135,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -4493,16 +5572,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -4914,16 +6091,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -5247,16 +6522,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
@@ -5336,16 +6709,114 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Tag name",
 						"propertyKeyword": "tagName",
 						"propertyTooltip": "",
-						"propertyType": "text"
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.*.name"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "selecthashed",
+						"withEmptyOption": true,
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										}
+									]
+								},
+								{
+									"level": "container",
+									"source": "tags.${tagName}",
+									"key": "allowedValues",
+									"exist": true
+								}
+							]
+						},
+						"shouldValidate": true,
+						"validation": {
+							"required": true
+						}
 					},
 					{
 						"propertyName": "Value",
 						"propertyKeyword": "tagValue",
 						"propertyTooltip": "",
 						"propertyType": "text",
+						"propertySource": {
+							"level": "container",
+							"source": "tags.${tagName}.allowedValues.*.value"
+						},
+						"dependency": {
+							"type": "and",
+							"values": [
+								{
+									"key": "tagName",
+									"pattern": "^.+$"
+								},
+								{
+									"type": "or",
+									"values": [
+										{
+											"level": "container",
+											"source": "tags.${tagName}",
+											"key": "allowedValues",
+											"isEmpty": true
+										},
+										{
+											"type": "not",
+											"values": [
+												{
+													"level": "container",
+													"source": "tags.${tagName}",
+													"key": "allowedValues",
+													"exist": true
+												}
+											]
+										}
+									]
+								}
+							]
+						},
 						"shouldValidate": true,
 						"validation": {
+							"required": true,
 							"regex": "^.{0,256}$"
+						}
+					},
+					{
+						"propertyName": "Value",
+						"propertyKeyword": "tagValue",
+						"propertyTooltip": "",
+						"propertyType": "select",
+						"disabled": true,
+						"dependency": {
+							"type": "or",
+							"values": [
+								{
+									"key": "tagName",
+									"exist": false
+								},
+								{
+									"key": "tagName",
+									"pattern": "^$"
+								}
+							]
 						}
 					}
 				]
