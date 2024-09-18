@@ -29,6 +29,10 @@ const DEFAULT_ROLE = 'PUBLIC';
 const HACKOLADE_APPLICATION = 'Hackolade';
 const CLOUD_PLATFORM_POSTFIXES = ['gcp', 'aws', 'azure'];
 
+const SECONDS_IN_DAY = 86400;
+const SECONDS_IN_HOUR = 3600;
+const SECONDS_IN_MINUTE = 60;
+
 const connect = async (
 	logger,
 	{
@@ -986,6 +990,15 @@ const getEntityData = async (fullName, logger) => {
 				'',
 			),
 		);
+		const isDynamic = _.toUpper(_.get(data, 'IS_DYNAMIC', '')) === 'YES';
+
+		if (isDynamic) {
+			const dynamicTableData = await getDynamicTableData({ fullName, logger });
+			const isIceberg = _.toUpper(_.get(data, 'IS_ICEBERG', '')) === 'YES';
+
+			entityLevelData = { ...data, ...dynamicTableData, iceberg: isIceberg };
+		}
+
 		let external = _.toUpper(_.get(data, 'TABLE_TYPE', '')) === 'EXTERNAL TABLE';
 		if (!external && checkExternalMetaFields(fields)) {
 			logger.log(
@@ -1132,6 +1145,126 @@ const getMaterializedViewData = async fullName => {
 			description: _.get(data, 'COMMENT') || '',
 		};
 	} catch (err) {
+		return {};
+	}
+};
+
+function getOptionValue({ query, optionName }) {
+	const regex = new RegExp(`${optionName}\\s*=\\s*'([^']*)'|${optionName}\\s*=\\s*(\\w+)`, 'i');
+	const match = query.match(regex);
+
+	if (match) {
+		return match[1] || match[2];
+	}
+}
+
+function getTargetLagStringValue(timeString) {
+	const timePattern = /(\d+)\s*(day|hour|minute|second)s?/g;
+	let totalSeconds = 0;
+	let match;
+	while ((match = timePattern.exec(timeString)) !== null) {
+		const value = parseInt(match[1]);
+		const unit = match[2];
+
+		switch (unit) {
+			case 'day':
+				totalSeconds += value * SECONDS_IN_DAY;
+				break;
+			case 'hour':
+				totalSeconds += value * SECONDS_IN_HOUR;
+				break;
+			case 'minute':
+				totalSeconds += value * SECONDS_IN_MINUTE;
+				break;
+			case 'second':
+				totalSeconds += value;
+				break;
+		}
+	}
+
+	if (totalSeconds >= SECONDS_IN_DAY) {
+		const days = totalSeconds / SECONDS_IN_DAY;
+		return {
+			targetLagAmount: Math.round(days),
+			targetLagTimeSpan: 'days',
+		};
+	} else if (totalSeconds >= SECONDS_IN_HOUR) {
+		const hours = totalSeconds / SECONDS_IN_HOUR;
+		return {
+			targetLagAmount: Math.round(hours),
+			targetLagTimeSpan: 'hours',
+		};
+	} else if (totalSeconds >= SECONDS_IN_MINUTE) {
+		const minutes = totalSeconds / SECONDS_IN_MINUTE;
+		return {
+			targetLagAmount: Math.round(minutes),
+			targetLagTimeSpan: 'minutes',
+		};
+	}
+	return {
+		targetLagAmount: Math.round(totalSeconds),
+		targetLagTimeSpan: 'seconds',
+	};
+}
+
+function getTargetLag(targetLag) {
+	if (targetLag === 'DOWNSTREAM') {
+		return {
+			targetLagDownstream: true,
+		};
+	}
+
+	return getTargetLagStringValue(targetLag);
+}
+
+const getDynamicTableData = async ({ fullName, logger }) => {
+	const [dbName, schemaName, tableName] = fullName.split('.');
+
+	try {
+		const rows = await execute(
+			`SHOW DYNAMIC TABLES LIKE '${removeQuotes(tableName)}' IN SCHEMA "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"`,
+		);
+
+		const data = _.first(rows);
+		const refreshMode = _.get(data, 'refresh_mode', '').toLowerCase();
+		const warehouse = _.get(data, 'warehouse', '');
+		const query = _.get(data, 'text', '');
+		const asClauseKeyword = 'AS\n';
+
+		const targetLag = getTargetLag(_.get(data, 'target_lag', ''));
+		const externalVolume = getOptionValue({ query, optionName: 'EXTERNAL_VOLUME' });
+		const initialize = getOptionValue({ query, optionName: 'INITIALIZE' }).toLowerCase();
+		const catalog = getOptionValue({ query, optionName: 'CATALOG' });
+		const baseLocation = getOptionValue({ query, optionName: 'BASE_LOCATION' });
+		const DATA_RETENTION_TIME_IN_DAYS = getOptionValue({ query, optionName: 'DATA_RETENTION_TIME_IN_DAYS' });
+		const MAX_DATA_EXTENSION_TIME_IN_DAYS = getOptionValue({
+			query,
+			optionName: 'MAX_DATA_EXTENSION_TIME_IN_DAYS',
+		});
+
+		const selectStatement = query
+			.slice(query.indexOf(asClauseKeyword) + asClauseKeyword.length, -1)
+			.split('\n')
+			.filter(Boolean)
+			.map(line => (line.startsWith('\t') ? line.slice(1, -1) : line))
+			.join('\n');
+
+		return {
+			dynamic: true,
+			targetLag,
+			refreshMode,
+			warehouse,
+			selectStatement,
+			externalVolume,
+			catalog,
+			initialize,
+			baseLocation,
+			DATA_RETENTION_TIME_IN_DAYS,
+			MAX_DATA_EXTENSION_TIME_IN_DAYS,
+		};
+	} catch (error) {
+		logger.log('error', { error }, `Reverse Engineering error while retrieving schema data from table ${fullName}`);
+
 		return {};
 	}
 };

@@ -276,6 +276,8 @@ module.exports = (baseProvider, options, app) => {
 			const schemaName = _.get(tableData, 'schemaData.schemaName');
 			const temporary = tableData.temporary ? ' TEMPORARY' : '';
 			const transient = tableData.transient && !tableData.temporary ? ' TRANSIENT' : '';
+			const orReplace = tableData.orReplace ? ' OR REPLACE' : '';
+			const tableIfNotExists = tableData.tableIfNotExists ? ' IF NOT EXISTS' : '';
 			const clusterKeys = !_.isEmpty(tableData.clusteringKey)
 				? ' CLUSTER BY (' +
 					(isActivated
@@ -327,6 +329,7 @@ module.exports = (baseProvider, options, app) => {
 
 			if (tableData.dynamic) {
 				const dynamicTableOptions = getDynamicTableProps({
+					iceberg: tableData.iceberg,
 					tableData,
 					tagsStatement,
 					clusterKeys,
@@ -336,11 +339,9 @@ module.exports = (baseProvider, options, app) => {
 					columnDefinitions,
 				});
 
-				const template = tableData.dynamicTableProps.iceberg
-					? templates.createDynamicIcebergTable
-					: templates.createDynamicTable;
-
-				return assignTemplates(template, {
+				return assignTemplates(templates.createDynamicTable, {
+					orReplace,
+					tableIfNotExists,
 					name: tableData.fullName,
 					transient,
 					...dynamicTableOptions,
@@ -747,6 +748,7 @@ module.exports = (baseProvider, options, app) => {
 			const getLocation = location => {
 				return location.namespace ? location.namespace + location.path : location.path;
 			};
+
 			const fileFormat = firstTab.external ? firstTab.externalFileFormat : firstTab.fileFormat;
 			const entityLevelCompositePrimaryKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'PRIMARY KEY')
@@ -819,7 +821,6 @@ module.exports = (baseProvider, options, app) => {
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
 				external: firstTab.external,
-				dynamic: firstTab.dynamic,
 				dynamicTableProps: {
 					iceberg: firstTab.iceberg,
 					warehouse: firstTab.warehouse,
