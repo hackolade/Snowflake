@@ -344,17 +344,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -894,17 +888,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -1431,17 +1419,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -1968,17 +1950,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -2505,17 +2481,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -3035,17 +3005,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -3492,17 +3456,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -3935,17 +3893,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -4391,17 +4343,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -4855,17 +4801,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -5319,17 +5259,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
@@ -5783,17 +5717,11 @@ making sure that you maintain a proper JSON format.
 				"enableForReference": true,
 				"propertyType": "checkbox",
 				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "primaryKey",
-							"value": false
-						},
-						{
-							"key": "primaryKey",
-							"exists": false
-						}
-					]
+					"type": "not",
+					"values": {
+						"key": "primaryKey",
+						"value": true
+					}
 				},
 				"defaultValue": false
 			},
