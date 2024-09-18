@@ -821,6 +821,7 @@ module.exports = (baseProvider, options, app) => {
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
 				external: firstTab.external,
+				dynamic: firstTab.dynamic,
 				dynamicTableProps: {
 					iceberg: firstTab.iceberg,
 					warehouse: firstTab.warehouse,
