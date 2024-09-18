@@ -10,21 +10,7 @@ module.exports = {
 		'${out_of_line_constraints}\n' +
 		'\t)${tableOptions};\n',
 	createDynamicTable:
-		'CREATE OR REPLACE${transient} DYNAMIC TABLE\n' +
-		'\t${name}\n' +
-		'${column_definitions}' +
-		'${targetLag}' +
-		'${warehouse}' +
-		'${refreshMode}' +
-		'${initialize}' +
-		'${clusterKeys}' +
-		'${dataRetentionTime}' +
-		'${maxDataExtensionTime}' +
-		'${comment}' +
-		'${tagsStatement}' +
-		'${selectStatement};\n',
-	createDynamicIcebergTable:
-		'CREATE DYNAMIC ICEBERG${transient} TABLE\n' +
+		'CREATE${orReplace}${transient} DYNAMIC${iceberg} TABLE${tableIfNotExists}\n' +
 		'\t${name}\n' +
 		'${column_definitions}' +
 		'${targetLag}' +
@@ -36,8 +22,9 @@ module.exports = {
 		'${initialize}' +
 		'${clusterKeys}' +
 		'${dataRetentionTime}' +
-		'${comment}' +
+		'${maxDataExtensionTime}' +
 		'${copyGrants}' +
+		'${comment}' +
 		'${tagsStatement}' +
 		'${selectStatement};\n',
 	createLikeTable: 'CREATE TABLE IF NOT EXISTS ${name} LIKE ${source_table}${tableOptions};\n',
