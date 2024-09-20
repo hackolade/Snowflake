@@ -18,6 +18,7 @@ const {
 	prepareCollectionStageCopyOptions,
 } = require('./helpers/alterScriptHelpers/common');
 const { escapeString } = require('./utils/escapeString');
+const { joinActivatedAndDeactivatedStatements } = require('./utils/joinActivatedAndDeactivatedStatements');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
@@ -319,9 +320,8 @@ module.exports = (baseProvider, options, app) => {
 				: '';
 			const copyOptions = tab(getCopyOptions(tableData.copyOptions), ' ');
 			const atOrBefore = tab(getAtOrBefore(tableData.cloneParams), ' ');
-			const columnDefinitions = tableData.columns
-				.map(column => commentIfDeactivated(column.statement, column))
-				.join(',\n\t\t');
+			const columns = tableData.columns.map(column => commentIfDeactivated(column.statement, column));
+			const columnDefinitions = joinActivatedAndDeactivatedStatements({ statements: columns, indent: '\n\t\t' });
 			const tagsStatement = getTagStatement({
 				tags: tableData.tableTags,
 				isCaseSensitive: tableData.isCaseSensitive,
