@@ -63,6 +63,7 @@ module.exports = app => {
 	}
 
 	const getDynamicTableProps = ({
+		iceberg,
 		tableData,
 		transient,
 		tagsStatement,
@@ -90,6 +91,7 @@ module.exports = app => {
 
 		return {
 			targetLag: getTargetLag(targetLag),
+			iceberg: iceberg ? ' ICEBERG' : '',
 			warehouse: warehouse ? `WAREHOUSE = ${warehouse}\n` : '',
 			selectStatement: selectStatement ? getSelectStatement(selectStatement) : '',
 			externalVolume: externalVolume ? `EXTERNAL_VOLUME = '${externalVolume}'\n` : '',
