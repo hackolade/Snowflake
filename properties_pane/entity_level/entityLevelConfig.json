@@ -159,7 +159,14 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Dynamic",
 				"propertyKeyword": "dynamic",
-				"propertyType": "checkbox"
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": {
+						"key": "external",
+						"value": true
+					}
+				}
 			},
 			{
 				"propertyName": "Or replace",
@@ -167,10 +174,6 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"disabledOnCondition": {
 					"key": "tableIfNotExists",
-					"value": true
-				},
-				"dependency": {
-					"key": "dynamic",
 					"value": true
 				}
 			},
@@ -182,10 +185,6 @@ making sure that you maintain a proper JSON format.
 				"disabledOnCondition": {
 					"key": "orReplace",
 					"value": true
-				},
-				"dependency": {
-					"key": "dynamic",
-					"value": true
 				}
 			},
 			{
@@ -193,8 +192,17 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "iceberg",
 				"propertyType": "checkbox",
 				"dependency": {
-					"key": "dynamic",
-					"value": true
+					"type": "not",
+					"values": [
+						{
+							"key": "external",
+							"value": true
+						},
+						{
+							"key": "transient",
+							"value": true
+						}
+					]
 				}
 			},
 			{
@@ -268,7 +276,20 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Transient",
 				"propertyKeyword": "transient",
-				"propertyType": "checkbox"
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "external",
+							"value": true
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Refresh Mode",
@@ -293,7 +314,24 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "External",
 				"propertyKeyword": "external",
-				"propertyType": "checkbox"
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": [
+						{
+							"key": "dynamic",
+							"value": true
+						},
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "transient",
+							"value": true
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Cluster by",
