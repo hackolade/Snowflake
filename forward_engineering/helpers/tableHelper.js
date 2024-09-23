@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { preSpace } = require('../utils/preSpace');
 
 module.exports = app => {
 	const { tab } = app.require('@hackolade/ddl-fe-utils').general;
@@ -52,7 +53,9 @@ module.exports = app => {
 			return '';
 		}
 
-		return `TARGET_LAG = ${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagTimeSpan}'`}\n`;
+		const targetLagValue = targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagTimeSpan}'`;
+
+		return `TARGET_LAG = ${targetLagValue}\n`;
 	}
 
 	function getSelectStatement(selectStatement) {
@@ -110,9 +113,9 @@ module.exports = app => {
 			copyGrants: copyGrants ? `${copyGrants.trim()}\n` : '',
 			comment: comment ? `${comment.trim()}\n` : '',
 			tagsStatement: tagsStatement ? `${tagsStatement.trim()}\n` : '',
-			transient: transient ? ' TRANSIENT' : '',
-			iceberg: iceberg ? ' ICEBERG' : '',
-			dynamic: dynamic ? ' DYNAMIC' : '',
+			transient: preSpace(transient && 'TRANSIENT'),
+			iceberg: preSpace(iceberg && 'ICEBERG'),
+			dynamic: preSpace(dynamic && 'DYNAMIC'),
 		};
 	};
 

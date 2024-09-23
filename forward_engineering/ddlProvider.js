@@ -19,6 +19,7 @@ const {
 } = require('./helpers/alterScriptHelpers/common');
 const { escapeString } = require('./utils/escapeString');
 const { joinActivatedAndDeactivatedStatements } = require('./utils/joinActivatedAndDeactivatedStatements');
+const { preSpace } = require('./utils/preSpace');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
@@ -99,11 +100,11 @@ module.exports = (baseProvider, options, app) => {
 		return input;
 	}
 
-	const getOrReplaceStatement = isEnabled => (isEnabled ? ' OR REPLACE' : '');
+	const getOrReplaceStatement = isEnabled => preSpace(isEnabled && 'OR REPLACE');
 	const getBodyStatement = body => (body ? `\n\t${insertNewlinesAtEdges(escapeString(scriptFormat, body))}` : '');
 	const getCommentsStatement = text => (text ? `\n\tCOMMENT = '${text}'` : '');
 	const getNotNullStatement = isEnabled => (isEnabled ? '\n\tNOT NULL' : '');
-	const getIfNotExistStatement = ifNotExist => (ifNotExist ? ' IF NOT EXISTS' : '');
+	const getIfNotExistStatement = ifNotExist => preSpace(ifNotExist && 'IF NOT EXISTS');
 
 	return {
 		createSchema({
@@ -122,7 +123,7 @@ module.exports = (baseProvider, options, app) => {
 			tags,
 			schemaTags,
 		}) {
-			const transientStatement = transient ? ' TRANSIENT' : '';
+			const transientStatement = preSpace(transient && 'TRANSIENT');
 			const dataRetentionStatement =
 				!isNaN(dataRetention) && dataRetention ? `\n\tDATA_RETENTION_TIME_IN_DAYS=${dataRetention}` : '';
 			const managedAccessStatement = managedAccess ? '\n\tWITH MANAGED ACCESS' : '';
@@ -137,6 +138,8 @@ module.exports = (baseProvider, options, app) => {
 				data_retention: dataRetentionStatement,
 				comment: commentStatement,
 			});
+
+			const joinPackages = packages => packages.map(({ packageName }) => `'${packageName}'`).join(', ');
 
 			const getParameters = payload => {
 				if (!payload) {
@@ -153,8 +156,7 @@ module.exports = (baseProvider, options, app) => {
 
 				const handlerStatement = handler ? `\n\tHANDLER = '${handler}'` : '';
 
-				const joinPackages = () => packages.map(({ packageName }) => `'${packageName}'`).join(', ');
-				const packagesStatement = packages ? `\n\tPACKAGES = (${joinPackages()})` : '';
+				const packagesStatement = packages ? `\n\tPACKAGES = (${joinPackages(packages)})` : '';
 
 				return `${runtimeVersionStatement}${handlerStatement}${packagesStatement}`;
 			};
@@ -220,7 +222,7 @@ module.exports = (baseProvider, options, app) => {
 			const stagesStatements = stages.map(stage =>
 				assignTemplates(templates.createStage, {
 					name: getFullName(currentSchemaName, getName(isCaseSensitive, stage.name)),
-					temporary: stage.temporary ? ' TEMPORARY' : '',
+					temporary: preSpace(stage.temporary && 'TEMPORARY'),
 					url: stage.url ? `\n\tURL=${stage.url}` : '',
 					storageIntegration: stage.storageIntegration
 						? `\n\tSTORAGE_INTEGRATION=${stage.storageIntegration}`
@@ -275,35 +277,39 @@ module.exports = (baseProvider, options, app) => {
 
 		createTable(tableData, isActivated) {
 			const schemaName = _.get(tableData, 'schemaData.schemaName');
-			const temporary = tableData.temporary ? ' TEMPORARY' : '';
-			const transient = tableData.transient && !tableData.temporary ? ' TRANSIENT' : '';
-			const orReplace = tableData.orReplace ? ' OR REPLACE' : '';
-			const tableIfNotExists = tableData.tableIfNotExists ? ' IF NOT EXISTS' : '';
-			const clusterKeys = !_.isEmpty(tableData.clusteringKey)
-				? ' CLUSTER BY (' +
-					(isActivated
-						? foreignKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)
-						: foreignActiveKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)) +
-					')'
-				: '';
-			const partitionKeys = !_.isEmpty(tableData.partitioningKey)
-				? ' PARTITION BY (' +
-					(isActivated
-						? foreignKeysToString(
-								tableData.isCaseSensitive,
-								tableData.partitioningKey.map(key => ({
-									name: `${getName(tableData.isCaseSensitive, key.name)}`,
-									isActivated: key.isActivated,
-								})),
-							)
-						: mergeKeys(tableData.partitioningKey)) +
-					')'
-				: '';
-			const comment = tableData.comment ? ` COMMENT=${escapeString(scriptFormat, tableData.comment)}` : '';
-			const copyGrants = tableData.copyGrants ? ` COPY GRANTS` : '';
-			const dataRetentionTime = tableData.dataRetentionTime
-				? ` DATA_RETENTION_TIME_IN_DAYS=${tableData.dataRetentionTime}`
-				: '';
+			const temporary = preSpace(tableData.temporary && 'TEMPORARY');
+			const transient = preSpace(tableData.transient && !tableData.temporary && 'TRANSIENT');
+			const orReplace = preSpace(tableData.orReplace && 'OR REPLACE');
+			const tableIfNotExists = preSpace(tableData.tableIfNotExists && 'IF NOT EXISTS');
+
+			const clusterKeys = preSpace(
+				!_.isEmpty(tableData.clusteringKey) &&
+					'CLUSTER BY (' +
+						(isActivated
+							? foreignKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)
+							: foreignActiveKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)) +
+						')',
+			);
+			const partitionKeys = preSpace(
+				!_.isEmpty(tableData.partitioningKey) &&
+					'PARTITION BY (' +
+						(isActivated
+							? foreignKeysToString(
+									tableData.isCaseSensitive,
+									tableData.partitioningKey.map(key => ({
+										name: `${getName(tableData.isCaseSensitive, key.name)}`,
+										isActivated: key.isActivated,
+									})),
+								)
+							: mergeKeys(tableData.partitioningKey)) +
+						')',
+			);
+
+			const comment = preSpace(tableData.comment && `COMMENT=${escapeString(scriptFormat, tableData.comment)}`);
+			const copyGrants = preSpace(tableData.copyGrants && 'COPY GRANTS');
+			const dataRetentionTime = preSpace(
+				tableData.dataRetentionTime && `DATA_RETENTION_TIME_IN_DAYS=${tableData.dataRetentionTime}`,
+			);
 			const stageFileFormat = tableData.fileFormat
 				? tab(
 						'STAGE_FILE_FORMAT = ' +
@@ -364,18 +370,19 @@ module.exports = (baseProvider, options, app) => {
 					tableOptions: addOptions([clusterKeys, copyGrants, tagsStatement]),
 				});
 			} else if (tableData.external) {
-				const location = tableData.externalOptions.location
-					? ' WITH LOCATION=' + tableData.externalOptions.location
-					: '';
-				const refreshOnCreate = tableData.externalOptions.REFRESH_ON_CREATE
-					? ' REFRESH_ON_CREATE=' + tableData.externalOptions.REFRESH_ON_CREATE
-					: '';
-				const autoRefresh = tableData.externalOptions.AUTO_REFRESH
-					? ' AUTO_REFRESH=' + tableData.externalOptions.AUTO_REFRESH
-					: '';
-				const pattern = tableData.externalOptions.PATTERN
-					? ' PATTERN=' + tableData.externalOptions.PATTERN
-					: '';
+				const location = preSpace(
+					tableData.externalOptions.location && 'WITH LOCATION=' + tableData.externalOptions.location,
+				);
+				const refreshOnCreate = preSpace(
+					tableData.externalOptions.REFRESH_ON_CREATE &&
+						'REFRESH_ON_CREATE=' + tableData.externalOptions.REFRESH_ON_CREATE,
+				);
+				const autoRefresh = preSpace(
+					tableData.externalOptions.AUTO_REFRESH && 'AUTO_REFRESH=' + tableData.externalOptions.AUTO_REFRESH,
+				);
+				const pattern = preSpace(
+					tableData.externalOptions.PATTERN && 'PATTERN=' + tableData.externalOptions.PATTERN,
+				);
 
 				return assignTemplates(templates.createExternalTable, {
 					name: tableData.fullName,
@@ -426,21 +433,22 @@ module.exports = (baseProvider, options, app) => {
 				name: columnDefinition.name,
 				type: decorateType(columnDefinition.type, columnDefinition),
 				collation: getCollation(columnDefinition.type, columnDefinition.collation),
-				default: !_.isUndefined(columnDefinition.default)
-					? ' DEFAULT ' +
-						getDefault({
-							scriptFormat,
-							type: columnDefinition.type,
-							defaultValue: columnDefinition.default,
-						})
-					: '',
+				default: preSpace(
+					!_.isUndefined(columnDefinition.default) &&
+						'DEFAULT ' +
+							getDefault({
+								scriptFormat,
+								type: columnDefinition.type,
+								defaultValue: columnDefinition.default,
+							}),
+				),
 				autoincrement: getAutoIncrement(columnDefinition.type, 'AUTOINCREMENT', columnDefinition.autoincrement),
 				identity: getAutoIncrement(columnDefinition.type, 'IDENTITY', columnDefinition.identity),
-				not_nul: !columnDefinition.nullable ? ' NOT NULL' : '',
+				not_nul: preSpace(!columnDefinition.nullable && 'NOT NULL'),
 				inline_constraint: getInlineConstraint(columnDefinition),
-				comment: columnDefinition.comment
-					? ` COMMENT ${escapeString(scriptFormat, columnDefinition.comment)}`
-					: '',
+				comment: preSpace(
+					columnDefinition.comment && `COMMENT ${escapeString(scriptFormat, columnDefinition.comment)}`,
+				),
 				tag: getTagStatement({
 					tags: columnDefinition.columnTags,
 					isCaseSensitive: columnDefinition.isCaseSensitive,
@@ -554,8 +562,8 @@ module.exports = (baseProvider, options, app) => {
 				: undefined;
 
 			return assignTemplates(templates.createView, {
-				secure: viewData.secure ? ' SECURE' : '',
-				materialized: viewData.materialized ? ' MATERIALIZED' : '',
+				secure: preSpace(viewData.secure && 'SECURE'),
+				materialized: preSpace(viewData.materialized && 'MATERIALIZED'),
 				name: getFullName(schemaName, viewData.name),
 				column_list: viewColumnsToString(columnList, isActivated),
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
@@ -684,9 +692,10 @@ module.exports = (baseProvider, options, app) => {
 									name: sequence.name || undefined,
 									start: sequence.sequenceStart || DEFAULT_SNOWFLAKE_SEQUENCE_START,
 									increment: sequence.sequenceIncrement || DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT,
-									comment: sequence.sequenceComments
-										? ` COMMENT=${escapeString(scriptFormat, sequence.sequenceComments)}`
-										: '',
+									comment: preSpace(
+										sequence.sequenceComments &&
+											`COMMENT=${escapeString(scriptFormat, sequence.sequenceComments)}`,
+									),
 								}),
 							)
 							.filter(sequence => sequence.name)
@@ -700,9 +709,10 @@ module.exports = (baseProvider, options, app) => {
 									formatTypeOptions: clean(
 										getFormatTypeOptions(fileFormat.fileFormat, fileFormat.formatTypeOptions),
 									),
-									comment: fileFormat.fileFormatComments
-										? ` COMMENT=${escapeString(scriptFormat, fileFormat.fileFormatComments)}`
-										: '',
+									comment: preSpace(
+										fileFormat.fileFormatComments &&
+											`COMMENT=${escapeString(scriptFormat, fileFormat.fileFormatComments)}`,
+									),
 								}),
 							)
 							.filter(fileFormat => fileFormat.name)
@@ -1105,7 +1115,7 @@ module.exports = (baseProvider, options, app) => {
 			};
 
 			createAndPushStatement(isNameChanged, {
-				ifExists: ' IF EXISTS',
+				ifExists: preSpace('IF EXISTS'),
 				name: oldName,
 				option: 'RENAME TO ',
 				optionValue: getName(isCaseSensitive, tag.name),
@@ -1117,27 +1127,27 @@ module.exports = (baseProvider, options, app) => {
 			});
 
 			createAndPushStatement(!isAllowedValuesDropped && !_.isEmpty(droppedAllowedValues), {
-				ifExists: ' IF EXISTS',
+				ifExists: preSpace('IF EXISTS'),
 				name: newName,
 				option: 'DROP',
 				optionValue: getTagAllowedValues({ allowedValues: droppedAllowedValues }),
 			});
 
 			createAndPushStatement(!_.isEmpty(newAllowedValues), {
-				ifExists: ' IF EXISTS',
+				ifExists: preSpace('IF EXISTS'),
 				name: newName,
 				option: 'ADD',
 				optionValue: getTagAllowedValues({ allowedValues: newAllowedValues }),
 			});
 
 			createAndPushStatement(isCommentDropped, {
-				ifExists: ' IF EXISTS',
+				ifExists: preSpace('IF EXISTS'),
 				name: newName,
 				option: 'UNSET COMMENT',
 			});
 
 			createAndPushStatement(isCommentChanged, {
-				ifExists: ' IF EXISTS',
+				ifExists: preSpace('IF EXISTS'),
 				name: newName,
 				option: 'SET COMMENT = ',
 				optionValue: toString(tag.description),

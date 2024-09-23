@@ -1,6 +1,7 @@
 const templates = require('../configs/templates');
 const _ = require('lodash');
 const { escapeString } = require('../utils/escapeString');
+const { preSpace } = require('../utils/preSpace');
 
 module.exports = app => {
 	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
@@ -113,7 +114,7 @@ module.exports = app => {
 	};
 
 	const getUnique = columnDefinition => {
-		return columnDefinition.unique && !columnDefinition.compositeUniqueKey ? ' UNIQUE' : '';
+		return preSpace(columnDefinition.unique && !columnDefinition.compositeUniqueKey && 'UNIQUE');
 	};
 
 	const getPrimaryKey = columnDefinition => {
@@ -121,7 +122,7 @@ module.exports = app => {
 			return '';
 		}
 
-		return ' PRIMARY KEY';
+		return preSpace('PRIMARY KEY');
 	};
 
 	const getInlineConstraint = columnDefinition => {
@@ -135,7 +136,7 @@ module.exports = app => {
 			expression: columnDefinition.expression
 				? `(${columnDefinition.expression})`
 				: `(value:${columnDefinition.name}::${columnDefinition.type})`,
-			comment: columnDefinition.comment ? ` COMMENT ${escapeString(columnDefinition.comment)}` : '',
+			comment: preSpace(columnDefinition.comment && `COMMENT ${escapeString(columnDefinition.comment)}`),
 		});
 
 		return { statement: externalColumnStatement, isActivated: columnDefinition.isActivated };
