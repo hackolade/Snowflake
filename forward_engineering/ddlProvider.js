@@ -414,6 +414,8 @@ module.exports = (baseProvider, options, app) => {
 				name: tableData.fullName,
 				temporary,
 				transient,
+				tableIfNotExists,
+				orReplace,
 				tableOptions: addOptions(
 					[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants, tagsStatement],
 					comment,
@@ -832,6 +834,8 @@ module.exports = (baseProvider, options, app) => {
 				external: firstTab.external,
 				dynamic: firstTab.dynamic,
 				iceberg: firstTab.iceberg,
+				orReplace: firstTab.orReplace,
+				tableIfNotExists: firstTab.tableIfNotExists,
 				tableExtraProps: {
 					warehouse: firstTab.warehouse,
 					targetLag: firstTab.targetLag,

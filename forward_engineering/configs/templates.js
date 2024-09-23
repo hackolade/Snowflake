@@ -6,7 +6,7 @@ module.exports = {
 	dropSchema: 'DROP SCHEMA IF EXISTS ${name};\n',
 
 	createTable:
-		'CREATE${temporary}${transient} TABLE IF NOT EXISTS\n' +
+		'CREATE${orReplace}${temporary}${transient} TABLE${tableIfNotExists}\n' +
 		'\t${name} (\n' +
 		'\t\t${column_definitions}' +
 		'${out_of_line_constraints}\n' +
