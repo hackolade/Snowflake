@@ -62,9 +62,8 @@ module.exports = app => {
 		return `AS\n${selectStatement.split('\n').map(mapStatement).join('')}`;
 	}
 
-	const getDynamicTableProps = ({
+	const getTableExtraProps = ({
 		tableData,
-		transient,
 		tagsStatement,
 		clusterKeys,
 		comment,
@@ -72,21 +71,26 @@ module.exports = app => {
 		copyGrants,
 		columnDefinitions,
 	}) => {
-		if (!tableData.dynamicTableProps) {
+		if (!tableData.tableExtraProps) {
 			return {};
 		}
 
-		const { selectStatement } = tableData;
 		const {
-			targetLag,
-			warehouse,
-			refreshMode,
-			initialize,
-			maxDataExtensionTime,
-			externalVolume,
-			catalog,
-			baseLocation,
-		} = tableData.dynamicTableProps;
+			iceberg,
+			dynamic,
+			transient,
+			selectStatement,
+			tableExtraProps: {
+				targetLag,
+				warehouse,
+				refreshMode,
+				initialize,
+				maxDataExtensionTime,
+				externalVolume,
+				catalog,
+				baseLocation,
+			},
+		} = tableData;
 
 		return {
 			targetLag: getTargetLag(targetLag),
@@ -106,6 +110,9 @@ module.exports = app => {
 			copyGrants: copyGrants ? `${copyGrants.trim()}\n` : '',
 			comment: comment ? `${comment.trim()}\n` : '',
 			tagsStatement: tagsStatement ? `${tagsStatement.trim()}\n` : '',
+			transient: transient ? ' TRANSIENT' : '',
+			iceberg: iceberg ? ' ICEBERG' : '',
+			dynamic: dynamic ? ' DYNAMIC' : '',
 		};
 	};
 
@@ -115,6 +122,6 @@ module.exports = app => {
 		addOptions,
 		getAtOrBefore,
 		mergeKeys,
-		getDynamicTableProps,
+		getTableExtraProps,
 	};
 };

@@ -29,7 +29,7 @@ module.exports = (baseProvider, options, app) => {
 	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
-	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys, getDynamicTableProps } =
+	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys, getTableExtraProps } =
 		require('./helpers/tableHelper')(app);
 	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(app);
 	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(app);
@@ -327,9 +327,8 @@ module.exports = (baseProvider, options, app) => {
 				isCaseSensitive: tableData.isCaseSensitive,
 			});
 
-			if (tableData.dynamic) {
-				const dynamicTableOptions = getDynamicTableProps({
-					iceberg: tableData.iceberg,
+			if (tableData.dynamic || tableData.iceberg) {
+				const tableExtraOptions = getTableExtraProps({
 					tableData,
 					tagsStatement,
 					clusterKeys,
@@ -344,7 +343,7 @@ module.exports = (baseProvider, options, app) => {
 					tableIfNotExists,
 					name: tableData.fullName,
 					transient,
-					...dynamicTableOptions,
+					...tableExtraOptions,
 				});
 			} else if (tableData.selectStatement) {
 				return assignTemplates(templates.createAsSelect, {
@@ -822,8 +821,8 @@ module.exports = (baseProvider, options, app) => {
 				transient: firstTab.transient,
 				external: firstTab.external,
 				dynamic: firstTab.dynamic,
-				dynamicTableProps: {
-					iceberg: firstTab.iceberg,
+				iceberg: firstTab.iceberg,
+				tableExtraProps: {
 					warehouse: firstTab.warehouse,
 					targetLag: firstTab.targetLag,
 					refreshMode: firstTab.refreshMode,
