@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const { escapeString } = require('../../utils/escapeString');
+const { preSpace } = require('../../utils/preSpace');
 
 module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => {
 	const getSchemaFullName = (database, schemaName, isCaseSensitive) => {
@@ -20,7 +21,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		const tableName = getName(isCaseSensitive, newName);
 		const tableFullName = getFullName(schemaFullName, tableName);
 
-		return assignTemplates(template, { dynamic: dynamic ? ' DYNAMIC' : '', name: tableFullName });
+		return assignTemplates(template, { dynamic: preSpace(dynamic && 'DYNAMIC'), name: tableFullName });
 	};
 
 	const getAlterSchemaName = ({ script, data }) => {
@@ -76,7 +77,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 				const value = getValue({ key, data, propValue }, 'setProperty');
 				const statement = `${mapKeyToKeyword[key]} = ${value}`;
 
-				return Boolean(index) ? tab(statement) : statement;
+				return index ? tab(statement) : statement;
 			});
 
 			if (!_.isEmpty(setPropertyData)) {
@@ -99,7 +100,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 
 			const unsetPropertyData = unsetProperty.map((key, index) => {
 				key = mapKeyToKeyword[key];
-				return Boolean(index) ? `${key}` : `${key}`;
+				return `${key}`;
 			});
 
 			if (!_.isEmpty(unsetPropertyData)) {

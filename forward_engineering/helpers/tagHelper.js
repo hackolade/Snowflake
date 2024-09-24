@@ -3,6 +3,7 @@
  */
 
 const { differenceBy, some, partition, isEmpty } = require('lodash');
+const { preSpace } = require('../utils/preSpace');
 
 module.exports = ({ getName, toString }) => {
 	/**
@@ -33,7 +34,7 @@ module.exports = ({ getName, toString }) => {
 			.map(({ value }) => toString(value))
 			.join(', ');
 
-		return isEmpty(values) ? '' : ` ALLOWED_VALUES ${values}`;
+		return preSpace(!isEmpty(values) && `ALLOWED_VALUES ${values}`);
 	};
 
 	/**

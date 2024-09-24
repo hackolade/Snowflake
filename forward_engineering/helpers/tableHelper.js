@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { preSpace } = require('../utils/preSpace');
 
 module.exports = app => {
 	const { tab } = app.require('@hackolade/ddl-fe-utils').general;
@@ -52,7 +53,9 @@ module.exports = app => {
 			return '';
 		}
 
-		return `TARGET_LAG = ${targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagTimeSpan}'`}\n`;
+		const targetLagValue = targetLagDownstream ? 'DOWNSTREAM' : `'${targetLagAmount} ${targetLagTimeSpan}'`;
+
+		return `TARGET_LAG = ${targetLagValue}\n`;
 	}
 
 	function getSelectStatement(selectStatement) {
@@ -62,9 +65,8 @@ module.exports = app => {
 		return `AS\n${selectStatement.split('\n').map(mapStatement).join('')}`;
 	}
 
-	const getDynamicTableProps = ({
+	const getTableExtraProps = ({
 		tableData,
-		transient,
 		tagsStatement,
 		clusterKeys,
 		comment,
@@ -72,21 +74,26 @@ module.exports = app => {
 		copyGrants,
 		columnDefinitions,
 	}) => {
-		if (!tableData.dynamicTableProps) {
+		if (!tableData.tableExtraProps) {
 			return {};
 		}
 
-		const { selectStatement } = tableData;
 		const {
-			targetLag,
-			warehouse,
-			refreshMode,
-			initialize,
-			maxDataExtensionTime,
-			externalVolume,
-			catalog,
-			baseLocation,
-		} = tableData.dynamicTableProps;
+			iceberg,
+			dynamic,
+			transient,
+			selectStatement,
+			tableExtraProps: {
+				targetLag,
+				warehouse,
+				refreshMode,
+				initialize,
+				maxDataExtensionTime,
+				externalVolume,
+				catalog,
+				baseLocation,
+			},
+		} = tableData;
 
 		return {
 			targetLag: getTargetLag(targetLag),
@@ -106,6 +113,9 @@ module.exports = app => {
 			copyGrants: copyGrants ? `${copyGrants.trim()}\n` : '',
 			comment: comment ? `${comment.trim()}\n` : '',
 			tagsStatement: tagsStatement ? `${tagsStatement.trim()}\n` : '',
+			transient: preSpace(transient && 'TRANSIENT'),
+			iceberg: preSpace(iceberg && 'ICEBERG'),
+			dynamic: preSpace(dynamic && 'DYNAMIC'),
 		};
 	};
 
@@ -115,6 +125,6 @@ module.exports = app => {
 		addOptions,
 		getAtOrBefore,
 		mergeKeys,
-		getDynamicTableProps,
+		getTableExtraProps,
 	};
 };
