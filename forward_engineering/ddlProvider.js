@@ -399,7 +399,8 @@ module.exports = (baseProvider, options, app) => {
 						],
 						comment,
 					),
-
+					orReplace,
+					tableIfNotExists,
 					column_definitions: columnDefinitions,
 					out_of_line_constraints: getOutOfLineConstraints(
 						isActivated,

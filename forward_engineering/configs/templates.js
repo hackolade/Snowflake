@@ -38,7 +38,7 @@ module.exports = {
 	createAsSelect: 'CREATE TABLE IF NOT EXISTS ${name} AS ${selectStatement}${tableOptions};\n',
 
 	createExternalTable:
-		'CREATE EXTERNAL TABLE IF NOT EXISTS \n' +
+		'CREATE${orReplace} EXTERNAL TABLE${tableIfNotExists}\n' +
 		'\t${name} (\n' +
 		'\t\t${column_definitions}${out_of_line_constraints}\n' +
 		'\t)${tableOptions};\n',
