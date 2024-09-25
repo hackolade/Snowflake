@@ -40,7 +40,14 @@
             "disableDenormalization": true,
             "enableComplexTypesNormalization": true,
             "relationships": {
-                "compositeRelationships": true
+                "compositeRelationships": {
+                    "allowRelationshipsByProperties": [
+                        "primaryKey",
+                        "unique",
+                        "compositeUniqueKey",
+                        "compositePrimaryKey"
+                    ]
+                }
             },
             "FEScriptCommentsSupported": true,
             "disableJsonDataMaxLength": true,
