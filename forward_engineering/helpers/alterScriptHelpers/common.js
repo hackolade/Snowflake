@@ -209,7 +209,7 @@ const prepareCollectionFormatTypeOptions = ({ collection, data }) => {
 };
 
 const prepareCollectionStageCopyOptions =
-	(clean, getStageCopyOptions, _) =>
+	(clean, getStageCopyOptions) =>
 	({ collection, data }) => {
 		const { new: newOptions = {}, old: oldOptions = {} } = collection?.role?.compMod?.stageCopyOptions || {};
 		const commonOptionsKeys = getObjectCommonKeys(oldOptions, newOptions);
