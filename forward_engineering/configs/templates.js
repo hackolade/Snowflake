@@ -20,12 +20,21 @@ module.exports = {
 		'${warehouse}' +
 		'${externalVolume}' +
 		'${catalog}' +
+		'${catalogTableName}' +
+		'${catalogNamespace}' +
+		'${catalogSync}' +
+		'${metadataFilePath}' +
+		'${replaceInvalidCharacters}' +
+		'${autoRefresh}' +
+		'${storageSerializationPolicy}' +
 		'${baseLocation}' +
 		'${refreshMode}' +
 		'${initialize}' +
 		'${clusterKeys}' +
 		'${dataRetentionTime}' +
 		'${maxDataExtensionTime}' +
+		'${changeTracking}' +
+		'${defaultDdlCollation}' +
 		'${copyGrants}' +
 		'${comment}' +
 		'${tagsStatement}' +

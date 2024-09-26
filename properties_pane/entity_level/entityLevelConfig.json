@@ -208,28 +208,326 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "External volume",
 				"propertyKeyword": "externalVolume",
+				"propertyTooltip": "Specifies the identifier (name) for the external volume where the Iceberg table stores its metadata files and data in Parquet format. Iceberg metadata and manifest files store the table schema, partitions, snapshots, and other metadata.",
 				"propertyType": "text",
 				"dependency": {
 					"key": "iceberg",
 					"value": true
+				}
+			},
+			{
+				"propertyName": "Catalog management",
+				"propertyKeyword": "catalogMgmt",
+				"propertyType": "select",
+				"options": ["snowflake", "external"],
+				"dependency": {
+					"key": "iceberg",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "External catalog",
+				"propertyKeyword": "catalogExternal",
+				"propertyTooltip": "Specifies the identifier (name) of the catalog integration for this table.",
+				"propertyType": "select",
+				"options": ["glue", "iceberg files", "delta files", "iceberg rest"],
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "catalogMgmt",
+							"value": "external"
+						}
+					]
 				}
 			},
 			{
 				"propertyName": "Catalog",
 				"propertyKeyword": "catalog",
 				"propertyType": "text",
+				"defaultValue": "snowflake",
+				"disabled": true,
 				"dependency": {
-					"key": "iceberg",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "catalogMgmt",
+							"value": "snowflake"
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Catalog",
+				"propertyKeyword": "catalog",
+				"propertyTooltip": "Specifies the catalog integration name.",
+				"propertyType": "text",
+				"defaultValue": "",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "catalogMgmt",
+							"value": "external"
+						}
+					]
 				}
 			},
 			{
 				"propertyName": "Base location",
 				"propertyKeyword": "baseLocation",
+				"propertyTooltip": "The path to a directory where Snowflake can write data and metadata files for the table.",
 				"propertyType": "text",
 				"dependency": {
-					"key": "iceberg",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "catalog",
+									"value": "snowflake"
+								},
+								{
+									"key": "catalogExternal",
+									"value": "delta files"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Catalog Sync",
+				"propertyKeyword": "catalogSync",
+				"propertyTooltip": "Optionally specifies the name of a catalog integration configured for Polaris Catalog.",
+				"propertyType": "text",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "catalog",
+							"value": "snowflake"
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Storage serialization policy",
+				"propertyKeyword": "storageSerializationPolicy",
+				"propertyTooltip": "Specifies the storage serialization policy for the table. If not specified at table creation, the table inherits the value set at the schema, database, or account level. If the value isn’t specified at any level, the table uses the default value.",
+				"propertyType": "select",
+				"defaultValue": "optimized",
+				"options": ["optimized", "compatible"],
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "catalog",
+							"value": "snowflake"
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Change tracking",
+				"propertyKeyword": "changeTracking",
+				"propertyTooltip": "Specifies whether to enable change tracking on the table.",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "catalog",
+							"value": "snowflake"
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Default DDL collation",
+				"propertyKeyword": "defaultDdlCollation",
+				"propertyTooltip": "Specifies a default collation specification for the columns in the table, including columns added to the table in the future.",
+				"propertyType": "text",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "catalog",
+							"value": "snowflake"
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Catalog table name",
+				"propertyKeyword": "catalogTableName",
+				"propertyTooltip": "Specifies the table name as recognized by the AWS Glue Data Catalog. ",
+				"propertyType": "text",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "catalogExternal",
+									"value": "glue"
+								},
+								{
+									"key": "catalogExternal",
+									"value": "iceberg rest"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Catalog namespace",
+				"propertyKeyword": "catalogNamespace",
+				"propertyTooltip": "Optionally specifies the namespace (for example, my_database) for the REST catalog source, and overrides the default catalog namespace specified with the catalog integration.",
+				"propertyType": "text",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "catalogExternal",
+									"value": "glue"
+								},
+								{
+									"key": "catalogExternal",
+									"value": "iceberg rest"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Metadata file path",
+				"propertyKeyword": "metadataFilePath",
+				"propertyTooltip": "Specifies the relative path of the Iceberg metadata file to use for column definitions.",
+				"propertyType": "text",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "catalogExternal",
+							"value": "iceberg files"
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Replace invalid characters",
+				"propertyKeyword": "replaceInvalidCharacters",
+				"propertyTooltip": "Specifies whether to replace invalid UTF-8 characters with the Unicode replacement character in query results.",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "catalogExternal",
+									"value": "glue"
+								},
+								{
+									"key": "catalogExternal",
+									"value": "iceberg files"
+								},
+								{
+									"key": "catalogExternal",
+									"value": "delta files"
+								},
+								{
+									"key": "catalogExternal",
+									"value": "iceberg rest"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Auto refresh",
+				"propertyKeyword": "autoRefresh",
+				"propertyTooltip": "Specifies whether Snowflake should automatically poll the external Iceberg catalog associated with the table for metadata updates when you use automated refresh.",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values": [
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"type": "or",
+							"values": [
+								{
+									"key": "catalogExternal",
+									"value": "glue"
+								},
+								{
+									"key": "catalogExternal",
+									"value": "iceberg rest"
+								}
+							]
+						}
+					]
 				}
 			},
 			{
@@ -271,7 +569,24 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Temporary",
 				"propertyKeyword": "temporary",
-				"propertyType": "checkbox"
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": [
+						{
+							"key": "dynamic",
+							"value": true
+						},
+						{
+							"key": "iceberg",
+							"value": true
+						},
+						{
+							"key": "external",
+							"value": true
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Transient",
@@ -952,7 +1267,7 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Max data extension in days",
+				"propertyName": "Max data extension time in days",
 				"propertyKeyword": "MAX_DATA_EXTENSION_TIME_IN_DAYS",
 				"propertyTooltip": "The maximum number of days Snowflake can extend the data retention period for tables to ingest streaming data to prevent streams from becoming stale. This parameter does not apply to a database created from a share since it is read-only.",
 				"propertyValidate": true,
@@ -961,8 +1276,29 @@ making sure that you maintain a proper JSON format.
 				"minValue": 0,
 				"maxValue": 90,
 				"dependency": {
-					"key": "dynamic",
-					"value": true
+					"type": "or",
+					"values": [
+						{
+							"type": "not",
+							"values": {
+								"key": "external",
+								"value": true
+							}
+						},
+						{
+							"type": "and",
+							"values": [
+								{
+									"key": "iceberg",
+									"value": true
+								},
+								{
+									"key": "catalog",
+									"value": "snowflake"
+								}
+							]
+						}
+					]
 				}
 			},
 			{

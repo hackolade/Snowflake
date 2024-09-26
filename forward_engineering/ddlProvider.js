@@ -2,7 +2,20 @@
  * @typedef {import('./types').Tag} Tag
  */
 
-const _ = require('lodash');
+const {
+	differenceBy,
+	flatMap,
+	flow,
+	get,
+	isEmpty,
+	isPlainObject,
+	isUndefined,
+	head,
+	omit,
+	toUpper,
+	trim,
+	uniqBy,
+} = require('lodash');
 const defaultTypes = require('./configs/defaultTypes');
 const types = require('./configs/types');
 const templates = require('./configs/templates');
@@ -90,7 +103,7 @@ module.exports = (baseProvider, options, app) => {
 				isParentActivated ? commentIfDeactivated(constraint.statement, constraint) : constraint.statement,
 		);
 
-		return !_.isEmpty(constraints) ? ',\n\t\t' + constraints.join(',\n\t\t') : '';
+		return !isEmpty(constraints) ? ',\n\t\t' + constraints.join(',\n\t\t') : '';
 	};
 
 	function insertNewlinesAtEdges(input) {
@@ -269,21 +282,21 @@ module.exports = (baseProvider, options, app) => {
 
 		hydrateJsonSchemaColumn(jsonSchema, definitionJsonSchema) {
 			if (jsonSchema.type === 'variant') {
-				return _.omit(jsonSchema, ['subtype', 'mode']);
+				return omit(jsonSchema, ['subtype', 'mode']);
 			}
 
 			return jsonSchema;
 		},
 
 		createTable(tableData, isActivated) {
-			const schemaName = _.get(tableData, 'schemaData.schemaName');
+			const schemaName = get(tableData, 'schemaData.schemaName');
 			const temporary = preSpace(tableData.temporary && 'TEMPORARY');
 			const transient = preSpace(tableData.transient && !tableData.temporary && 'TRANSIENT');
 			const orReplace = preSpace(tableData.orReplace && 'OR REPLACE');
 			const tableIfNotExists = preSpace(tableData.tableIfNotExists && 'IF NOT EXISTS');
 
 			const clusterKeys = preSpace(
-				!_.isEmpty(tableData.clusteringKey) &&
+				!isEmpty(tableData.clusteringKey) &&
 					'CLUSTER BY (' +
 						(isActivated
 							? foreignKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)
@@ -291,7 +304,7 @@ module.exports = (baseProvider, options, app) => {
 						')',
 			);
 			const partitionKeys = preSpace(
-				!_.isEmpty(tableData.partitioningKey) &&
+				!isEmpty(tableData.partitioningKey) &&
 					'PARTITION BY (' +
 						(isActivated
 							? foreignKeysToString(
@@ -437,7 +450,7 @@ module.exports = (baseProvider, options, app) => {
 				type: decorateType(columnDefinition.type, columnDefinition),
 				collation: getCollation(columnDefinition.type, columnDefinition.collation),
 				default: preSpace(
-					!_.isUndefined(columnDefinition.default) &&
+					!isUndefined(columnDefinition.default) &&
 						'DEFAULT ' +
 							getDefault({
 								scriptFormat,
@@ -515,7 +528,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createView(viewData, dbData, isActivated) {
-			const schemaName = _.get(viewData, 'schemaData.schemaName');
+			const schemaName = get(viewData, 'schemaData.schemaName');
 			const { columnList, tableColumns, tables } = viewData.keys.reduce(
 				(result, key) => {
 					result.columnList.push({
@@ -543,7 +556,7 @@ module.exports = (baseProvider, options, app) => {
 				},
 			);
 
-			if (_.isEmpty(tables) && !viewData.selectStatement) {
+			if (isEmpty(tables) && !viewData.selectStatement) {
 				return '';
 			}
 
@@ -598,15 +611,15 @@ module.exports = (baseProvider, options, app) => {
 				autoincrement:
 					jsonSchema.defaultOption === 'Autoincrement' && jsonSchema.autoincrement
 						? {
-								start: _.get(jsonSchema, 'autoincrement.start_num'),
-								step: _.get(jsonSchema, 'autoincrement.step_num'),
+								start: get(jsonSchema, 'autoincrement.start_num'),
+								step: get(jsonSchema, 'autoincrement.step_num'),
 							}
 						: false,
 				identity:
 					jsonSchema.defaultOption === 'Identity' && jsonSchema.identity
 						? {
-								start: _.get(jsonSchema, 'identity.start_num'),
-								step: _.get(jsonSchema, 'identity.step_num'),
+								start: get(jsonSchema, 'identity.start_num'),
+								step: get(jsonSchema, 'identity.step_num'),
 							}
 						: false,
 				collation: jsonSchema.collate
@@ -659,7 +672,7 @@ module.exports = (baseProvider, options, app) => {
 									handler: udf.functionHandler || undefined,
 									function:
 										udf.functionBody || udf.storedProcFunction
-											? tab(_.trim(udf.functionBody || udf.storedProcFunction))
+											? tab(trim(udf.functionBody || udf.storedProcFunction))
 											: undefined,
 									comment:
 										udf.functionDescription || udf.storedProcDescription
@@ -682,7 +695,7 @@ module.exports = (baseProvider, options, app) => {
 									runtimeVersion: procedure.runtimeVersion || undefined,
 									packages: procedure.packages || undefined,
 									handler: procedure.handler || undefined,
-									body: procedure.body ? tab(_.trim(procedure.body)) : undefined,
+									body: procedure.body ? tab(trim(procedure.body)) : undefined,
 									description: procedure.description || undefined,
 								}),
 							)
@@ -751,38 +764,34 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateTable({ tableData, entityData, jsonSchema }) {
-			const keyConstraints = keyHelper.getTableKeyConstraints({ jsonSchema });
-			const firstTab = _.get(entityData, '[0]', {});
-			const schemaName = getName(firstTab.isCaseSensitive, _.get(tableData, 'schemaData.schemaName'));
-			const databaseName = getName(firstTab.isCaseSensitive, _.get(tableData, 'schemaData.databaseName'));
+			const firstTab = head(entityData) ?? {};
+
+			const schemaName = getName(firstTab.isCaseSensitive, get(tableData, 'schemaData.schemaName'));
+			const databaseName = getName(firstTab.isCaseSensitive, get(tableData, 'schemaData.databaseName'));
 			const tableName = getName(firstTab.isCaseSensitive, tableData.name);
 			const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
+			const fileFormat = firstTab.external ? firstTab.externalFileFormat : firstTab.fileFormat;
+
 			const getLocation = location => {
 				return location.namespace ? location.namespace + location.path : location.path;
 			};
 
-			const fileFormat = firstTab.external ? firstTab.externalFileFormat : firstTab.fileFormat;
+			const keyConstraints = keyHelper.getTableKeyConstraints({ jsonSchema });
+
+			const entityLevelCompositeKeysReducer = (keys, data) => ({
+				...keys,
+				[data.name]: data.columns.map(column => {
+					return { name: column.name, isActivated: column.isActivated };
+				}),
+			});
+
 			const entityLevelCompositePrimaryKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'PRIMARY KEY')
-				.reduce((keys, data) => {
-					return {
-						...keys,
-						[data.name]: data.columns.map(column => {
-							return { name: column.name, isActivated: column.isActivated };
-						}),
-					};
-				}, {});
+				.reduce(entityLevelCompositeKeysReducer, {});
 
 			const entityLevelCompositeUniqueKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'UNIQUE')
-				.reduce((keys, data) => {
-					return {
-						...keys,
-						[data.name]: data.columns.map(column => {
-							return { name: column.name, isActivated: column.isActivated };
-						}),
-					};
-				}, {});
+				.reduce(entityLevelCompositeKeysReducer, {});
 
 			const compositePrimaryKeys = tableData.columnDefinitions
 				.filter(column => column.compositePrimaryKey)
@@ -794,7 +803,7 @@ module.exports = (baseProvider, options, app) => {
 					return {
 						...result,
 						[column.primaryKeyConstraintName]: Array.isArray(result[column.primaryKeyConstraintName])
-							? _.uniqBy(
+							? uniqBy(
 									[
 										...result[column.primaryKeyConstraintName],
 										{ name: column.name, isActivated: column.isActivated },
@@ -815,7 +824,7 @@ module.exports = (baseProvider, options, app) => {
 					return {
 						...result,
 						[column.uniqueKeyConstraintName]: Array.isArray(result[column.uniqueKeyConstraintName])
-							? _.uniqBy(
+							? uniqBy(
 									[
 										...result[column.uniqueKeyConstraintName],
 										{ name: column.name, isActivated: column.isActivated },
@@ -829,7 +838,7 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				...tableData,
 				fullName,
-				name: getName(firstTab.isCaseSensitive, tableData.name),
+				name: tableName,
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
 				external: firstTab.external,
@@ -844,11 +853,22 @@ module.exports = (baseProvider, options, app) => {
 					initialize: firstTab.initialize,
 					query: firstTab.query,
 					externalVolume: firstTab.externalVolume,
-					catalog: firstTab.catalog,
 					baseLocation: firstTab.baseLocation,
 					maxDataExtensionTime: !isNaN(firstTab.MAX_DATA_EXTENSION_TIME_IN_DAYS)
 						? firstTab.MAX_DATA_EXTENSION_TIME_IN_DAYS
 						: '',
+					catalog: firstTab.catalog,
+					catalogMgmt: firstTab.catalogMgmt,
+					catalogExternal: firstTab.catalogExternal,
+					catalogSync: firstTab.catalogSync,
+					storageSerializationPolicy: firstTab.storageSerializationPolicy,
+					changeTracking: firstTab.changeTracking,
+					defaultDdlCollation: firstTab.defaultDdlCollation,
+					catalogTableName: firstTab.catalogTableName,
+					catalogNamespace: firstTab.catalogNamespace,
+					metadataFilePath: firstTab.metadataFilePath,
+					replaceInvalidCharacters: firstTab.replaceInvalidCharacters,
+					autoRefresh: firstTab.autoRefresh,
 				},
 				selectStatement: firstTab.selectStatement,
 				isCaseSensitive: firstTab.isCaseSensitive,
@@ -865,30 +885,30 @@ module.exports = (baseProvider, options, app) => {
 					: '',
 				fileFormat: fileFormat,
 				formatName: firstTab.customFileFormatName,
-				formatTypeOptions: _.isEmpty(firstTab.formatTypeOptions)
+				formatTypeOptions: isEmpty(firstTab.formatTypeOptions)
 					? {}
 					: clean(getFormatTypeOptions(fileFormat, firstTab.formatTypeOptions)),
-				copyOptions: _.isEmpty(firstTab.stageCopyOptions)
+				copyOptions: isEmpty(firstTab.stageCopyOptions)
 					? {}
 					: clean(getStageCopyOptions(firstTab.stageCopyOptions)),
 				cloneTableName: getName(
 					firstTab.isCaseSensitive,
-					_.get(tableData, `relatedSchemas[${firstTab.clone}].code`, ''),
+					get(tableData, `relatedSchemas[${firstTab.clone}].code`, ''),
 				),
 				likeTableName: getName(
 					firstTab.isCaseSensitive,
-					_.get(tableData, `relatedSchemas[${firstTab.like}].code`, ''),
+					get(tableData, `relatedSchemas[${firstTab.like}].code`, ''),
 				),
-				cloneParams: _.isEmpty(firstTab.cloneParams)
+				cloneParams: isEmpty(firstTab.cloneParams)
 					? {}
 					: {
-							atOrBefore: _.toUpper(firstTab.cloneParams.atOrBefore),
+							atOrBefore: toUpper(firstTab.cloneParams.atOrBefore),
 							TIMESTAMP: firstTab.cloneParams.TIMESTAMP,
 							OFFSET: firstTab.cloneParams.OFFSET,
 							STATEMENT: firstTab.cloneParams.STATEMENT,
 						},
 				externalOptions: {
-					location: _.isPlainObject(firstTab.location) ? getLocation(firstTab.location) : '',
+					location: isPlainObject(firstTab.location) ? getLocation(firstTab.location) : '',
 					REFRESH_ON_CREATE: toBoolean(firstTab.REFRESH_ON_CREATE),
 					AUTO_REFRESH: toBoolean(firstTab.AUTO_REFRESH),
 					PATTERN: firstTab.PATTERN ? toString(firstTab.PATTERN) : '',
@@ -945,8 +965,8 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				...data,
 				name: getName(data.definition?.isCaseSensitive, data.name),
-				dbName: getName(_.first(data.containerData)?.isCaseSensitive, data.dbName),
-				entityName: getName(_.first(data.entityData)?.isCaseSensitive, data.entityName),
+				dbName: getName(head(data.containerData)?.isCaseSensitive, data.dbName),
+				entityName: getName(head(data.entityData)?.isCaseSensitive, data.entityName),
 			};
 		},
 
@@ -963,12 +983,12 @@ module.exports = (baseProvider, options, app) => {
 				dynamic: data.dynamic,
 				...data.nameData,
 			});
-			const { script } = _.flow(
+			const { script } = flow(
 				getAlterEntityRename(templates.alterTableScript, templates.alterEntityRename),
 				getSetCollectionProperty(alterTableScript),
 				getUnsetCollectionProperty(alterTableScript),
 				getAlterTableFormat(alterTableScript, getFileFormat),
-				getAlterTableStageCopyOptions(alterTableScript, getCopyOptions, _),
+				getAlterTableStageCopyOptions(alterTableScript, getCopyOptions),
 				getAlterObjectTagsScript(alterTableScript),
 			)({ data, script: [] });
 
@@ -976,13 +996,13 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateAlertTable(collection) {
-			const { data } = _.flow(
+			const { data } = flow(
 				prepareName,
 				prepareTableName,
 				prepareCollectionFileFormat,
 				prepareCollectionFormatTypeOptions,
 				prepareAlterSetUnsetData,
-				prepareCollectionStageCopyOptions(clean, getStageCopyOptions, _),
+				prepareCollectionStageCopyOptions(clean, getStageCopyOptions),
 				prepareObjectTagsData('tableTags'),
 			)({ collection, data: {} });
 
@@ -1005,7 +1025,7 @@ module.exports = (baseProvider, options, app) => {
 			const { nameData } = data;
 			const alterTableTemplateName = nameData.isMaterialized ? 'alterMaterializedViewScript' : 'alterViewScript';
 			const alterTableScript = getAlterEntityScript(templates[alterTableTemplateName], nameData);
-			const { script } = _.flow(
+			const { script } = flow(
 				getAlterEntityRename(templates[alterTableTemplateName], templates.alterEntityRename),
 				getSetCollectionProperty(alterTableScript),
 				getUnsetCollectionProperty(alterTableScript),
@@ -1016,7 +1036,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateAlterView(collection) {
-			const { data } = _.flow(
+			const { data } = flow(
 				prepareName,
 				prepareTableName,
 				prepareAlterSetUnsetData,
@@ -1028,7 +1048,7 @@ module.exports = (baseProvider, options, app) => {
 
 		alterSchema(data) {
 			const alterSchemaScript = getAlterSchemaScript(data?.nameData);
-			const { script } = _.flow(
+			const { script } = flow(
 				getAlterSchemaName,
 				getSetCollectionProperty(alterSchemaScript),
 				getUnsetCollectionProperty(alterSchemaScript),
@@ -1040,7 +1060,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateAlterSchema(schema) {
-			const preparedData = _.flow(
+			const preparedData = flow(
 				prepareName,
 				prepareContainerName,
 				prepareAlterSetUnsetData,
@@ -1100,10 +1120,10 @@ module.exports = (baseProvider, options, app) => {
 		alterTag({ tag, oldTag, schemaName, isCaseSensitive }) {
 			const oldName = getFullName(schemaName, getName(isCaseSensitive, oldTag.name));
 			const newName = getFullName(schemaName, getName(isCaseSensitive, tag.name));
-			const flattenAllowedValues = _.flatMap(tag.allowedValues, ({ value }) => value).filter(Boolean);
-			const flattenOldAllowedValues = _.flatMap(oldTag.allowedValues, ({ value }) => value).filter(Boolean);
-			const newAllowedValues = _.differenceBy(tag.allowedValues, oldTag.allowedValues, ({ value }) => value);
-			const droppedAllowedValues = _.differenceBy(oldTag.allowedValues, tag.allowedValues, ({ value }) => value);
+			const flattenAllowedValues = flatMap(tag.allowedValues, ({ value }) => value).filter(Boolean);
+			const flattenOldAllowedValues = flatMap(oldTag.allowedValues, ({ value }) => value).filter(Boolean);
+			const newAllowedValues = differenceBy(tag.allowedValues, oldTag.allowedValues, ({ value }) => value);
+			const droppedAllowedValues = differenceBy(oldTag.allowedValues, tag.allowedValues, ({ value }) => value);
 
 			const isNameChanged = oldName !== newName;
 			const isCommentDropped = oldTag.description && !tag.description;
@@ -1131,14 +1151,14 @@ module.exports = (baseProvider, options, app) => {
 				option: 'UNSET ALLOWED_VALUES',
 			});
 
-			createAndPushStatement(!isAllowedValuesDropped && !_.isEmpty(droppedAllowedValues), {
+			createAndPushStatement(!isAllowedValuesDropped && !isEmpty(droppedAllowedValues), {
 				ifExists: preSpace('IF EXISTS'),
 				name: newName,
 				option: 'DROP',
 				optionValue: getTagAllowedValues({ allowedValues: droppedAllowedValues }),
 			});
 
-			createAndPushStatement(!_.isEmpty(newAllowedValues), {
+			createAndPushStatement(!isEmpty(newAllowedValues), {
 				ifExists: preSpace('IF EXISTS'),
 				name: newName,
 				option: 'ADD',

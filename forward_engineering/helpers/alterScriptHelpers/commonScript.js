@@ -211,7 +211,7 @@ module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => 
 		};
 
 	const getAlterTableStageCopyOptions =
-		(alterScript, getCopyOptions, _) =>
+		(alterScript, getCopyOptions) =>
 		({ script, data }) => {
 			const { stageCopyOptions, nameData } = data;
 
