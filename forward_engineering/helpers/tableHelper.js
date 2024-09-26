@@ -92,6 +92,15 @@ module.exports = app => {
 				externalVolume,
 				catalog,
 				baseLocation,
+				catalogSync,
+				storageSerializationPolicy,
+				changeTracking,
+				defaultDdlCollation,
+				catalogTableName,
+				catalogNamespace,
+				metadataFilePath,
+				replaceInvalidCharacters,
+				autoRefresh,
 			},
 		} = tableData;
 
@@ -116,6 +125,17 @@ module.exports = app => {
 			transient: preSpace(transient && 'TRANSIENT'),
 			iceberg: preSpace(iceberg && 'ICEBERG'),
 			dynamic: preSpace(dynamic && 'DYNAMIC'),
+			catalogSync: catalogSync ? `CATALOG_SYNC = '${catalogSync}'\n` : '',
+			storageSerializationPolicy: storageSerializationPolicy
+				? `STORAGE_SERIALIZATION_POLICY = ${storageSerializationPolicy}\n`
+				: '',
+			changeTracking: changeTracking ? 'CHANGE_TRACKING = TRUE\n' : '',
+			defaultDdlCollation: defaultDdlCollation ? `DEFAULT_DDL_COLLATION = '${defaultDdlCollation}'\n` : '',
+			catalogTableName: catalogTableName ? `CATALOG_TABLE_NAME = '${catalogTableName}'\n` : '',
+			catalogNamespace: catalogNamespace ? `CATALOG_NAMESPACE = '${catalogNamespace}'\n` : '',
+			metadataFilePath: metadataFilePath ? `METADATA_FILE_PATH = '${metadataFilePath}'\n` : '',
+			replaceInvalidCharacters: replaceInvalidCharacters ? 'REPLACE_INVALID_CHARACTERS = TRUE\n' : '',
+			autoRefresh: autoRefresh ? 'AUTO_REFRESH = TRUE\n' : '',
 		};
 	};
 

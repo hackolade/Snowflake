@@ -764,38 +764,34 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateTable({ tableData, entityData, jsonSchema }) {
-			const keyConstraints = keyHelper.getTableKeyConstraints({ jsonSchema });
 			const firstTab = head(entityData) ?? {};
+
 			const schemaName = getName(firstTab.isCaseSensitive, get(tableData, 'schemaData.schemaName'));
 			const databaseName = getName(firstTab.isCaseSensitive, get(tableData, 'schemaData.databaseName'));
 			const tableName = getName(firstTab.isCaseSensitive, tableData.name);
 			const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
+			const fileFormat = firstTab.external ? firstTab.externalFileFormat : firstTab.fileFormat;
+
 			const getLocation = location => {
 				return location.namespace ? location.namespace + location.path : location.path;
 			};
 
-			const fileFormat = firstTab.external ? firstTab.externalFileFormat : firstTab.fileFormat;
+			const keyConstraints = keyHelper.getTableKeyConstraints({ jsonSchema });
+
+			const entityLevelCompositeKeysReducer = (keys, data) => ({
+				...keys,
+				[data.name]: data.columns.map(column => {
+					return { name: column.name, isActivated: column.isActivated };
+				}),
+			});
+
 			const entityLevelCompositePrimaryKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'PRIMARY KEY')
-				.reduce((keys, data) => {
-					return {
-						...keys,
-						[data.name]: data.columns.map(column => {
-							return { name: column.name, isActivated: column.isActivated };
-						}),
-					};
-				}, {});
+				.reduce(entityLevelCompositeKeysReducer, {});
 
 			const entityLevelCompositeUniqueKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'UNIQUE')
-				.reduce((keys, data) => {
-					return {
-						...keys,
-						[data.name]: data.columns.map(column => {
-							return { name: column.name, isActivated: column.isActivated };
-						}),
-					};
-				}, {});
+				.reduce(entityLevelCompositeKeysReducer, {});
 
 			const compositePrimaryKeys = tableData.columnDefinitions
 				.filter(column => column.compositePrimaryKey)
@@ -842,7 +838,7 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				...tableData,
 				fullName,
-				name: getName(firstTab.isCaseSensitive, tableData.name),
+				name: tableName,
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
 				external: firstTab.external,
@@ -857,11 +853,22 @@ module.exports = (baseProvider, options, app) => {
 					initialize: firstTab.initialize,
 					query: firstTab.query,
 					externalVolume: firstTab.externalVolume,
-					catalog: firstTab.catalog,
 					baseLocation: firstTab.baseLocation,
 					maxDataExtensionTime: !isNaN(firstTab.MAX_DATA_EXTENSION_TIME_IN_DAYS)
 						? firstTab.MAX_DATA_EXTENSION_TIME_IN_DAYS
 						: '',
+					catalog: firstTab.catalog,
+					catalogMgmt: firstTab.catalogMgmt,
+					catalogExternal: firstTab.catalogExternal,
+					catalogSync: firstTab.catalogSync,
+					storageSerializationPolicy: firstTab.storageSerializationPolicy,
+					changeTracking: firstTab.changeTracking,
+					defaultDdlCollation: firstTab.defaultDdlCollation,
+					catalogTableName: firstTab.catalogTableName,
+					catalogNamespace: firstTab.catalogNamespace,
+					metadataFilePath: firstTab.metadataFilePath,
+					replaceInvalidCharacters: firstTab.replaceInvalidCharacters,
+					autoRefresh: firstTab.autoRefresh,
 				},
 				selectStatement: firstTab.selectStatement,
 				isCaseSensitive: firstTab.isCaseSensitive,
