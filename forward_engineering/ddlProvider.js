@@ -4,13 +4,13 @@
 
 const {
 	differenceBy,
-	first,
 	flatMap,
 	flow,
 	get,
 	isEmpty,
 	isPlainObject,
 	isUndefined,
+	head,
 	omit,
 	toUpper,
 	trim,
@@ -765,7 +765,7 @@ module.exports = (baseProvider, options, app) => {
 
 		hydrateTable({ tableData, entityData, jsonSchema }) {
 			const keyConstraints = keyHelper.getTableKeyConstraints({ jsonSchema });
-			const firstTab = get(entityData, '[0]', {});
+			const firstTab = head(entityData) ?? {};
 			const schemaName = getName(firstTab.isCaseSensitive, get(tableData, 'schemaData.schemaName'));
 			const databaseName = getName(firstTab.isCaseSensitive, get(tableData, 'schemaData.databaseName'));
 			const tableName = getName(firstTab.isCaseSensitive, tableData.name);
@@ -958,8 +958,8 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				...data,
 				name: getName(data.definition?.isCaseSensitive, data.name),
-				dbName: getName(first(data.containerData)?.isCaseSensitive, data.dbName),
-				entityName: getName(first(data.entityData)?.isCaseSensitive, data.entityName),
+				dbName: getName(head(data.containerData)?.isCaseSensitive, data.dbName),
+				entityName: getName(head(data.entityData)?.isCaseSensitive, data.entityName),
 			};
 		},
 
