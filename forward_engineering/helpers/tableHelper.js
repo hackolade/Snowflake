@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const { isEmpty, toUpper, trim } = require('lodash');
 const { preSpace } = require('../utils/preSpace');
 
 module.exports = app => {
@@ -14,7 +14,7 @@ module.exports = app => {
 	};
 
 	const getCopyOptions = copyOptions => {
-		if (_.isEmpty(copyOptions)) {
+		if (isEmpty(copyOptions)) {
 			return '';
 		}
 
@@ -22,12 +22,9 @@ module.exports = app => {
 	};
 
 	const addOptions = (options, comment) => {
-		const allOptions = _.trim(
-			tab(options.filter(statement => Boolean(_.trim(statement, '\t\n '))).join('\n')),
-			'\t\n',
-		);
+		const allOptions = trim(tab(options.filter(statement => Boolean(trim(statement, '\t\n '))).join('\n')), '\t\n');
 
-		if (_.trim(comment)) {
+		if (trim(comment)) {
 			return allOptions + '\n\t' + comment;
 		}
 
@@ -127,7 +124,7 @@ module.exports = app => {
 			dynamic: preSpace(dynamic && 'DYNAMIC'),
 			catalogSync: catalogSync ? `CATALOG_SYNC = '${catalogSync}'\n` : '',
 			storageSerializationPolicy: storageSerializationPolicy
-				? `STORAGE_SERIALIZATION_POLICY = ${storageSerializationPolicy}\n`
+				? `STORAGE_SERIALIZATION_POLICY = ${toUpper(storageSerializationPolicy)}\n`
 				: '',
 			changeTracking: changeTracking ? 'CHANGE_TRACKING = TRUE\n' : '',
 			defaultDdlCollation: defaultDdlCollation ? `DEFAULT_DDL_COLLATION = '${defaultDdlCollation}'\n` : '',
