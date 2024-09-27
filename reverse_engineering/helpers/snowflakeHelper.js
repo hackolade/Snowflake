@@ -58,36 +58,7 @@ const connect = async (
 		'Connection',
 	);
 
-	let authPromise;
-	if (authType === 'okta') {
-		authPromise = authByOkta(logger, {
-			account,
-			accessUrl,
-			username,
-			password,
-			authenticator,
-			role,
-			warehouse,
-			timeout,
-		});
-	}
-	if (authType === 'externalbrowser') {
-		authPromise = authByExternalBrowser(logger, {
-			account,
-			accessUrl,
-			token,
-			proofKey,
-			username,
-			password,
-			role,
-			warehouse,
-			timeout,
-		});
-	} else {
-		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
-	}
-
-	return await authPromise.catch(err => {
+	const connectionFallbackStrategy = err => {
 		if (err.code !== CANT_REACH_SNOWFLAKE_ERROR_STATUS || hasCloudPlatform(account)) {
 			throw err;
 		}
@@ -113,7 +84,38 @@ const connect = async (
 			cloudPlatform,
 			queryRequestTimeout,
 		});
-	});
+	};
+
+	let authPromise;
+	if (authType === 'okta') {
+		return authByOkta(logger, {
+			account,
+			accessUrl,
+			username,
+			password,
+			authenticator,
+			role,
+			warehouse,
+			timeout,
+		}).catch(connectionFallbackStrategy);
+	}
+	if (authType === 'externalbrowser') {
+		authPromise = authByExternalBrowser(logger, {
+			account,
+			accessUrl,
+			token,
+			proofKey,
+			username,
+			password,
+			role,
+			warehouse,
+			timeout,
+		});
+	} else {
+		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
+	}
+
+	return authPromise.catch(connectionFallbackStrategy);
 };
 
 const authByOkta = async (
@@ -346,10 +348,22 @@ const authByExternalBrowser = async (
 			);
 			logger.log('info', `Fallback to ${defaultWarehouse} warehouse`, 'Connection');
 
+			const logError = err => logger.log('info', `WAREHOUSE error: ${err}`, 'Connection');
+
+			const logAndReturnEmptyArray = err => {
+				logError(err);
+				return [];
+			};
+
 			execute(`USE WAREHOUSE "${removeQuotes(defaultWarehouse)}";`).then(resolve, async err => {
+				if (err) {
+					logError(err);
+				}
+
 				const currentInfo = await execute(
 					`select current_warehouse() as warehouse, current_role() as role;`,
-				).catch(err => []);
+				).catch(logAndReturnEmptyArray);
+
 				const infoRow = _.first(currentInfo);
 				const currentWarehouse = _.get(infoRow, 'WAREHOUSE', '');
 				const currentRole = _.get(infoRow, 'ROLE', '');
@@ -571,7 +585,7 @@ const getFullEntityName = (schemaName, tableName) => {
 };
 
 const addQuotes = string => {
-	if (/^\".*\"$/.test(string)) {
+	if (/^".*"$/.test(string)) {
 		return string;
 	}
 
@@ -885,7 +899,7 @@ const getJsonSchema = async (logger, limit, tableName) => {
 };
 
 const removeQuotes = str => {
-	return (str || '').replace(/^\"([\s\S]*)\"$/im, '$1');
+	return (str || '').replace(/^"([\s\S]*)"$/im, '$1');
 };
 
 const removeLinear = str => {
@@ -907,44 +921,43 @@ const handleClusteringKey = (fieldsNames, keysExpression) => {
 	const items = keysExpression.split(',');
 
 	return items.reduce((keys, item) => {
-		const arguments = item.split('(');
+		const args = item.split('(');
 		let expression = '';
-		const clusteringKeys = arguments
-			.map(argument => {
-				const rawName = _.get(_.trim(argument).match(/^([\S]+)/), 1);
-				if (!rawName) {
-					if (expression) {
-						expression += '(';
-					}
-					expression += argument;
-					return false;
-				}
-				const name = removeQuotes(_.last(getVariantName(_.trim(rawName)).split('.')));
-				const fieldName = fieldsNames.find(fieldName => _.toUpper(fieldName) === _.toUpper(name));
-				if (!fieldName) {
-					if (expression) {
-						expression += '(';
-					}
-					expression += argument;
-					return false;
-				}
 
-				if (name === _.trim(removeQuotes(item))) {
-					return {
-						name: fieldName,
-					};
-				}
-
+		const clusteringKeys = args.reduce((acc, arg) => {
+			const rawName = _.get(_.trim(arg).match(/^(\S+)/), 1);
+			if (!rawName) {
 				if (expression) {
 					expression += '(';
 				}
-				expression += argument.replace(new RegExp(`^${name}`), '${name}');
+				expression += arg;
+				return acc;
+			}
+			const name = removeQuotes(_.last(getVariantName(_.trim(rawName)).split('.')));
+			const fieldName = fieldsNames.find(fieldName => _.toUpper(fieldName) === _.toUpper(name));
+			if (!fieldName) {
+				if (expression) {
+					expression += '(';
+				}
+				expression += arg;
+				return acc;
+			}
 
-				return {
-					name: fieldName,
-				};
-			})
-			.filter(Boolean);
+			if (name === _.trim(removeQuotes(item))) {
+				acc.push({ name: fieldName });
+
+				return acc;
+			}
+
+			if (expression) {
+				expression += '(';
+			}
+			expression += arg.replace(new RegExp(`^${name}`), '${name}');
+
+			acc.push({ name: fieldName });
+
+			return acc;
+		}, []);
 
 		if (!_.isEmpty(clusteringKeys)) {
 			return [
@@ -1048,11 +1061,7 @@ const getEntityData = async (fullName, logger) => {
 const checkExternalMetaFields = fields => {
 	const metaField = _.first(fields) || {};
 
-	if (metaField.name === 'VALUE' && metaField.type === 'VARIANT') {
-		return true;
-	}
-
-	return false;
+	return metaField.name === 'VALUE' && metaField.type === 'VARIANT';
 };
 
 const getFileFormatOptions = stageData => {
@@ -1317,7 +1326,7 @@ const getProcedures = async (dbName, schemaName) => {
 
 	return rows.map(row => {
 		const procedureArguments =
-			row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'].replace(/[\(\)]/gm, '');
+			row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'].replace(/[()]/gm, '');
 
 		return {
 			name: row['PROCEDURE_NAME'],
