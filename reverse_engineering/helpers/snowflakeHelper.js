@@ -3,24 +3,11 @@ const snowflake = require('snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
 const BSON = require('bson');
+const errorMessages = require('./errorMessages');
 
 const ALREADY_CONNECTED_STATUS = 405502;
 const CANT_REACH_SNOWFLAKE_ERROR_STATUS = 401001;
 const CONNECTION_TIMED_OUT_CODE = 'CONNECTION_TIMED_OUT';
-
-let connection;
-let containers = {};
-
-const noConnectionError = { message: 'Connection error' };
-const oktaAuthenticatorError = { message: "Can't get SSO URL. Please, check the authenticator" };
-const oktaCredentialsError = {
-	message:
-		'Incorrect Okta username/password or MFA is enabled. Please, check credentials or use the "Identity Provider SSO (via external browser)" for MFA auth',
-};
-const oktaMFAError = {
-	message:
-		'Native Okta auth doesn\'t support MFA. Please, use the "Identity Provider SSO (via external browser)" auth instead',
-};
 
 const DEFAULT_CLIENT_APP_ID = 'JavaScript';
 const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
@@ -32,6 +19,11 @@ const CLOUD_PLATFORM_POSTFIXES = ['gcp', 'aws', 'azure'];
 const SECONDS_IN_DAY = 86400;
 const SECONDS_IN_HOUR = 3600;
 const SECONDS_IN_MINUTE = 60;
+
+const noConnectionError = { message: errorMessages.CONNECTION_ERROR };
+
+let connection;
+let containers = {};
 
 const connect = async (
 	logger,
@@ -56,40 +48,17 @@ const connect = async (
 
 	logger.log(
 		'info',
-		`Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`,
+		`Connection name: ${name}\n` +
+			`Cloud platform: ${cloudPlatform}\n` +
+			`Host: ${host}\n` +
+			`Auth type: ${authType}\n` +
+			`Username: ${username}\n` +
+			`Warehouse: ${warehouse}\n` +
+			`Role: ${role}`,
 		'Connection',
 	);
 
-	let authPromise;
-	if (authType === 'okta') {
-		authPromise = authByOkta(logger, {
-			account,
-			accessUrl,
-			username,
-			password,
-			authenticator,
-			role,
-			warehouse,
-			timeout,
-		});
-	}
-	if (authType === 'externalbrowser') {
-		authPromise = authByExternalBrowser(logger, {
-			account,
-			accessUrl,
-			token,
-			proofKey,
-			username,
-			password,
-			role,
-			warehouse,
-			timeout,
-		});
-	} else {
-		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
-	}
-
-	return await authPromise.catch(err => {
+	const connectionFallbackStrategy = err => {
 		if (err.code !== CANT_REACH_SNOWFLAKE_ERROR_STATUS || hasCloudPlatform(account)) {
 			throw err;
 		}
@@ -115,13 +84,46 @@ const connect = async (
 			cloudPlatform,
 			queryRequestTimeout,
 		});
-	});
+	};
+
+	let authPromise;
+	if (authType === 'okta') {
+		return authByOkta(logger, {
+			account,
+			accessUrl,
+			username,
+			password,
+			authenticator,
+			role,
+			warehouse,
+			timeout,
+		}).catch(connectionFallbackStrategy);
+	}
+	if (authType === 'externalbrowser') {
+		authPromise = authByExternalBrowser(logger, {
+			account,
+			accessUrl,
+			token,
+			proofKey,
+			username,
+			password,
+			role,
+			warehouse,
+			timeout,
+		});
+	} else {
+		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
+	}
+
+	return authPromise.catch(connectionFallbackStrategy);
 };
 
 const authByOkta = async (
 	logger,
 	{ account, accessUrl, username, password, authenticator, role, timeout, warehouse = DEFAULT_WAREHOUSE },
 ) => {
+	const oktaCredentialsError = { message: errorMessages.OKTA_CREDENTIALS_ERROR };
+
 	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(
@@ -142,7 +144,7 @@ const authByOkta = async (
 	logger.log('info', `Token URL: ${tokenUrl}\nSSO URL: ${ssoUrl}`, 'Connection');
 
 	if (!tokenUrl || !ssoUrl) {
-		return Promise.reject(oktaAuthenticatorError);
+		return Promise.reject({ message: errorMessages.OKTA_SSO_ERROR });
 	}
 
 	const authNData = await axios
@@ -158,7 +160,7 @@ const authByOkta = async (
 	const status = _.get(authNData, 'data.status', 'SUCCESS');
 	const authToken = _.get(authNData, 'data.sessionToken', '');
 	if (status.startsWith('MFA')) {
-		return Promise.reject(oktaMFAError);
+		return Promise.reject({ message: errorMessages.OKTA_MFA_ERROR });
 	}
 
 	const identityProviderTokenData = await axios.post(tokenUrl, { username, password }).catch(err => {
@@ -346,10 +348,22 @@ const authByExternalBrowser = async (
 			);
 			logger.log('info', `Fallback to ${defaultWarehouse} warehouse`, 'Connection');
 
+			const logError = err => logger.log('info', `WAREHOUSE error: ${err}`, 'Connection');
+
+			const logAndReturnEmptyArray = err => {
+				logError(err);
+				return [];
+			};
+
 			execute(`USE WAREHOUSE "${removeQuotes(defaultWarehouse)}";`).then(resolve, async err => {
+				if (err) {
+					logError(err);
+				}
+
 				const currentInfo = await execute(
 					`select current_warehouse() as warehouse, current_role() as role;`,
-				).catch(err => []);
+				).catch(logAndReturnEmptyArray);
+
 				const infoRow = _.first(currentInfo);
 				const currentWarehouse = _.get(infoRow, 'WAREHOUSE', '');
 				const currentRole = _.get(infoRow, 'ROLE', '');
@@ -529,15 +543,35 @@ const getRowsByDatabases = entitiesRows => {
 	}, {});
 };
 
-const getEntitiesNames = async () => {
-	const databases = await showDatabases().catch(e => []);
-	const tablesRows = await showTablesByDatabases(databases).catch(e => []);
-	const externalTableRows = await showExternalTables().catch(e => []);
-	const viewsRows = await showViews().catch(e => []);
-	const materializedViewsRows = await showMaterializedViews().catch(e => []);
+const getEntitiesNames = async ({ logger }) => {
+	const logErrorAndReturnEmptyArray = err => {
+		logger.log('error', err, 'SHOW command error');
+		return [];
+	};
+
+	const logTablesMeta = ({ tables = [] }) => {
+		if (!tables.length) {
+			return;
+		}
+		const getMeta = table =>
+			`${table.database_name}.${table.name}: rows=${table.rows}; is_dynamic=${table.is_dynamic}; is_external=${table.is_external}; is_iceberg=${table.is_iceberg};`;
+		const combinedMeta = tables.map(getMeta);
+
+		logger.log('info', combinedMeta, 'Tables metadata');
+	};
+
+	const databases = await showDatabases().catch(logErrorAndReturnEmptyArray);
+	const tablesRows = await showTablesByDatabases(databases).catch(logErrorAndReturnEmptyArray);
+	const flatTableRows = tablesRows.flatMap(row => row.value).filter(Boolean);
+
+	logTablesMeta({ tables: flatTableRows });
+
+	const externalTableRows = await showExternalTables().catch(logErrorAndReturnEmptyArray);
+	const viewsRows = await showViews().catch(logErrorAndReturnEmptyArray);
+	const materializedViewsRows = await showMaterializedViews().catch(logErrorAndReturnEmptyArray);
 
 	const entitiesRows = [
-		...tablesRows.flatMap(row => row.value).filter(Boolean),
+		...flatTableRows,
 		...externalTableRows,
 		...viewsRows.map(annotateView),
 		...materializedViewsRows.map(annotateView),
@@ -571,7 +605,7 @@ const getFullEntityName = (schemaName, tableName) => {
 };
 
 const addQuotes = string => {
-	if (/^\".*\"$/.test(string)) {
+	if (/^".*"$/.test(string)) {
 		return string;
 	}
 
@@ -885,7 +919,7 @@ const getJsonSchema = async (logger, limit, tableName) => {
 };
 
 const removeQuotes = str => {
-	return (str || '').replace(/^\"([\s\S]*)\"$/im, '$1');
+	return (str || '').replace(/^"([\s\S]*)"$/im, '$1');
 };
 
 const removeLinear = str => {
@@ -907,44 +941,43 @@ const handleClusteringKey = (fieldsNames, keysExpression) => {
 	const items = keysExpression.split(',');
 
 	return items.reduce((keys, item) => {
-		const arguments = item.split('(');
+		const args = item.split('(');
 		let expression = '';
-		const clusteringKeys = arguments
-			.map(argument => {
-				const rawName = _.get(_.trim(argument).match(/^([\S]+)/), 1);
-				if (!rawName) {
-					if (expression) {
-						expression += '(';
-					}
-					expression += argument;
-					return false;
-				}
-				const name = removeQuotes(_.last(getVariantName(_.trim(rawName)).split('.')));
-				const fieldName = fieldsNames.find(fieldName => _.toUpper(fieldName) === _.toUpper(name));
-				if (!fieldName) {
-					if (expression) {
-						expression += '(';
-					}
-					expression += argument;
-					return false;
-				}
 
-				if (name === _.trim(removeQuotes(item))) {
-					return {
-						name: fieldName,
-					};
-				}
-
+		const clusteringKeys = args.reduce((acc, arg) => {
+			const rawName = _.get(_.trim(arg).match(/^(\S+)/), 1);
+			if (!rawName) {
 				if (expression) {
 					expression += '(';
 				}
-				expression += argument.replace(new RegExp(`^${name}`), '${name}');
+				expression += arg;
+				return acc;
+			}
+			const name = removeQuotes(_.last(getVariantName(_.trim(rawName)).split('.')));
+			const fieldName = fieldsNames.find(fieldName => _.toUpper(fieldName) === _.toUpper(name));
+			if (!fieldName) {
+				if (expression) {
+					expression += '(';
+				}
+				expression += arg;
+				return acc;
+			}
 
-				return {
-					name: fieldName,
-				};
-			})
-			.filter(Boolean);
+			if (name === _.trim(removeQuotes(item))) {
+				acc.push({ name: fieldName });
+
+				return acc;
+			}
+
+			if (expression) {
+				expression += '(';
+			}
+			expression += arg.replace(new RegExp(`^${name}`), '${name}');
+
+			acc.push({ name: fieldName });
+
+			return acc;
+		}, []);
 
 		if (!_.isEmpty(clusteringKeys)) {
 			return [
@@ -1048,11 +1081,7 @@ const getEntityData = async (fullName, logger) => {
 const checkExternalMetaFields = fields => {
 	const metaField = _.first(fields) || {};
 
-	if (metaField.name === 'VALUE' && metaField.type === 'VARIANT') {
-		return true;
-	}
-
-	return false;
+	return metaField.name === 'VALUE' && metaField.type === 'VARIANT';
 };
 
 const getFileFormatOptions = stageData => {
@@ -1317,7 +1346,7 @@ const getProcedures = async (dbName, schemaName) => {
 
 	return rows.map(row => {
 		const procedureArguments =
-			row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'].replace(/[\(\)]/gm, '');
+			row['ARGUMENT_SIGNATURE'] === '()' ? '' : row['ARGUMENT_SIGNATURE'].replace(/[()]/gm, '');
 
 		return {
 			name: row['PROCEDURE_NAME'],
