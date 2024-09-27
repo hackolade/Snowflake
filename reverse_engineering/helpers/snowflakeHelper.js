@@ -3,24 +3,11 @@ const snowflake = require('snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
 const BSON = require('bson');
+const errorMessages = require('./errorMessages');
 
 const ALREADY_CONNECTED_STATUS = 405502;
 const CANT_REACH_SNOWFLAKE_ERROR_STATUS = 401001;
 const CONNECTION_TIMED_OUT_CODE = 'CONNECTION_TIMED_OUT';
-
-let connection;
-let containers = {};
-
-const noConnectionError = { message: 'Connection error' };
-const oktaAuthenticatorError = { message: "Can't get SSO URL. Please, check the authenticator" };
-const oktaCredentialsError = {
-	message:
-		'Incorrect Okta username/password or MFA is enabled. Please, check credentials or use the "Identity Provider SSO (via external browser)" for MFA auth',
-};
-const oktaMFAError = {
-	message:
-		'Native Okta auth doesn\'t support MFA. Please, use the "Identity Provider SSO (via external browser)" auth instead',
-};
 
 const DEFAULT_CLIENT_APP_ID = 'JavaScript';
 const DEFAULT_CLIENT_APP_VERSION = '1.5.1';
@@ -32,6 +19,11 @@ const CLOUD_PLATFORM_POSTFIXES = ['gcp', 'aws', 'azure'];
 const SECONDS_IN_DAY = 86400;
 const SECONDS_IN_HOUR = 3600;
 const SECONDS_IN_MINUTE = 60;
+
+const noConnectionError = { message: errorMessages.CONNECTION_ERROR };
+
+let connection;
+let containers = {};
 
 const connect = async (
 	logger,
@@ -56,7 +48,13 @@ const connect = async (
 
 	logger.log(
 		'info',
-		`Connection name: ${name}\nCloud platform: ${cloudPlatform}\nHost: ${host}\nAuth type: ${authType}\nUsername: ${username}\nWarehouse: ${warehouse}\nRole: ${role}`,
+		`Connection name: ${name}\n` +
+			`Cloud platform: ${cloudPlatform}\n` +
+			`Host: ${host}\n` +
+			`Auth type: ${authType}\n` +
+			`Username: ${username}\n` +
+			`Warehouse: ${warehouse}\n` +
+			`Role: ${role}`,
 		'Connection',
 	);
 
@@ -122,6 +120,8 @@ const authByOkta = async (
 	logger,
 	{ account, accessUrl, username, password, authenticator, role, timeout, warehouse = DEFAULT_WAREHOUSE },
 ) => {
+	const oktaCredentialsError = { message: errorMessages.OKTA_CREDENTIALS_ERROR };
+
 	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
 	const ssoUrlsData = await axios.post(
@@ -142,7 +142,7 @@ const authByOkta = async (
 	logger.log('info', `Token URL: ${tokenUrl}\nSSO URL: ${ssoUrl}`, 'Connection');
 
 	if (!tokenUrl || !ssoUrl) {
-		return Promise.reject(oktaAuthenticatorError);
+		return Promise.reject({ message: errorMessages.OKTA_SSO_ERROR });
 	}
 
 	const authNData = await axios
@@ -158,7 +158,7 @@ const authByOkta = async (
 	const status = _.get(authNData, 'data.status', 'SUCCESS');
 	const authToken = _.get(authNData, 'data.sessionToken', '');
 	if (status.startsWith('MFA')) {
-		return Promise.reject(oktaMFAError);
+		return Promise.reject({ message: errorMessages.OKTA_MFA_ERROR });
 	}
 
 	const identityProviderTokenData = await axios.post(tokenUrl, { username, password }).catch(err => {
