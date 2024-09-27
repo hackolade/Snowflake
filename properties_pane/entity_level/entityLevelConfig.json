@@ -1259,11 +1259,41 @@ making sure that you maintain a proper JSON format.
 				"minValue": 0,
 				"maxValue": 90,
 				"dependency": {
-					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
+					"type": "or",
+					"values": [
+						{
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": {
+										"key": "external",
+										"value": true
+									}
+								},
+								{
+									"type": "not",
+									"values": {
+										"key": "iceberg",
+										"value": true
+									}
+								}
+							]
+						},
+						{
+							"type": "and",
+							"values": [
+								{
+									"key": "iceberg",
+									"value": true
+								},
+								{
+									"key": "catalogMgmt",
+									"value": "snowflake"
+								}
+							]
+						}
+					]
 				}
 			},
 			{
@@ -1279,11 +1309,23 @@ making sure that you maintain a proper JSON format.
 					"type": "or",
 					"values": [
 						{
-							"type": "not",
-							"values": {
-								"key": "external",
-								"value": true
-							}
+							"type": "and",
+							"values": [
+								{
+									"type": "not",
+									"values": {
+										"key": "external",
+										"value": true
+									}
+								},
+								{
+									"type": "not",
+									"values": {
+										"key": "iceberg",
+										"value": true
+									}
+								}
+							]
 						},
 						{
 							"type": "and",
@@ -1293,7 +1335,7 @@ making sure that you maintain a proper JSON format.
 									"value": true
 								},
 								{
-									"key": "catalog",
+									"key": "catalogMgmt",
 									"value": "snowflake"
 								}
 							]
