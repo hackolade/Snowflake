@@ -543,15 +543,35 @@ const getRowsByDatabases = entitiesRows => {
 	}, {});
 };
 
-const getEntitiesNames = async () => {
-	const databases = await showDatabases().catch(e => []);
-	const tablesRows = await showTablesByDatabases(databases).catch(e => []);
-	const externalTableRows = await showExternalTables().catch(e => []);
-	const viewsRows = await showViews().catch(e => []);
-	const materializedViewsRows = await showMaterializedViews().catch(e => []);
+const getEntitiesNames = async ({ logger }) => {
+	const logErrorAndReturnEmptyArray = err => {
+		logger.log('error', err, 'SHOW command error');
+		return [];
+	};
+
+	const logTablesMeta = ({ tables = [] }) => {
+		if (!tables.length) {
+			return;
+		}
+		const getMeta = table =>
+			`${table.database_name}.${table.name}: rows=${table.rows}; is_dynamic=${table.is_dynamic}; is_external=${table.is_external}; is_iceberg=${table.is_iceberg};`;
+		const combinedMeta = tables.map(getMeta);
+
+		logger.log('info', combinedMeta, 'Tables metadata');
+	};
+
+	const databases = await showDatabases().catch(logErrorAndReturnEmptyArray);
+	const tablesRows = await showTablesByDatabases(databases).catch(logErrorAndReturnEmptyArray);
+	const flatTableRows = tablesRows.flatMap(row => row.value).filter(Boolean);
+
+	logTablesMeta({ tables: flatTableRows });
+
+	const externalTableRows = await showExternalTables().catch(logErrorAndReturnEmptyArray);
+	const viewsRows = await showViews().catch(logErrorAndReturnEmptyArray);
+	const materializedViewsRows = await showMaterializedViews().catch(logErrorAndReturnEmptyArray);
 
 	const entitiesRows = [
-		...tablesRows.flatMap(row => row.value).filter(Boolean),
+		...flatTableRows,
 		...externalTableRows,
 		...viewsRows.map(annotateView),
 		...materializedViewsRows.map(annotateView),
