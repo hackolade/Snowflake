@@ -493,6 +493,8 @@ const showViews = () => execute('SHOW VIEWS;');
 
 const showMaterializedViews = () => execute('SHOW MATERIALIZED VIEWS;');
 
+const showIcebergTables = ({ options = '' } = {}) => execute(`SHOW ICEBERG TABLES${options};`);
+
 const annotateView = row => ({ ...row, name: `${row.name} (v)` });
 
 const splitEntityNames = names => {
@@ -543,32 +545,59 @@ const getRowsByDatabases = entitiesRows => {
 	}, {});
 };
 
-const getEntitiesNames = async ({ logger }) => {
-	const logErrorAndReturnEmptyArray = err => {
+const logErrorAndReturnEmptyArray =
+	({ logger }) =>
+	err => {
 		logger.log('error', err, 'SHOW command error');
 		return [];
 	};
 
-	const logTablesMeta = ({ tables = [] }) => {
-		if (!tables.length) {
-			return;
+const logTablesMeta = async ({ logger, tables = [], icebergTables = [] }) => {
+	if (!tables.length || !logger) {
+		return;
+	}
+
+	const logError = logErrorAndReturnEmptyArray({ logger });
+
+	const getMeta = async table => {
+		const { database_name, name, rows, is_dynamic, is_external, is_iceberg } = table;
+		const baseInfo =
+			`${database_name}.${name}: ` +
+			`rows=${rows}; ` +
+			`is_dynamic=${is_dynamic}; ` +
+			`is_external=${is_external}; ` +
+			`is_iceberg=${is_iceberg};`;
+
+		let icebergInfo = '';
+
+		if (is_iceberg) {
+			const icebergMeta = _.head(await showIcebergTables({ options: ` LIKE '%${name}%'` }).catch(logError));
+			if (icebergMeta) {
+				icebergInfo = '\nIceberg table meta: ';
+				_.forOwn(icebergMeta, (value, key) => (icebergInfo += `${key}=${value};`));
+			}
 		}
-		const getMeta = table =>
-			`${table.database_name}.${table.name}: rows=${table.rows}; is_dynamic=${table.is_dynamic}; is_external=${table.is_external}; is_iceberg=${table.is_iceberg};`;
-		const combinedMeta = tables.map(getMeta);
 
-		logger.log('info', combinedMeta, 'Tables metadata');
+		return `${baseInfo}${icebergInfo}`;
 	};
+	const combinedMeta = await Promise.all(tables.map(getMeta));
 
-	const databases = await showDatabases().catch(logErrorAndReturnEmptyArray);
-	const tablesRows = await showTablesByDatabases(databases).catch(logErrorAndReturnEmptyArray);
+	logger.log('info', combinedMeta, 'Tables metadata');
+};
+
+const getEntitiesNames = async ({ logger }) => {
+	const logError = logErrorAndReturnEmptyArray({ logger });
+
+	const databases = await showDatabases().catch(logError);
+	const tablesRows = await showTablesByDatabases(databases).catch(logError);
 	const flatTableRows = tablesRows.flatMap(row => row.value).filter(Boolean);
+	const icebergTables = await showIcebergTables().catch(logError);
 
-	logTablesMeta({ tables: flatTableRows });
+	await logTablesMeta({ logger, tables: flatTableRows, icebergTables });
 
-	const externalTableRows = await showExternalTables().catch(logErrorAndReturnEmptyArray);
-	const viewsRows = await showViews().catch(logErrorAndReturnEmptyArray);
-	const materializedViewsRows = await showMaterializedViews().catch(logErrorAndReturnEmptyArray);
+	const externalTableRows = await showExternalTables().catch(logError);
+	const viewsRows = await showViews().catch(logError);
+	const materializedViewsRows = await showMaterializedViews().catch(logError);
 
 	const entitiesRows = [
 		...flatTableRows,
