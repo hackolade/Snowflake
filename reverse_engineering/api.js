@@ -111,7 +111,8 @@ const getDbCollectionsData = async (data, logger, cb) => {
 					getSampleDocSize(quantity, data.recordSamplingSettings),
 					fullTableName,
 				);
-				const entityData = await snowflakeHelper.getEntityData(fullTableName, logger);
+
+				const entityData = await snowflakeHelper.getEntityData({ fullTableName, logger });
 
 				logger.progress({ message: `Schema inference`, containerName: schema, entityName: table });
 				logger.log(
