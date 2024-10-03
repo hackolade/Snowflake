@@ -51,7 +51,8 @@
             },
             "FEScriptCommentsSupported": true,
             "disableJsonDataMaxLength": true,
-            "discoverRelationships": true
+            "discoverRelationships": true,
+            "enableKeysMultipleAbrr": true
         }
     },
     "description": "Hackolade plugin for Snowflake",
