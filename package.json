@@ -1,6 +1,6 @@
 {
     "name": "Snowflake",
-    "version": "0.2.12",
+    "version": "0.2.13",
     "author": "hackolade",
     "engines": {
         "hackolade": "7.7.10",
@@ -51,7 +51,8 @@
             },
             "FEScriptCommentsSupported": true,
             "disableJsonDataMaxLength": true,
-            "discoverRelationships": true
+            "discoverRelationships": true,
+            "enableKeysMultipleAbrr": true
         }
     },
     "description": "Hackolade plugin for Snowflake",
