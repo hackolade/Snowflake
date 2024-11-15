@@ -347,6 +347,9 @@ module.exports = (baseProvider, options, app) => {
 			});
 
 			if (tableData.dynamic || tableData.iceberg) {
+				const isExternalCatalog = tableData.iceberg && tableData.tableExtraProps.catalogMgmt === 'external';
+				const tableColumnDefinitions = isExternalCatalog ? '' : columnDefinitions;
+
 				const tableExtraOptions = getTableExtraProps({
 					tableData,
 					tagsStatement,
@@ -354,7 +357,7 @@ module.exports = (baseProvider, options, app) => {
 					comment,
 					dataRetentionTime,
 					copyGrants,
-					columnDefinitions,
+					columnDefinitions: tableColumnDefinitions,
 				});
 
 				return assignTemplates(templates.createDynamicTable, {
