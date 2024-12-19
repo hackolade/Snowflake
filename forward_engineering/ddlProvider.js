@@ -135,6 +135,7 @@ module.exports = (baseProvider, options, app) => {
 			isCaseSensitive,
 			tags,
 			schemaTags,
+			isActivated = true,
 		}) {
 			const transientStatement = preSpace(transient && 'TRANSIENT');
 			const dataRetentionStatement =
@@ -269,7 +270,7 @@ module.exports = (baseProvider, options, app) => {
 
 			statements.push(schemaStatement);
 
-			return [
+			const statement = [
 				...statements,
 				...userDefinedFunctions,
 				...proceduresStatements,
@@ -278,6 +279,7 @@ module.exports = (baseProvider, options, app) => {
 				...stagesStatements,
 				...tagsStatements,
 			].join('\n');
+			return commentIfDeactivated(statement, { isActivated });
 		},
 
 		hydrateJsonSchemaColumn(jsonSchema, definitionJsonSchema) {
@@ -660,6 +662,7 @@ module.exports = (baseProvider, options, app) => {
 				managedAccess: containerData.managedAccess,
 				dataRetention: containerData.DATA_RETENTION_TIME_IN_DAYS,
 				schemaTags: containerData.schemaTags,
+				isActivated: containerData.isActivated,
 				udfs: Array.isArray(udfs)
 					? udfs
 							.map(udf =>

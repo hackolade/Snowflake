@@ -1,9 +1,7 @@
-const _ = require('lodash');
-
 const STARTS_QUERY = ['//'];
 
 const commentIfDeactivated = (statement, data, isPartOfLine) => {
-	if (_.has(data, 'isActivated') && !data.isActivated) {
+	if (data.isActivated === false) {
 		if (isPartOfLine) {
 			return '// ' + statement;
 		} else if (statement.includes('\n')) {
