@@ -135,7 +135,7 @@ module.exports = (baseProvider, options, app) => {
 			isCaseSensitive,
 			tags,
 			schemaTags,
-			isActivated,
+			isActivated = true,
 		}) {
 			const transientStatement = preSpace(transient && 'TRANSIENT');
 			const dataRetentionStatement =
