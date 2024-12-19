@@ -1,5 +1,3 @@
-const _ = require('lodash');
-
 const STARTS_QUERY = ['//'];
 
 const commentIfDeactivated = (statement, data, isPartOfLine) => {
