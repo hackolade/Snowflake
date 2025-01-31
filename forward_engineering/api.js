@@ -2,6 +2,9 @@
 
 const _ = require('lodash');
 const { commentDropStatements } = require('./helpers/commentHelpers/commentDropStatements');
+const {
+	createColumnDefinitionBySchema,
+} = require('../forward_engineering/helpers/alterScriptHelpers/createColumnDefinition');
 const { DROP_STATEMENTS } = require('./helpers/constants');
 
 module.exports = {
@@ -99,5 +102,30 @@ module.exports = {
 		} catch (e) {
 			callback({ message: e.message, stack: e.stack });
 		}
+	},
+
+	getEntityColumnDefinitions(data, logger, callback, app) {
+		const ddlProvider = require('../forward_engineering/ddlProvider')(null, null, app);
+		const { decorateType } = require('./helpers/columnDefinitionHelper')(app);
+
+		const parentJsonSchema = JSON.parse(data.jsonSchema);
+		const columnDefinitions = _.toPairs(parentJsonSchema.properties).reduce((result, [name, jsonSchema]) => {
+			const columnDefinition = createColumnDefinitionBySchema({
+				name,
+				jsonSchema,
+				parentJsonSchema,
+				ddlProvider,
+			});
+
+			return {
+				...result,
+				[name]: {
+					...columnDefinition,
+					type: decorateType(columnDefinition.type, columnDefinition),
+				},
+			};
+		}, {});
+
+		callback(null, columnDefinitions);
 	},
 };
