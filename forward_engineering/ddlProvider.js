@@ -548,8 +548,12 @@ module.exports = (baseProvider, options, app) => {
 						isActivated: key.isActivated,
 					});
 
-					if (key.entityName && !result.tables.includes(key.entityName)) {
-						result.tables.push(getFullName(key.dbName, key.entityName));
+					if (key.entityName) {
+						const tableName = getFullName(key.dbName, key.entityName);
+
+						if (!result.tables.includes(tableName)) {
+							result.tables.push(tableName);
+						}
 					}
 
 					return result;
