@@ -145,7 +145,7 @@ module.exports = app => {
 	 */
 	const getViewSelectStatement = ({ tables, viewData, viewColumns }) => {
 		const templateVariables = {
-			['${viewColumns}']: `\t${viewColumns}\n`,
+			['${viewColumns}']: `\t${viewColumns}`,
 		};
 
 		if (viewData.selectStatement) {
