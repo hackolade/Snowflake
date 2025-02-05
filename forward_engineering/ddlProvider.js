@@ -604,7 +604,7 @@ module.exports = (baseProvider, options, app) => {
 				secure: preSpace(viewData.secure && 'SECURE'),
 				materialized: preSpace(viewData.materialized && 'MATERIALIZED'),
 				name: getFullName(schemaName, viewData.name),
-				column_list: viewColumns,
+				column_list: viewColumnsToString(columnList, isActivated),
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
 				comment: viewData.comment ? `COMMENT=${escapeString(scriptFormat, viewData.comment)}\n` : '',
 				select_statement: selectStatement,
