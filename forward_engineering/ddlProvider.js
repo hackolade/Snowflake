@@ -581,7 +581,6 @@ module.exports = (baseProvider, options, app) => {
 			}
 
 			const viewColumns = viewColumnsToString(tableColumns, isActivated);
-
 			const selectStatement = getViewSelectStatement({
 				tables,
 				viewData,
