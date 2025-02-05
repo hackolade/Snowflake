@@ -43,8 +43,15 @@ module.exports = (baseProvider, options, app) => {
 	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
-	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys, getTableExtraProps } =
-		require('./helpers/tableHelper')(app);
+	const {
+		getFileFormat,
+		getCopyOptions,
+		addOptions,
+		getAtOrBefore,
+		mergeKeys,
+		getTableExtraProps,
+		getViewSelectStatement,
+	} = require('./helpers/tableHelper')(app);
 	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(app);
 	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(app);
 
@@ -573,9 +580,12 @@ module.exports = (baseProvider, options, app) => {
 				return '';
 			}
 
-			const selectStatement =
-				viewData.selectStatement ||
-				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')}`;
+			const viewColumns = viewColumnsToString(tableColumns, isActivated);
+			const selectStatement = getViewSelectStatement({
+				tables,
+				viewData,
+				viewColumns,
+			});
 
 			const tagStatement = getTagStatement({
 				tags: viewData.viewTags,
