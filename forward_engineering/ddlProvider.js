@@ -43,8 +43,15 @@ module.exports = (baseProvider, options, app) => {
 	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
-	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys, getTableExtraProps } =
-		require('./helpers/tableHelper')(app);
+	const {
+		getFileFormat,
+		getCopyOptions,
+		addOptions,
+		getAtOrBefore,
+		mergeKeys,
+		getTableExtraProps,
+		getViewSelectStatement,
+	} = require('./helpers/tableHelper')(app);
 	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(app);
 	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(app);
 
@@ -565,9 +572,13 @@ module.exports = (baseProvider, options, app) => {
 				return '';
 			}
 
-			const selectStatement =
-				viewData.selectStatement ||
-				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')}`;
+			const viewColumns = viewColumnsToString(tableColumns, isActivated);
+
+			const selectStatement = getViewSelectStatement({
+				tables,
+				viewData,
+				viewColumns,
+			});
 
 			const tagStatement = getTagStatement({
 				tags: viewData.viewTags,
@@ -586,7 +597,7 @@ module.exports = (baseProvider, options, app) => {
 				secure: preSpace(viewData.secure && 'SECURE'),
 				materialized: preSpace(viewData.materialized && 'MATERIALIZED'),
 				name: getFullName(schemaName, viewData.name),
-				column_list: viewColumnsToString(columnList, isActivated),
+				column_list: viewColumns,
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
 				comment: viewData.comment ? `COMMENT=${escapeString(scriptFormat, viewData.comment)}\n` : '',
 				select_statement: selectStatement,

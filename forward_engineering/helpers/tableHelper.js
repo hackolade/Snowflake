@@ -136,6 +136,28 @@ module.exports = app => {
 		};
 	};
 
+	/**
+	 * @param {Object} params
+	 * @param {string[]} params.tables
+	 * @param {Object} params.viewData
+	 * @param {string} params.viewColumns
+	 * @returns {string}
+	 */
+	const getViewSelectStatement = ({ tables, viewData, viewColumns }) => {
+		const templateVariables = {
+			['${viewColumns}']: `\t${viewColumns}\n`,
+		};
+
+		if (viewData.selectStatement) {
+			return Object.entries(templateVariables).reduce(
+				(acc, [key, value]) => acc.replace(key, value),
+				viewData.selectStatement,
+			);
+		}
+
+		return `SELECT \n\t${viewColumns}\nFROM ${tables.join(' INNER JOIN ')}`;
+	};
+
 	return {
 		getFileFormat,
 		getCopyOptions,
@@ -143,5 +165,6 @@ module.exports = app => {
 		getAtOrBefore,
 		mergeKeys,
 		getTableExtraProps,
+		getViewSelectStatement,
 	};
 };
