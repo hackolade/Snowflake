@@ -16,7 +16,10 @@
 				"propertyKeyword": "selectStatement",
 				"propertyType": "details",
 				"propertyTooltip": "select statement",
-				"template": "textarea",
+				"template": "codeEditor",
+				"templateOptions": {
+					"editorDialect": "sql"
+				},
 				"markdown": false
 			},
 			{

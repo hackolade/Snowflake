@@ -43,8 +43,15 @@ module.exports = (baseProvider, options, app) => {
 	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
-	const { getFileFormat, getCopyOptions, addOptions, getAtOrBefore, mergeKeys, getTableExtraProps } =
-		require('./helpers/tableHelper')(app);
+	const {
+		getFileFormat,
+		getCopyOptions,
+		addOptions,
+		getAtOrBefore,
+		mergeKeys,
+		getTableExtraProps,
+		getViewSelectStatement,
+	} = require('./helpers/tableHelper')(app);
 	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(app);
 	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(app);
 
@@ -539,6 +546,10 @@ module.exports = (baseProvider, options, app) => {
 					result.columnList.push({
 						name: `${getName(viewData.isCaseSensitive, key.alias || key.name)}`,
 						isActivated: key.isActivated,
+						comment: preSpace(
+							key.definition.description &&
+								`COMMENT ${escapeString(scriptFormat, key.definition.description)}`,
+						),
 					});
 					result.tableColumns.push({
 						name: `${getName(viewData.isCaseSensitive, key.entityName)}.${getName(
@@ -548,8 +559,12 @@ module.exports = (baseProvider, options, app) => {
 						isActivated: key.isActivated,
 					});
 
-					if (key.entityName && !result.tables.includes(key.entityName)) {
-						result.tables.push(getFullName(key.dbName, key.entityName));
+					if (key.entityName) {
+						const tableName = getFullName(key.dbName, key.entityName);
+
+						if (!result.tables.includes(tableName)) {
+							result.tables.push(tableName);
+						}
 					}
 
 					return result;
@@ -565,9 +580,12 @@ module.exports = (baseProvider, options, app) => {
 				return '';
 			}
 
-			const selectStatement =
-				viewData.selectStatement ||
-				`SELECT \n\t${viewColumnsToString(tableColumns, isActivated)}\nFROM ${tables.join(' INNER JOIN ')}`;
+			const viewColumns = viewColumnsToString(tableColumns, isActivated);
+			const selectStatement = getViewSelectStatement({
+				tables,
+				viewData,
+				viewColumns,
+			});
 
 			const tagStatement = getTagStatement({
 				tags: viewData.viewTags,
