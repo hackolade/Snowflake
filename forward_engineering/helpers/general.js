@@ -151,12 +151,14 @@ module.exports = app => {
 		fkData.foreignTableActivated;
 
 	const viewColumnsToString = (keys, isParentActivated) => {
+		const mergeCommentWithName = ({ name, comment }) => (comment ? `${name}${comment}` : name);
+
 		if (!isParentActivated) {
-			return keys.map(key => key.name).join(',\n\t');
+			return keys.map(mergeCommentWithName).join(',\n\t');
 		}
 
-		let activatedKeys = keys.filter(key => key.isActivated).map(key => key.name);
-		let deactivatedKeys = keys.filter(key => !key.isActivated).map(key => key.name);
+		const activatedKeys = keys.filter(key => key.isActivated).map(mergeCommentWithName);
+		const deactivatedKeys = keys.filter(key => !key.isActivated).map(mergeCommentWithName);
 
 		if (activatedKeys.length === 0) {
 			return commentIfDeactivated(deactivatedKeys.join(',\n\t'), { isActivated: false }, true);
