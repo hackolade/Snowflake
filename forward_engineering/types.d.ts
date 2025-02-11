@@ -28,3 +28,8 @@ export type ColumnDefinition = {
   unique?: boolean;
   uniqueKeyConstraintName?: string;
 };
+
+export type AppInstance = {
+	require: (packageName: string) => unknown;
+  general: object;
+}

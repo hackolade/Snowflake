@@ -1,19 +1,65 @@
 /**
+ * @typedef {import('./types').AppInstance} AppInstance
  * @typedef {import('./types').ColumnDefinition} ColumnDefinition
  */
+const { toLower } = require('lodash');
 
-module.exports = ({ app }) => {
-	const { decorateType } = require('./helpers/columnDefinitionHelper')(app);
+const types = require('./configs/types');
+const defaultTypes = require('./configs/defaultTypes');
 
-	return {
-		/**
-		 * @param {{ columnDefinition: ColumnDefinition; }}
-		 * @returns {{ type: string; }}
-		 */
-		getColumnDataTypeData({ columnDefinition }) {
-			return {
-				type: decorateType(columnDefinition.type, columnDefinition),
-			};
-		},
-	};
-};
+class DbtProvider {
+	/**
+	 * @type {AppInstance}
+	 */
+	#appInstance;
+
+	/**
+	 * @param {{ appInstance: AppInstance }}
+	 */
+	constructor({ appInstance }) {
+		this.#appInstance = appInstance;
+	}
+
+	/**
+	 * @param {{ appInstance }}
+	 * @returns {DbtProvider}
+	 */
+	static createDbtProvider({ appInstance }) {
+		return new DbtProvider({ appInstance });
+	}
+
+	/**
+	 * @param {string} type
+	 * @returns {string | undefined}
+	 */
+	getDefaultType(type) {
+		return defaultTypes[type];
+	}
+
+	/**
+	 * @returns {Record<string, object>}
+	 */
+	getTypesDescriptors() {
+		return types;
+	}
+
+	/**
+	 * @param {string} type
+	 * @returns {boolean}
+	 */
+	hasType(type) {
+		return Object.keys(types).map(toLower).includes(toLower(type));
+	}
+
+	/**
+	 * @param {{ columnDefinition: ColumnDefinition; }}
+	 * @returns {{ type: string; }}
+	 */
+	decorateType({ type, columnDefinition }) {
+		const { decorateType } = require('./helpers/columnDefinitionHelper')(this.#appInstance);
+
+		return decorateType(type, columnDefinition);
+	}
+}
+
+module.exports = DbtProvider;
