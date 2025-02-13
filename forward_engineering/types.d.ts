@@ -12,3 +12,24 @@ export type ObjectTag = {
   tagName?: string,
   tagValue?: string,
 };
+
+export type ColumnDefinition = {
+  name: string;
+  type: string;
+  nullable: boolean;
+  isActivated: boolean;
+  isCaseSensitive?: boolean;
+  length?: number;
+  precision?: number;
+  primaryKey?: boolean;
+  primaryKeyConstraintName?: string;
+  scale?: number;
+  timePrecision?: number;
+  unique?: boolean;
+  uniqueKeyConstraintName?: string;
+};
+
+export type AppInstance = {
+	require: (packageName: string) => unknown;
+  general: object;
+}

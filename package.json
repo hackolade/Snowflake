@@ -24,7 +24,8 @@
                 "jsonDocument": true,
                 "jsonSchema": true,
                 "excel": true,
-                "plugin": true
+                "plugin": true,
+                "dbt": true
             },
             "forwardEngineering": {
                 "jsonSchema": {
