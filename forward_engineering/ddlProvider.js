@@ -626,6 +626,9 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateColumn({ columnDefinition, jsonSchema, dbData }) {
+			const pkConstraintName = jsonSchema.compositePrimaryKey ? undefined : jsonSchema.primaryKeyConstraintName;
+			const ukConstraintName = jsonSchema.compositeUniqueKey ? undefined : jsonSchema.uniqueKeyConstraintName;
+
 			return {
 				...columnDefinition,
 				name: getName(jsonSchema.isCaseSensitive, columnDefinition.name),
@@ -658,12 +661,10 @@ module.exports = (baseProvider, options, app) => {
 					: {},
 				comment: jsonSchema.refDescription || jsonSchema.description,
 				unique: jsonSchema.uniqueKeyConstraintName ? false : jsonSchema.unique,
-				primaryKeyConstraintName: jsonSchema.primaryKeyConstraintName,
-				compositePrimaryKey:
-					jsonSchema.compositePrimaryKey || (jsonSchema.primaryKeyConstraintName && jsonSchema.primaryKey),
-				compositeUniqueKey:
-					jsonSchema.compositeUniqueKey || (jsonSchema.uniqueKeyConstraintName && jsonSchema.unique),
-				uniqueKeyConstraintName: jsonSchema.uniqueKeyConstraintName,
+				primaryKeyConstraintName: pkConstraintName,
+				compositePrimaryKey: jsonSchema.compositePrimaryKey || (pkConstraintName && jsonSchema.primaryKey),
+				compositeUniqueKey: jsonSchema.compositeUniqueKey || (ukConstraintName && jsonSchema.unique),
+				uniqueKeyConstraintName: ukConstraintName,
 				primaryKey: jsonSchema.primaryKeyConstraintName ? false : columnDefinition.primaryKey,
 				expression: jsonSchema.expression,
 				columnTags: jsonSchema.columnTags ?? [],
