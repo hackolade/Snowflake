@@ -329,8 +329,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -889,8 +901,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -1436,8 +1460,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -1983,8 +2019,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -2530,8 +2578,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -3070,8 +3130,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -3537,8 +3609,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -3990,8 +4074,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -4456,8 +4552,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -4930,8 +5038,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -5404,8 +5524,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -5878,8 +6010,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -6434,8 +6578,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
@@ -6880,8 +7036,20 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "primaryKeyConstraintName",
 				"propertyType": "text",
 				"dependency": {
-					"key": "primaryKey",
-					"value": true
+					"type": "and",
+					"values": [
+						{
+							"key": "primaryKey",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"key": "compositePrimaryKey",
+								"value": true
+							}
+						}
+					]
 				}
 			},
 			{
