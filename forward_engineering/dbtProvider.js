@@ -7,6 +7,8 @@ const { toLower } = require('lodash');
 
 const types = require('./configs/types');
 const defaultTypes = require('./configs/defaultTypes');
+const getKeyHelper = require('./helpers/keyHelper');
+const getColumnDefinitionHelper = require('./helpers/columnDefinitionHelper');
 
 class DbtProvider {
 	/**
@@ -57,9 +59,9 @@ class DbtProvider {
 	 * @returns {{ type: string; }}
 	 */
 	decorateType({ type, columnDefinition }) {
-		const { decorateType } = require('./helpers/columnDefinitionHelper')(this.#appInstance);
+		const columnDefinitionHelper = getColumnDefinitionHelper(this.#appInstance);
 
-		return decorateType(type, columnDefinition);
+		return columnDefinitionHelper.decorateType(type, columnDefinition);
 	}
 
 	/**
@@ -67,9 +69,9 @@ class DbtProvider {
 	 * @returns {CompositeKeyConstraintDto[]}
 	 */
 	getCompositeKeyConstraints({ jsonSchema }) {
-		const { getCompositePrimaryKeys, getCompositeUniqueKeys } = require('./helpers/keyHelper')(this.#appInstance);
-		const compositePrimaryKeys = getCompositePrimaryKeys(jsonSchema);
-		const compositeUniqueKeys = getCompositeUniqueKeys(jsonSchema);
+		const keyHelper = getKeyHelper(this.#appInstance);
+		const compositePrimaryKeys = keyHelper.getCompositePrimaryKeys(jsonSchema);
+		const compositeUniqueKeys = keyHelper.getCompositeUniqueKeys(jsonSchema);
 
 		return [...compositePrimaryKeys, ...compositeUniqueKeys];
 	}
