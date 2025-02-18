@@ -60,6 +60,14 @@ class DbtProvider {
 
 		return decorateType(type, columnDefinition);
 	}
+
+	getCompositeKeyConstraints({ jsonSchema }) {
+		const { getCompositePrimaryKeys, getCompositeUniqueKeys } = require('./helpers/keyHelper')(this.#appInstance);
+		const compositePrimaryKeys = getCompositePrimaryKeys(jsonSchema);
+		const compositeUniqueKeys = getCompositeUniqueKeys(jsonSchema);
+
+		return [...compositePrimaryKeys, ...compositeUniqueKeys];
+	}
 }
 
 module.exports = DbtProvider;
