@@ -171,5 +171,7 @@ module.exports = app => {
 	return {
 		getTableKeyConstraints,
 		getClusteringKey,
+		getCompositePrimaryKeys,
+		getCompositeUniqueKeys,
 	};
 };

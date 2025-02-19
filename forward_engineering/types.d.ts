@@ -30,6 +30,17 @@ export type ColumnDefinition = {
 };
 
 export type AppInstance = {
-	require: (packageName: string) => unknown;
+  require: (packageName: string) => unknown;
   general: object;
 }
+
+export type ConstraintDtoColumn = {
+  name: string;
+  isActivated: boolean;
+};
+
+export type CompositeKeyConstraintDto = {
+  keyType: 'PRIMARY KEY' | 'UNIQUE';
+  name: string;
+  columns: ConstraintDtoColumn[];
+};
