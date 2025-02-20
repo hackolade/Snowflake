@@ -1,7 +1,8 @@
 /**
  * @typedef {import('./types').AppInstance} AppInstance
  * @typedef {import('./types').ColumnDefinition} ColumnDefinition
- * @typedef {import('./types').CompositeKeyConstraintDto} CompositeKeyConstraintDto
+ * @typedef {import('./types').ConstraintDto} ConstraintDto
+ * @typedef {import('./types').JsonSchema} JsonSchema
  */
 const { toLower } = require('lodash');
 
@@ -65,8 +66,8 @@ class DbtProvider {
 	}
 
 	/**
-	 * @param {{ jsonSchema: Record<string, unknown> }}
-	 * @returns {CompositeKeyConstraintDto[]}
+	 * @param {{ jsonSchema: JsonSchema }}
+	 * @returns {ConstraintDto[]}
 	 */
 	getCompositeKeyConstraints({ jsonSchema }) {
 		const keyHelper = getKeyHelper(this.#appInstance);
@@ -74,6 +75,16 @@ class DbtProvider {
 		const compositeUniqueKeys = keyHelper.getCompositeUniqueKeys(jsonSchema);
 
 		return [...compositePrimaryKeys, ...compositeUniqueKeys];
+	}
+
+	/**
+	 * @param {{ columnDefinition: ColumnDefinition; jsonSchema: JsonSchema }}
+	 * @returns {ConstraintDto[]}
+	 */
+	getColumnConstraints({ columnDefinition, jsonSchema }) {
+		const keyHelper = getKeyHelper(this.#appInstance);
+
+		return keyHelper.getColumnConstraints({ columnDefinition, jsonSchema });
 	}
 }
 

@@ -39,8 +39,12 @@ export type ConstraintDtoColumn = {
   isActivated: boolean;
 };
 
-export type CompositeKeyConstraintDto = {
-  keyType: 'PRIMARY KEY' | 'UNIQUE';
+export type KeyType = 'PRIMARY KEY' | 'UNIQUE';
+
+export type ConstraintDto = {
+  keyType: KeyType;
   name: string;
   columns: ConstraintDtoColumn[];
 };
+
+export type JsonSchema = Record<string, unknown>;
