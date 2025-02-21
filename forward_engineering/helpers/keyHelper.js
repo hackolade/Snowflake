@@ -199,7 +199,7 @@ module.exports = app => {
 			return;
 		}
 
-		return hydratePrimaryKeyOptions(
+		return hydrateUniqueOptions(
 			{ constraintName: columnDefinition.uniqueKeyConstraintName },
 			columnDefinition.name,
 			columnDefinition.isActivated,
