@@ -68,8 +68,15 @@ module.exports = (baseProvider, options, app) => {
 		getViewSelectStatement,
 	} = require('./helpers/tableHelper')(app);
 
-	const { decorateType, getDefault, getAutoIncrement, getCollation, getInlineConstraint, createExternalColumn } =
-		require('./helpers/columnDefinitionHelper')(app);
+	const {
+		decorateType,
+		getDefault,
+		getAutoIncrement,
+		getCollation,
+		getInlineConstraint,
+		createExternalColumn,
+		prepareComment,
+	} = require('./helpers/columnDefinitionHelper')(app);
 
 	const { commentIfDeactivated } = require('./helpers/commentHelpers/commentDeactivatedHelper');
 
@@ -473,9 +480,7 @@ module.exports = (baseProvider, options, app) => {
 				identity: getAutoIncrement(columnDefinition.type, 'IDENTITY', columnDefinition.identity),
 				not_nul: preSpace(!columnDefinition.nullable && 'NOT NULL'),
 				inline_constraint: getInlineConstraint(columnDefinition),
-				comment: preSpace(
-					columnDefinition.comment && `COMMENT ${escapeString(scriptFormat, columnDefinition.comment)}`,
-				),
+				comment: prepareComment({ scriptFormat, comment: columnDefinition.comment }),
 				tag: getTagStatement({
 					tags: columnDefinition.columnTags,
 					isCaseSensitive: columnDefinition.isCaseSensitive,
@@ -937,7 +942,9 @@ module.exports = (baseProvider, options, app) => {
 					AUTO_REFRESH: toBoolean(firstTab.AUTO_REFRESH),
 					PATTERN: firstTab.PATTERN ? toString(firstTab.PATTERN) : '',
 				},
-				columns: firstTab.external ? tableData.columnDefinitions.map(createExternalColumn) : tableData.columns,
+				columns: firstTab.external
+					? tableData.columnDefinitions.map(createExternalColumn(scriptFormat))
+					: tableData.columns,
 				compositePrimaryKeys: Object.entries(compositePrimaryKeys).map(([name, keys]) =>
 					generateConstraint({
 						name,

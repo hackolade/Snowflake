@@ -129,14 +129,23 @@ module.exports = app => {
 		return getPrimaryKey(columnDefinition) + getUnique(columnDefinition);
 	};
 
-	const createExternalColumn = columnDefinition => {
+	const prepareComment = ({ scriptFormat, comment }) => {
+		if (!comment) {
+			return '';
+		}
+		const unescapedDoubleSlashes = comment.replace(/\\\\/g, '\\');
+
+		return preSpace(`COMMENT ${escapeString(scriptFormat, unescapedDoubleSlashes)}`);
+	};
+
+	const createExternalColumn = scriptFormat => columnDefinition => {
 		const externalColumnStatement = assignTemplates(templates.externalColumnDefinition, {
 			name: columnDefinition.name,
 			type: decorateType(columnDefinition.type, columnDefinition),
 			expression: columnDefinition.expression
 				? `(${columnDefinition.expression})`
 				: `(value:${columnDefinition.name}::${columnDefinition.type})`,
-			comment: preSpace(columnDefinition.comment && `COMMENT ${escapeString(columnDefinition.comment)}`),
+			comment: prepareComment({ scriptFormat, comment: columnDefinition.comment }),
 		});
 
 		return { statement: externalColumnStatement, isActivated: columnDefinition.isActivated };
@@ -149,5 +158,6 @@ module.exports = app => {
 		getCollation,
 		getInlineConstraint,
 		createExternalColumn,
+		prepareComment,
 	};
 };
