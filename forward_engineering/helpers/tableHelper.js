@@ -1,9 +1,9 @@
 const { isEmpty, toUpper, trim } = require('lodash');
 const { preSpace } = require('../utils/preSpace');
+const { toOptions } = require('./general');
 
 module.exports = app => {
 	const { tab } = app.require('@hackolade/ddl-fe-utils').general;
-	const { toOptions } = require('./general')(app);
 
 	const getFileFormat = (fileFormat, formatTypeOptions, formatName = '') => {
 		if (fileFormat !== 'custom') {

@@ -4,10 +4,10 @@
  * @typedef {import('forward_engineering/types').ConstraintDto} ConstraintDto
  */
 const _ = require('lodash');
+const { addQuotes } = require('./general');
 
 module.exports = app => {
 	const { clean } = app.require('@hackolade/ddl-fe-utils').general;
-	const { addQuotes } = require('./general')(app);
 
 	const mapProperties = (jsonSchema, iteratee) => {
 		return Object.entries(jsonSchema.properties).map(iteratee);

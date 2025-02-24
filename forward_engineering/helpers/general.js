@@ -2,265 +2,265 @@ const _ = require('lodash');
 const assignTemplates = require('../utils/assignTemplates');
 const { commentIfDeactivated } = require('./commentHelpers/commentDeactivatedHelper');
 
-module.exports = app => {
-	const { checkAllKeysActivated } = app.require('@hackolade/ddl-fe-utils').general;
-
-	const escape = value => String(value).replace(/'/g, "''").replace(/\\\\/g, '\\').replace(/\\/g, '\\\\');
-	const toString = value => (_.isUndefined(value) ? value : `'${escape(value)}'`);
-	const isNone = value => _.toLower(value) === 'none';
-	const isAuto = value => _.toLower(value) === 'auto';
-	const toStringIfNotNone = value => (isNone(value) ? value : toString(value));
-	const toStringIfNotAuto = value => (isAuto(value) ? value : toString(value));
-	const toNumber = value => (isNaN(value) ? '' : Number(value));
-	const toBoolean = value => (value === true ? 'TRUE' : undefined);
-	const toOptions = options => {
-		return Object.entries(options)
-			.filter(([__, value]) => !_.isEmpty(value) || value !== false)
-			.map(([optionName, value]) => {
-				if (Array.isArray(value)) {
-					value = '(' + value.filter(value => !_.isEmpty(value)).join(', ') + ')';
-				}
-
-				return `${optionName}=${value}`;
-			})
-			.join('\n');
-	};
-
-	const findJsonSchemaChain = (keyId, jsonSchema, name) => {
-		if (jsonSchema.GUID === keyId) {
-			return [{ ...jsonSchema, name }];
-		} else if (_.isPlainObject(jsonSchema.properties)) {
-			const nestedName = Object.keys(jsonSchema.properties).reduce((result, name) => {
-				if (result.length) {
-					return result;
-				}
-				const nestedName = findJsonSchemaChain(keyId, jsonSchema.properties[name], name);
-
-				if (nestedName) {
-					return result.concat(nestedName);
-				}
-
-				return result;
-			}, []);
-
-			if (nestedName.length) {
-				return [{ ...jsonSchema, name }].concat(nestedName);
+const escape = value => String(value).replace(/'/g, "''").replace(/\\\\/g, '\\').replace(/\\/g, '\\\\');
+const toString = value => (_.isUndefined(value) ? value : `'${escape(value)}'`);
+const isNone = value => _.toLower(value) === 'none';
+const isAuto = value => _.toLower(value) === 'auto';
+const toStringIfNotNone = value => (isNone(value) ? value : toString(value));
+const toStringIfNotAuto = value => (isAuto(value) ? value : toString(value));
+const toNumber = value => (isNaN(value) ? '' : Number(value));
+const toBoolean = value => (value === true ? 'TRUE' : undefined);
+const toOptions = options => {
+	return Object.entries(options)
+		.filter(([__, value]) => !_.isEmpty(value) || value !== false)
+		.map(([optionName, value]) => {
+			if (Array.isArray(value)) {
+				value = '(' + value.filter(value => !_.isEmpty(value)).join(', ') + ')';
 			}
-		} else if (_.isArray(jsonSchema.items)) {
-			const nestedName = jsonSchema.items.reduce((result, schema) => {
-				if (result.length) {
-					return result;
-				}
-				const nestedName = findJsonSchemaChain(keyId, schema, '');
 
-				if (nestedName) {
-					return result.concat(nestedName);
-				}
+			return `${optionName}=${value}`;
+		})
+		.join('\n');
+};
 
+const findJsonSchemaChain = (keyId, jsonSchema, name) => {
+	if (jsonSchema.GUID === keyId) {
+		return [{ ...jsonSchema, name }];
+	} else if (_.isPlainObject(jsonSchema.properties)) {
+		const nestedName = Object.keys(jsonSchema.properties).reduce((result, name) => {
+			if (result.length) {
 				return result;
-			}, []);
-
-			if (nestedName.length) {
-				return [{ ...jsonSchema, name }].concat(nestedName);
 			}
-		} else if (jsonSchema.items) {
-			const nestedName = findJsonSchemaChain(keyId, jsonSchema.items, '');
+			const nestedName = findJsonSchemaChain(keyId, jsonSchema.properties[name], name);
 
 			if (nestedName) {
-				return [{ ...jsonSchema, name }].concat(nestedName);
+				return result.concat(nestedName);
 			}
+
+			return result;
+		}, []);
+
+		if (nestedName.length) {
+			return [{ ...jsonSchema, name }].concat(nestedName);
 		}
-	};
+	} else if (_.isArray(jsonSchema.items)) {
+		const nestedName = jsonSchema.items.reduce((result, schema) => {
+			if (result.length) {
+				return result;
+			}
+			const nestedName = findJsonSchemaChain(keyId, schema, '');
 
-	const composeClusteringKey = (isCaseSensitive, jsonSchema, clusteringKey) => {
-		const name = _.get(clusteringKey, 'clusteringKey[0].name', '');
-		const isActivated = _.get(clusteringKey, 'clusteringKey[0].isActivated', true);
-		const isComplexName = name => String(name || '').includes('.');
+			if (nestedName) {
+				return result.concat(nestedName);
+			}
 
-		if (clusteringKey.expression) {
+			return result;
+		}, []);
+
+		if (nestedName.length) {
+			return [{ ...jsonSchema, name }].concat(nestedName);
+		}
+	} else if (jsonSchema.items) {
+		const nestedName = findJsonSchemaChain(keyId, jsonSchema.items, '');
+
+		if (nestedName) {
+			return [{ ...jsonSchema, name }].concat(nestedName);
+		}
+	}
+};
+
+const composeClusteringKey = (isCaseSensitive, jsonSchema, clusteringKey) => {
+	const name = _.get(clusteringKey, 'clusteringKey[0].name', '');
+	const isActivated = _.get(clusteringKey, 'clusteringKey[0].isActivated', true);
+	const isComplexName = name => String(name || '').includes('.');
+
+	if (clusteringKey.expression) {
+		return {
+			name: assignTemplates(clusteringKey.expression, { name: getName(isCaseSensitive, name) }),
+			isActivated,
+			isExpression: true,
+		};
+	} else if (name && !isComplexName(name)) {
+		return { name, isActivated };
+	} else {
+		const keyId = _.get(clusteringKey, 'clusteringKey[0].keyId', '');
+		const name = findJsonSchemaChain(keyId, jsonSchema);
+
+		if (Array.isArray(name)) {
+			const type = _.get(name[name.length - 1], 'type', '')
+				.replace(/json/i, '')
+				.toLowerCase();
 			return {
-				name: assignTemplates(clusteringKey.expression, { name: getName(isCaseSensitive, name) }),
+				name: `(${name
+					.map(schema => getName(isCaseSensitive, schema.name))
+					.filter(Boolean)
+					.join(':')}::${type})`,
 				isActivated,
 				isExpression: true,
 			};
-		} else if (name && !isComplexName(name)) {
-			return { name, isActivated };
-		} else {
-			const keyId = _.get(clusteringKey, 'clusteringKey[0].keyId', '');
-			const name = findJsonSchemaChain(keyId, jsonSchema);
-
-			if (Array.isArray(name)) {
-				const type = _.get(name[name.length - 1], 'type', '')
-					.replace(/json/i, '')
-					.toLowerCase();
-				return {
-					name: `(${name
-						.map(schema => getName(isCaseSensitive, schema.name))
-						.filter(Boolean)
-						.join(':')}::${type})`,
-					isActivated,
-					isExpression: true,
-				};
-			}
 		}
-	};
+	}
+};
 
-	const foreignKeysToString = (isCaseSensitive, keys) => {
-		if (Array.isArray(keys)) {
-			const splitter = ', ';
-			let deactivatedKeys = [];
-			const processedKeys = keys
-				.reduce((keysString, key) => {
-					let keyName = _.isString(key.name) ? key.name.trim() : key.trim();
-					if (!key.isExpression) {
-						keyName = getName(isCaseSensitive, keyName);
-					}
+const foreignKeysToString = (isCaseSensitive, keys) => {
+	if (Array.isArray(keys)) {
+		const splitter = ', ';
+		let deactivatedKeys = [];
+		const processedKeys = keys
+			.reduce((keysString, key) => {
+				let keyName = _.isString(key.name) ? key.name.trim() : key.trim();
+				if (!key.isExpression) {
+					keyName = getName(isCaseSensitive, keyName);
+				}
 
-					if (!_.get(key, 'isActivated', true)) {
-						deactivatedKeys.push(keyName);
+				if (!_.get(key, 'isActivated', true)) {
+					deactivatedKeys.push(keyName);
 
-						return keysString;
-					}
+					return keysString;
+				}
 
-					return [...keysString, keyName];
-				}, [])
-				.filter(Boolean);
+				return [...keysString, keyName];
+			}, [])
+			.filter(Boolean);
 
-			if (processedKeys.length === 0) {
-				return commentIfDeactivated(deactivatedKeys.join(splitter), { isActivated: false }, true);
-			} else if (deactivatedKeys.length === 0) {
-				return processedKeys.join(splitter);
-			}
-
-			return (
-				processedKeys.join(splitter) +
-				commentIfDeactivated(splitter + deactivatedKeys.join(splitter), { isActivated: false }, true)
-			);
-		}
-		return keys;
-	};
-
-	const foreignActiveKeysToString = (isCaseSensitive, keys) => {
-		return keys?.map(key => getName(isCaseSensitive, key.name.trim())).join(', ');
-	};
-
-	const checkIfForeignKeyActivated = fkData =>
-		checkAllKeysActivated(fkData.foreignKey) &&
-		checkAllKeysActivated(fkData.primaryKey) &&
-		fkData.primaryTableActivated &&
-		fkData.foreignTableActivated;
-
-	const viewColumnsToString = (keys, isParentActivated) => {
-		const mergeCommentWithName = ({ name, comment }) => (comment ? `${name}${comment}` : name);
-
-		if (!isParentActivated) {
-			return keys.map(mergeCommentWithName).join(',\n\t');
-		}
-
-		const activatedKeys = keys.filter(key => key.isActivated).map(mergeCommentWithName);
-		const deactivatedKeys = keys.filter(key => !key.isActivated).map(mergeCommentWithName);
-
-		if (activatedKeys.length === 0) {
-			return commentIfDeactivated(deactivatedKeys.join(',\n\t'), { isActivated: false }, true);
-		}
-		if (deactivatedKeys.length === 0) {
-			return activatedKeys.join(',\n\t');
+		if (processedKeys.length === 0) {
+			return commentIfDeactivated(deactivatedKeys.join(splitter), { isActivated: false }, true);
+		} else if (deactivatedKeys.length === 0) {
+			return processedKeys.join(splitter);
 		}
 
 		return (
-			activatedKeys.join(',\n\t') +
-			'\n\t' +
-			commentIfDeactivated(deactivatedKeys.join(',\n\t'), { isActivated: false }, true)
+			processedKeys.join(splitter) +
+			commentIfDeactivated(splitter + deactivatedKeys.join(splitter), { isActivated: false }, true)
 		);
-	};
+	}
+	return keys;
+};
 
-	const getName = (isCaseSensitive, name) => {
-		if (!name) {
-			return name;
+const foreignActiveKeysToString = (isCaseSensitive, keys) => {
+	return keys?.map(key => getName(isCaseSensitive, key.name.trim())).join(', ');
+};
+
+const checkAllKeysActivated = keys => {
+	return keys.every(key => _.get(key, 'isActivated', true));
+};
+
+const checkIfForeignKeyActivated = fkData =>
+	checkAllKeysActivated(fkData.foreignKey) &&
+	checkAllKeysActivated(fkData.primaryKey) &&
+	fkData.primaryTableActivated &&
+	fkData.foreignTableActivated;
+
+const viewColumnsToString = (keys, isParentActivated) => {
+	const mergeCommentWithName = ({ name, comment }) => (comment ? `${name}${comment}` : name);
+
+	if (!isParentActivated) {
+		return keys.map(mergeCommentWithName).join(',\n\t');
+	}
+
+	const activatedKeys = keys.filter(key => key.isActivated).map(mergeCommentWithName);
+	const deactivatedKeys = keys.filter(key => !key.isActivated).map(mergeCommentWithName);
+
+	if (activatedKeys.length === 0) {
+		return commentIfDeactivated(deactivatedKeys.join(',\n\t'), { isActivated: false }, true);
+	}
+	if (deactivatedKeys.length === 0) {
+		return activatedKeys.join(',\n\t');
+	}
+
+	return (
+		activatedKeys.join(',\n\t') +
+		'\n\t' +
+		commentIfDeactivated(deactivatedKeys.join(',\n\t'), { isActivated: false }, true)
+	);
+};
+
+const getName = (isCaseSensitive, name) => {
+	if (!name) {
+		return name;
+	}
+
+	if (isCaseSensitive) {
+		return addQuotes(name);
+	}
+
+	return isValidCaseInsensitiveName(name) ? name : addQuotes(name);
+};
+
+const getEntityName = entityData => {
+	return (entityData && (entityData.code || entityData.collectionName)) || '';
+};
+
+const getFullName = (schemaName, name) => {
+	if (!schemaName) {
+		return name;
+	}
+
+	return `${schemaName}.${name}`;
+};
+
+const isValidCaseInsensitiveName = name => {
+	return /^[a-z_][a-z\d_$]*$/i.test(name);
+};
+
+const addQuotes = string => {
+	if (/^".*"$/.test(string)) {
+		return string;
+	}
+
+	return `"${string}"`;
+};
+
+const getDbName = containerData => {
+	return _.get(containerData, 'code') || _.get(containerData, 'name', '');
+};
+
+/**
+ * @template T
+ * @param {{ newItems: T[], oldItems: T[] }}
+ * @returns {{ addedItems: T[], removedItems: T[], modifiedItems: T[] }}
+ */
+const getGroupItemsByCompMode = ({ newItems = [], oldItems = [] }) => {
+	const addedItems = newItems.filter(newItem => !oldItems.some(item => item.id === newItem.id));
+	const removedItems = [];
+	const modifiedItems = [];
+
+	oldItems.forEach(oldItem => {
+		const newItem = newItems.find(item => item.id === oldItem.id);
+
+		if (!newItem) {
+			removedItems.push(oldItem);
+		} else if (!_.isEqual(newItem, oldItem)) {
+			modifiedItems.push(newItem);
 		}
-
-		if (isCaseSensitive) {
-			return addQuotes(name);
-		}
-
-		return isValidCaseInsensitiveName(name) ? name : addQuotes(name);
-	};
-
-	const getEntityName = entityData => {
-		return (entityData && (entityData.code || entityData.collectionName)) || '';
-	};
-
-	const getFullName = (schemaName, name) => {
-		if (!schemaName) {
-			return name;
-		}
-
-		return `${schemaName}.${name}`;
-	};
-
-	const isValidCaseInsensitiveName = name => {
-		return /^[a-z_][a-z\d_$]*$/i.test(name);
-	};
-
-	const addQuotes = string => {
-		if (/^".*"$/.test(string)) {
-			return string;
-		}
-
-		return `"${string}"`;
-	};
-
-	const getDbName = containerData => {
-		return _.get(containerData, 'code') || _.get(containerData, 'name', '');
-	};
-
-	/**
-	 * @template T
-	 * @param {{ newItems: T[], oldItems: T[] }}
-	 * @returns {{ addedItems: T[], removedItems: T[], modifiedItems: T[] }}
-	 */
-	const getGroupItemsByCompMode = ({ newItems = [], oldItems = [] }) => {
-		const addedItems = newItems.filter(newItem => !oldItems.some(item => item.id === newItem.id));
-		const removedItems = [];
-		const modifiedItems = [];
-
-		oldItems.forEach(oldItem => {
-			const newItem = newItems.find(item => item.id === oldItem.id);
-
-			if (!newItem) {
-				removedItems.push(oldItem);
-			} else if (!_.isEqual(newItem, oldItem)) {
-				modifiedItems.push(newItem);
-			}
-		});
-
-		return {
-			added: addedItems,
-			removed: removedItems,
-			modified: modifiedItems,
-		};
-	};
+	});
 
 	return {
-		escape,
-		toString,
-		isNone,
-		isAuto,
-		toStringIfNotNone,
-		toStringIfNotAuto,
-		toNumber,
-		toBoolean,
-		toOptions,
-		composeClusteringKey,
-		foreignKeysToString,
-		checkIfForeignKeyActivated,
-		foreignActiveKeysToString,
-		viewColumnsToString,
-		getName,
-		getEntityName,
-		getFullName,
-		getDbName,
-		addQuotes,
-		getGroupItemsByCompMode,
+		added: addedItems,
+		removed: removedItems,
+		modified: modifiedItems,
 	};
+};
+
+module.exports = {
+	escape,
+	toString,
+	isNone,
+	isAuto,
+	toStringIfNotNone,
+	toStringIfNotAuto,
+	toNumber,
+	toBoolean,
+	toOptions,
+	composeClusteringKey,
+	foreignKeysToString,
+	checkIfForeignKeyActivated,
+	foreignActiveKeysToString,
+	viewColumnsToString,
+	getName,
+	getEntityName,
+	getFullName,
+	getDbName,
+	addQuotes,
+	getGroupItemsByCompMode,
 };
