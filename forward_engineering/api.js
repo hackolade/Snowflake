@@ -1,13 +1,14 @@
-'use strict';
-
 const _ = require('lodash');
 const { commentDropStatements } = require('./helpers/commentHelpers/commentDropStatements');
 const { DROP_STATEMENTS } = require('./helpers/constants');
+const { getAlterScript } = require('./helpers/alterScriptFromDeltaHelper');
+const { applyToInstance } = require('./helpers/applyToInstanceHelper');
+const { getSystemInfo } = require('../reverse_engineering/helpers/loggerHelper');
+const reApi = require('../reverse_engineering/api');
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
 		try {
-			const { getAlterScript } = require('./helpers/alterScriptFromDeltaHelper');
 			const ddlProvider = require('./ddlProvider')(_, data.options, app);
 
 			const collection = JSON.parse(data.jsonSchema);
@@ -45,9 +46,6 @@ module.exports = {
 	},
 
 	applyToInstance(connectionInfo, logger, callback, app) {
-		const { applyToInstance } = require('./helpers/applyToInstanceHelper');
-		const { getSystemInfo } = require('../reverse_engineering/helpers/loggerHelper');
-
 		logger.clear();
 		logger.log('info', getSystemInfo(connectionInfo.appVersion), 'Apply to instance');
 		logger.log(
@@ -72,14 +70,10 @@ module.exports = {
 	},
 
 	async getExternalBrowserUrl(connectionInfo, logger, cb, app) {
-		const reApi = require('../reverse_engineering/api');
-
 		reApi.getExternalBrowserUrl(connectionInfo, logger, cb, app);
 	},
 
 	testConnection(connectionInfo, logger, callback, app) {
-		const reApi = require('../reverse_engineering/api');
-
 		reApi.testConnection(connectionInfo, logger, callback, app);
 	},
 
