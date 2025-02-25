@@ -33,12 +33,27 @@ const {
 const { escapeString } = require('./utils/escapeString');
 const { joinActivatedAndDeactivatedStatements } = require('./utils/joinActivatedAndDeactivatedStatements');
 const { preSpace } = require('./utils/preSpace');
+const assignTemplates = require('./utils/assignTemplates');
+const {
+	toString,
+	toBoolean,
+	composeClusteringKey,
+	foreignKeysToString,
+	checkIfForeignKeyActivated,
+	foreignActiveKeysToString,
+	getName,
+	getFullName,
+	getDbName,
+	viewColumnsToString,
+} = require('./helpers/general');
+const { generateConstraint } = require('./helpers/constraintHelper');
+const getFormatTypeOptions = require('./helpers/getFormatTypeOptions');
+const { getStageCopyOptions } = require('./helpers/getStageCopyOptions');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
 
 module.exports = (baseProvider, options, app) => {
-	const assignTemplates = app.require('@hackolade/ddl-fe-utils').assignTemplates;
 	const { tab, hasType, clean } = app.require('@hackolade/ddl-fe-utils').general;
 	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
@@ -52,26 +67,17 @@ module.exports = (baseProvider, options, app) => {
 		getTableExtraProps,
 		getViewSelectStatement,
 	} = require('./helpers/tableHelper')(app);
-	const getFormatTypeOptions = require('./helpers/getFormatTypeOptions')(app);
-	const { getStageCopyOptions } = require('./helpers/getStageCopyOptions')(app);
 
 	const {
-		toString,
-		toBoolean,
-		composeClusteringKey,
-		foreignKeysToString,
-		checkIfForeignKeyActivated,
-		foreignActiveKeysToString,
-		getName,
-		getFullName,
-		getDbName,
-		viewColumnsToString,
-	} = require('./helpers/general')(app);
+		decorateType,
+		getDefault,
+		getAutoIncrement,
+		getCollation,
+		getInlineConstraint,
+		createExternalColumn,
+		prepareComment,
+	} = require('./helpers/columnDefinitionHelper')(app);
 
-	const { decorateType, getDefault, getAutoIncrement, getCollation, getInlineConstraint, createExternalColumn } =
-		require('./helpers/columnDefinitionHelper')(app);
-
-	const { generateConstraint } = require('./helpers/constraintHelper')(app);
 	const { commentIfDeactivated } = require('./helpers/commentHelpers/commentDeactivatedHelper');
 
 	const {
@@ -474,9 +480,7 @@ module.exports = (baseProvider, options, app) => {
 				identity: getAutoIncrement(columnDefinition.type, 'IDENTITY', columnDefinition.identity),
 				not_nul: preSpace(!columnDefinition.nullable && 'NOT NULL'),
 				inline_constraint: getInlineConstraint(columnDefinition),
-				comment: preSpace(
-					columnDefinition.comment && `COMMENT ${escapeString(scriptFormat, columnDefinition.comment)}`,
-				),
+				comment: prepareComment({ scriptFormat, comment: columnDefinition.comment }),
 				tag: getTagStatement({
 					tags: columnDefinition.columnTags,
 					isCaseSensitive: columnDefinition.isCaseSensitive,
@@ -938,7 +942,9 @@ module.exports = (baseProvider, options, app) => {
 					AUTO_REFRESH: toBoolean(firstTab.AUTO_REFRESH),
 					PATTERN: firstTab.PATTERN ? toString(firstTab.PATTERN) : '',
 				},
-				columns: firstTab.external ? tableData.columnDefinitions.map(createExternalColumn) : tableData.columns,
+				columns: firstTab.external
+					? tableData.columnDefinitions.map(createExternalColumn(scriptFormat))
+					: tableData.columns,
 				compositePrimaryKeys: Object.entries(compositePrimaryKeys).map(([name, keys]) =>
 					generateConstraint({
 						name,

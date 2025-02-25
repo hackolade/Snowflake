@@ -1,8 +1,9 @@
 const _ = require('lodash');
 const { escapeString } = require('../../utils/escapeString');
 const { preSpace } = require('../../utils/preSpace');
+const assignTemplates = require('../../utils/assignTemplates');
 
-module.exports = ({ getName, getFullName, templates, assignTemplates, tab }) => {
+module.exports = ({ getName, getFullName, templates, tab }) => {
 	const getSchemaFullName = (database, schemaName, isCaseSensitive) => {
 		const setSchemaName = getName(isCaseSensitive, schemaName);
 		const databaseName = getName(isCaseSensitive, database);

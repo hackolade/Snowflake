@@ -1,11 +1,10 @@
 const _ = require('lodash');
+const { toString, toStringIfNotNone, toStringIfNotAuto, toNumber, toBoolean } = require('./general');
 
 const getNullIf = nullIfOptions =>
-	Array.isArray(nullIfOptions) ? nullIfOptions.filter(item => item && item['NULL_IF_item']) : [];
+	Array.isArray(nullIfOptions) ? nullIfOptions.filter(item => item?.['NULL_IF_item']) : [];
 
-const getFormatTypeOptions = app => (fileFormat, formatOptions) => {
-	const { toString, toStringIfNotNone, toStringIfNotAuto, toNumber, toBoolean } = require('./general')(app);
-
+const getFormatTypeOptions = (fileFormat, formatOptions) => {
 	switch (fileFormat) {
 		case 'CSV':
 			return {

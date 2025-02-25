@@ -1,10 +1,10 @@
 const _ = require('lodash');
 const { getNames, getBaseAndContainerNames } = require('./common');
+const { getFullName, getName } = require('../general');
 
-const getViewName = view => (view && view.code) || view.name || '';
+const getViewName = view => view?.code || view.name || '';
 
 const getAddViewScript = (ddlProvider, app) => view => {
-	const { getName } = require('../general')(app);
 	const { mapProperties } = app.require('@hackolade/ddl-fe-utils');
 
 	const { schemaName, databaseName } = getBaseAndContainerNames(view, getName);
@@ -28,9 +28,7 @@ const getAddViewScript = (ddlProvider, app) => view => {
 	return ddlProvider.createView(hydratedView, {}, view.isActivated);
 };
 
-const getDeleteViewScript = app => view => {
-	const { getFullName, getName } = require('../general')(app);
-
+const getDeleteViewScript = view => {
 	const jsonData = {
 		...view,
 		...(_.omit(view?.role, 'properties') || {}),

@@ -2,12 +2,11 @@ const _ = require('lodash');
 const { checkFieldPropertiesChanged, getNames, getBaseAndContainerNames } = require('./common');
 const { createColumnDefinitionBySchema } = require('./createColumnDefinition');
 const { commentIfDeactivated } = require('../commentHelpers/commentDeactivatedHelper');
+const { getEntityName, getFullName, getName, toString } = require('../general');
 
 const getAddCollectionScript =
-	({ ddlProvider, app, scriptFormat }) =>
+	({ ddlProvider, scriptFormat }) =>
 	collection => {
-		const { getEntityName, getName } = require('../general')(app);
-
 		const { schemaName, databaseName } = getBaseAndContainerNames(collection, getName);
 		const jsonSchema = {
 			...collection,
@@ -39,9 +38,7 @@ const getAddCollectionScript =
 		return ddlProvider.createTable(hydratedTable, jsonSchema.isActivated);
 	};
 
-const getDeleteCollectionScript = app => collection => {
-	const { getEntityName, getFullName, getName } = require('../general')(app);
-
+const getDeleteCollectionScript = collection => {
 	const jsonData = {
 		...collection,
 		...(_.omit(collection?.role, 'properties') || {}),
@@ -59,10 +56,8 @@ const getModifyCollectionScript = ddlProvider => collection => {
 };
 
 const getAddColumnScript =
-	({ ddlProvider, app, scriptFormat }) =>
+	({ ddlProvider, scriptFormat }) =>
 	collection => {
-		const { getEntityName, getFullName, getName } = require('../general')(app);
-
 		const collectionSchema = {
 			...collection,
 			...(_.omit(collection?.role, 'properties') || {}),
@@ -88,9 +83,7 @@ const getAddColumnScript =
 			);
 	};
 
-const getDeleteColumnScript = app => collection => {
-	const { getEntityName, getFullName, getName } = require('../general')(app);
-
+const getDeleteColumnScript = collection => {
 	const collectionSchema = {
 		...collection,
 		...(_.omit(collection?.role, 'properties') || {}),
@@ -103,8 +96,7 @@ const getDeleteColumnScript = app => collection => {
 		.map(([name]) => `ALTER TABLE IF EXISTS ${fullName} DROP COLUMN ${name};`);
 };
 
-const getModifyColumnScript = app => collection => {
-	const { getEntityName, getFullName, getName, toString } = require('../general')(app);
+const getModifyColumnScript = collection => {
 	const { getSetTagValue, getUnsetTagValue } = require('../../helpers/tagHelper')({ getName, toString });
 
 	const collectionSchema = {

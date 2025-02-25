@@ -42,12 +42,12 @@ const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat
 	const addedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'added', 'values'),
 		'created',
-		getAddCollectionScript({ ddlProvider, app, scriptFormat }),
+		getAddCollectionScript({ ddlProvider, scriptFormat }),
 	);
 	const deletedCollectionScripts = getCollectionScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
 		'deleted',
-		getDeleteCollectionScript(app),
+		getDeleteCollectionScript,
 	);
 
 	const modifiedCollectionScripts = getCollectionScripts(
@@ -58,15 +58,15 @@ const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
-		getAddColumnScript({ ddlProvider, app, scriptFormat }),
+		getAddColumnScript({ ddlProvider, scriptFormat }),
 	);
 	const deletedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
-		getDeleteColumnScript(app),
+		getDeleteColumnScript,
 	);
 	const modifiedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'modified', 'values'),
-		getModifyColumnScript(app),
+		getModifyColumnScript,
 	);
 
 	return {
@@ -100,7 +100,7 @@ const getAlterViewsScripts = ({ schema, ddlProvider, app }) => {
 	const deletedViewScripts = getViewScripts(
 		getItems(schema, 'views', 'deleted', 'values'),
 		'deleted',
-		getDeleteViewScript(app),
+		getDeleteViewScript,
 	);
 	const modifiedViewScripts = getModifiedScript(
 		getItems(schema, 'views', 'modified', 'values'),
@@ -119,13 +119,13 @@ const getAlterViewsScripts = ({ schema, ddlProvider, app }) => {
  */
 const getAlterTagsScripts = ({ collection, ddlProvider, app }) => {
 	const addedTagsScripts = getItems(collection, 'containers', 'added', 'values').flatMap(
-		getAddTagScript({ ddlProvider, app }),
+		getAddTagScript({ ddlProvider }),
 	);
 	const deletedTagsScripts = getItems(collection, 'containers', 'deleted', 'values').flatMap(
-		getDeleteTagScript({ ddlProvider, app }),
+		getDeleteTagScript({ ddlProvider }),
 	);
 	const modifiedTagsScripts = getItems(collection, 'containers', 'modified', 'values').flatMap(
-		getModifyTagScript({ ddlProvider, app }),
+		getModifyTagScript({ ddlProvider }),
 	);
 	return { addedTagsScripts, deletedTagsScripts, modifiedTagsScripts };
 };

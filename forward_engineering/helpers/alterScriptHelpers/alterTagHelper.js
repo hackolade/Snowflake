@@ -1,13 +1,13 @@
 const _ = require('lodash');
 const { prepareContainerLevelData } = require('./common');
+const { getDbName, getName, getGroupItemsByCompMode } = require('../general');
 
 /**
  * @returns {(container: object) => string[]}
  */
 const getAddTagScript =
-	({ ddlProvider, app }) =>
+	({ ddlProvider }) =>
 	container => {
-		const { getDbName, getName } = require('../general')(app);
 		const isCaseSensitive = container.role?.isCaseSensitive;
 		const dbName = getDbName(container.role);
 		const schemaName = getName(isCaseSensitive, dbName);
@@ -21,9 +21,8 @@ const getAddTagScript =
  * @returns {(container: object) => string[]}
  */
 const getDeleteTagScript =
-	({ ddlProvider, app }) =>
+	({ ddlProvider }) =>
 	container => {
-		const { getDbName, getName } = require('../general')(app);
 		const isCaseSensitive = container.role?.isCaseSensitive;
 		const dbName = getDbName(container.role);
 		const schemaName = getName(isCaseSensitive, dbName);
@@ -37,9 +36,8 @@ const getDeleteTagScript =
  * @returns {(container: object) => string[]}
  */
 const getModifyTagScript =
-	({ ddlProvider, app }) =>
+	({ ddlProvider }) =>
 	container => {
-		const { getDbName, getName, getGroupItemsByCompMode } = require('../general')(app);
 		const isCaseSensitive = container.role?.isCaseSensitive;
 		const dbName = getDbName(container.role);
 		const schemaName = getName(isCaseSensitive, dbName);
