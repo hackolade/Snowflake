@@ -142,7 +142,8 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "numeric",
 				"valueType": "number",
 				"allowNegative": false,
-				"typeDecorator": true
+				"typeDecorator": true,
+				"maxValue": 16777216
 			},
 			{
 				"propertyName": "Column expression",
@@ -3422,7 +3423,8 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "numChar",
 				"propertyType": "numeric",
 				"valueType": "number",
-				"allowNegative": false
+				"allowNegative": false,
+				"maxValue": 8388608
 			},
 			{
 				"propertyName": "Column expression",
