@@ -212,9 +212,12 @@ const getDbCollectionsData = async (data, logger, cb) => {
 			return [...packages, ...tablesPackages, viewPackage];
 		}, Promise.resolve([]));
 
-		const packages = await Promise.all(entitiesPromises);
+		const packages = (await Promise.all(entitiesPromises))
+			.filter(Boolean)
+			// putt dynamic table and views to the end of list
+			.sort(a => (a.entityLevel?.dynamic || a.views.length > 0 ? 1 : -1));
 
-		cb(null, packages.filter(Boolean));
+		cb(null, packages);
 	} catch (err) {
 		handleError(logger, err, cb);
 	}

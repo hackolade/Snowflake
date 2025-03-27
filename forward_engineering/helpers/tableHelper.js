@@ -123,9 +123,10 @@ module.exports = app => {
 			iceberg: preSpace(iceberg && 'ICEBERG'),
 			dynamic: preSpace(dynamic && 'DYNAMIC'),
 			catalogSync: catalogSync ? `CATALOG_SYNC = '${catalogSync}'\n` : '',
-			storageSerializationPolicy: storageSerializationPolicy
-				? `STORAGE_SERIALIZATION_POLICY = ${toUpper(storageSerializationPolicy)}\n`
-				: '',
+			storageSerializationPolicy:
+				storageSerializationPolicy && !dynamic
+					? `STORAGE_SERIALIZATION_POLICY = ${toUpper(storageSerializationPolicy)}\n`
+					: '',
 			changeTracking: changeTracking ? 'CHANGE_TRACKING = TRUE\n' : '',
 			defaultDdlCollation: defaultDdlCollation ? `DEFAULT_DDL_COLLATION = '${defaultDdlCollation}'\n` : '',
 			catalogTableName: catalogTableName ? `CATALOG_TABLE_NAME = '${catalogTableName}'\n` : '',

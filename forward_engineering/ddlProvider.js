@@ -362,8 +362,21 @@ module.exports = (baseProvider, options, app) => {
 			});
 
 			if (tableData.dynamic || tableData.iceberg) {
+				const dynamicTableColumnAliases = tableData.columnDefinitions.map(column => {
+					let statement = getName(tableData.isCaseSensitive, column.name);
+					if (column.comment) {
+						statement += ` COMMENT ${escapeString(scriptFormat, column.comment)}`;
+					}
+
+					return commentIfDeactivated(statement, column);
+				});
+				const dynamicTableColumnDefinitions = joinActivatedAndDeactivatedStatements({
+					statements: dynamicTableColumnAliases,
+					indent: '\n\t\t',
+				});
+
 				const isExternalCatalog = tableData.iceberg && tableData.tableExtraProps.catalogMgmt === 'external';
-				const tableColumnDefinitions = isExternalCatalog ? '' : columnDefinitions;
+				const tableColumnDefinitions = isExternalCatalog ? '' : dynamicTableColumnDefinitions;
 
 				const tableExtraOptions = getTableExtraProps({
 					tableData,
