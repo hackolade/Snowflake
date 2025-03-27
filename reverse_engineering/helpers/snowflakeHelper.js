@@ -559,30 +559,35 @@ const logTablesMeta = async ({ logger, tables = [], icebergTables = [] }) => {
 		return;
 	}
 
-	const logError = logErrorAndReturnEmptyArray({ logger, query: 'SHOW ICEBERG TABLES' });
+	const combinedMeta = [];
+	for (const table of tables) {
+		try {
+			const { database_name, name, rows, is_dynamic, is_external, is_iceberg } = table;
+			let metaInfo =
+				`${database_name}.${name}: ` +
+				`rows=${rows}; ` +
+				`is_dynamic=${is_dynamic}; ` +
+				`is_external=${is_external}; ` +
+				`is_iceberg=${is_iceberg};`;
 
-	const getMeta = async table => {
-		const { database_name, name, rows, is_dynamic, is_external, is_iceberg } = table;
-		const baseInfo =
-			`${database_name}.${name}: ` +
-			`rows=${rows}; ` +
-			`is_dynamic=${is_dynamic}; ` +
-			`is_external=${is_external}; ` +
-			`is_iceberg=${is_iceberg};`;
-
-		let icebergInfo = '';
-
-		if (is_iceberg) {
-			const icebergMeta = _.head(await showIcebergTables({ options: ` LIKE '%${name}%'` }).catch(logError));
-			if (icebergMeta) {
-				icebergInfo = '\nIceberg table meta: ';
-				_.forOwn(icebergMeta, (value, key) => (icebergInfo += `${key}=${value};`));
+			if (is_iceberg === 'Y') {
+				const response = await showIcebergTables({ options: ` LIKE '%${name}%'` });
+				const icebergMeta = _.head(response);
+				if (icebergMeta) {
+					metaInfo += '\nIceberg table meta: ';
+					_.forOwn(icebergMeta, (value, key) => (metaInfo += `${key}=${value};`));
+				}
 			}
-		}
 
-		return `${baseInfo}${icebergInfo}`;
-	};
-	const combinedMeta = await Promise.all(tables.map(getMeta));
+			combinedMeta.push(metaInfo);
+		} catch (error) {
+			logger.log(
+				'error',
+				error,
+				`Error getting iceberg table metadata for "${table.database_name}.${table.name}"`,
+			);
+		}
+	}
 
 	logger.log('info', combinedMeta, 'Tables metadata');
 };
