@@ -35,6 +35,7 @@
                 }
             },
             "enableReverseEngineering": true,
+            "enableRETableColumnAliases": true,
             "disableChoices": true,
             "enableJsonType": true,
             "reverseSchemaIntoOneColumn": true,
