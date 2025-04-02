@@ -316,7 +316,7 @@ module.exports = (baseProvider, options, app) => {
 						(isActivated
 							? foreignKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)
 							: foreignActiveKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)) +
-						')\n',
+						')',
 			);
 			const partitionKeys = preSpace(
 				!isEmpty(tableData.partitioningKey) &&
