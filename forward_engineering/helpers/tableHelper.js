@@ -111,7 +111,7 @@ module.exports = app => {
 			column_definitions: columnDefinitions ? `\t(\n\t\t${columnDefinitions}\n\t)\n` : '',
 			refreshMode: refreshMode ? `REFRESH_MODE = ${refreshMode}\n` : '',
 			initialize: initialize ? `INITIALIZE = ${initialize}\n` : '',
-			clusterKeys,
+			clusterKeys: clusterKeys ? `${clusterKeys.trim()}\n` : '',
 			dataRetentionTime: dataRetentionTime ? `${dataRetentionTime.trim()}\n` : '',
 			maxDataExtensionTime: maxDataExtensionTime
 				? `MAX_DATA_EXTENSION_TIME_IN_DAYS = ${maxDataExtensionTime}\n`
