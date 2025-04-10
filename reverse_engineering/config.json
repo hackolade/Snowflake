@@ -13,6 +13,18 @@
 				"value": "externalbrowser"
 			},
 			"value": "connectByExternalBrowser"
+		},
+		{
+			"dependency": {
+				"type": "not",
+				"values": [
+					{
+						"key": "authType",
+						"value": "externalbrowser"
+					}
+				]
+			},
+			"value": "getDatabases"
 		}
 	],
 	"helpUrl": "https://hackolade.com/help/ConnecttoaSnowflakeinstance.html"

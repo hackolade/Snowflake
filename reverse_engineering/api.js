@@ -48,17 +48,31 @@ const getExternalBrowserUrl = async (connectionInfo, logger, cb) => {
 	}
 };
 
-const getDatabases = (connectionInfo, logger, cb) => {
-	cb();
+const getDatabases = async (connectionInfo, logger, cb) => {
+	try {
+		logger.clear();
+
+		if (connectionInfo.databaseName) {
+			cb(null, [connectionInfo.databaseName]);
+			return;
+		}
+
+		await snowflakeHelper.connect(logger, connectionInfo);
+
+		const databaseNames = await snowflakeHelper.getDatabaseNames({ logger });
+
+		cb(null, databaseNames);
+	} catch (err) {
+		handleError(logger, err, cb);
+	}
 };
 
 const getDocumentKinds = (connectionInfo, logger, cb) => {
-	cb();
+	cb(null, []);
 };
 
 const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
 	try {
-		logger.clear();
 		await snowflakeHelper.connect(logger, connectionInfo);
 		const schemasInfo = await snowflakeHelper.getSchemasInfo();
 		logger.log('info', { schemas: schemasInfo }, 'Found schemas');

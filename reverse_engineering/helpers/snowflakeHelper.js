@@ -636,6 +636,15 @@ const getEntitiesNames = async ({ logger }) => {
 	}, []);
 };
 
+const getDatabaseNames = async ({ logger }) => {
+	const logError = logErrorAndReturnEmptyArray({ logger, query: 'SHOW' });
+	const databases = await showDatabases().catch(logError);
+
+	logger.log('info', { databases }, 'Found databases');
+
+	return databases.map(({ name }) => name);
+};
+
 const getFullEntityName = (schemaName, tableName) => {
 	return [...schemaName.split('.'), tableName].map(addQuotes).join('.');
 };
@@ -1628,6 +1637,7 @@ module.exports = {
 	disconnect,
 	testConnection,
 	getEntitiesNames,
+	getDatabaseNames,
 	getDDL,
 	getViewDDL,
 	getSchemaDDL,
