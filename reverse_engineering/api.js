@@ -48,21 +48,36 @@ const getExternalBrowserUrl = async (connectionInfo, logger, cb) => {
 	}
 };
 
-const getDatabases = (connectionInfo, logger, cb) => {
-	cb();
+const getDatabases = async (connectionInfo, logger, cb) => {
+	try {
+		logger.clear();
+
+		if (connectionInfo.databaseName) {
+			cb(null, [connectionInfo.databaseName]);
+			return;
+		}
+
+		await snowflakeHelper.connect(logger, connectionInfo);
+
+		const databaseNames = await snowflakeHelper.getDatabaseNames({ logger });
+
+		cb(null, databaseNames);
+	} catch (err) {
+		handleError(logger, err, cb);
+	}
 };
 
 const getDocumentKinds = (connectionInfo, logger, cb) => {
-	cb();
+	cb(null, []);
 };
 
 const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
 	try {
-		logger.clear();
 		await snowflakeHelper.connect(logger, connectionInfo);
-		const schemasInfo = await snowflakeHelper.getSchemasInfo();
+		const databaseName = connectionInfo.database || connectionInfo.databaseName;
+		const schemasInfo = await snowflakeHelper.getSchemasInfo(databaseName);
 		logger.log('info', { schemas: schemasInfo }, 'Found schemas');
-		const namesBySchemas = await snowflakeHelper.getEntitiesNames({ logger });
+		const namesBySchemas = await snowflakeHelper.getEntitiesNames({ databaseName, logger });
 
 		logger.log('info', { entities: namesBySchemas }, 'Found entities');
 
@@ -76,20 +91,25 @@ const getDbCollectionsData = async (data, logger, cb) => {
 	try {
 		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
 		const collections = data.collectionData.collections;
-		const dataBaseNames = data.collectionData.dataBaseNames;
-		const entitiesPromises = await dataBaseNames.reduce(async (packagesPromise, schema) => {
+		const schemaNames = data.collectionData.dataBaseNames;
+		const databaseName = data.database || data.databaseName;
+		const entitiesPromises = await schemaNames.reduce(async (packagesPromise, schemaName) => {
 			const packages = await packagesPromise;
-			const entities = snowflakeHelper.splitEntityNames(collections[schema]);
+			const fullSchemaName = databaseName + '.' + schemaName;
+			const entities = snowflakeHelper.splitEntityNames(collections[schemaName]);
 
-			const containerData = await snowflakeHelper.getContainerData({ schema, logger });
-			const [database, schemaName] = schema.split('.');
+			const containerData = await snowflakeHelper.getContainerData({ databaseName, schemaName, logger });
 
 			const tablesPackages = entities.tables.map(async table => {
-				const fullTableName = snowflakeHelper.getFullEntityName(schema, table);
-				logger.progress({ message: `Start getting data from table`, containerName: schema, entityName: table });
+				const fullTableName = snowflakeHelper.getFullEntityName(databaseName, schemaName, table);
+				logger.progress({
+					message: `Start getting data from table`,
+					containerName: fullSchemaName,
+					entityName: table,
+				});
 				logger.log(
 					'info',
-					{ message: `Start getting data from table`, containerName: schema, entityName: table },
+					{ message: `Start getting data from table`, containerName: fullSchemaName, entityName: table },
 					'Getting schema',
 				);
 				const ddl = await snowflakeHelper.getDDL(fullTableName, logger);
@@ -97,12 +117,16 @@ const getDbCollectionsData = async (data, logger, cb) => {
 
 				logger.progress({
 					message: `Fetching record for JSON schema inference`,
-					containerName: schema,
+					containerName: fullSchemaName,
 					entityName: table,
 				});
 				logger.log(
 					'info',
-					{ message: `Fetching record for JSON schema inference`, containerName: schema, entityName: table },
+					{
+						message: `Fetching record for JSON schema inference`,
+						containerName: fullSchemaName,
+						entityName: table,
+					},
 					'Getting schema',
 				);
 
@@ -114,19 +138,23 @@ const getDbCollectionsData = async (data, logger, cb) => {
 
 				const entityData = await snowflakeHelper.getEntityData({ fullTableName, logger });
 
-				logger.progress({ message: `Schema inference`, containerName: schema, entityName: table });
+				logger.progress({ message: `Schema inference`, containerName: fullSchemaName, entityName: table });
 				logger.log(
 					'info',
-					{ message: `Schema inference`, containerName: schema, entityName: table },
+					{ message: `Schema inference`, containerName: fullSchemaName, entityName: table },
 					'Getting schema',
 				);
 
 				const handledDocuments = snowflakeHelper.handleComplexTypesDocuments(jsonSchema, documents);
 
-				logger.progress({ message: `Data retrieved successfully`, containerName: schema, entityName: table });
+				logger.progress({
+					message: `Data retrieved successfully`,
+					containerName: fullSchemaName,
+					entityName: table,
+				});
 				logger.log(
 					'info',
-					{ message: `Data retrieved successfully`, containerName: schema, entityName: table },
+					{ message: `Data retrieved successfully`, containerName: fullSchemaName, entityName: table },
 					'Getting schema',
 				);
 
@@ -147,7 +175,7 @@ const getDbCollectionsData = async (data, logger, cb) => {
 					},
 					bucketInfo: {
 						indexes: [],
-						database,
+						database: databaseName,
 						...containerData,
 					},
 				};
@@ -155,15 +183,15 @@ const getDbCollectionsData = async (data, logger, cb) => {
 
 			const views = await Promise.all(
 				entities.views.map(async view => {
-					const fullViewName = snowflakeHelper.getFullEntityName(schema, view);
+					const fullViewName = snowflakeHelper.getFullEntityName(databaseName, schemaName, view);
 					logger.progress({
 						message: `Start getting data from view`,
-						containerName: schema,
+						containerName: fullSchemaName,
 						entityName: view,
 					});
 					logger.log(
 						'info',
-						{ message: `Start getting data from view`, containerName: schema, entityName: view },
+						{ message: `Start getting data from view`, containerName: fullSchemaName, entityName: view },
 						'Getting schema',
 					);
 
@@ -172,12 +200,12 @@ const getDbCollectionsData = async (data, logger, cb) => {
 
 					logger.progress({
 						message: `Data retrieved successfully`,
-						containerName: schema,
+						containerName: fullSchemaName,
 						entityName: view,
 					});
 					logger.log(
 						'info',
-						{ message: `Data retrieved successfully`, containerName: schema, entityName: view },
+						{ message: `Data retrieved successfully`, containerName: fullSchemaName, entityName: view },
 						'Getting schema',
 					);
 
@@ -204,7 +232,7 @@ const getDbCollectionsData = async (data, logger, cb) => {
 				emptyBucket: false,
 				bucketInfo: {
 					indexes: [],
-					database,
+					database: databaseName,
 					...containerData,
 				},
 			});

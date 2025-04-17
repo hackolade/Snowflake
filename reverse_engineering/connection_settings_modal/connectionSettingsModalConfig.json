@@ -58,6 +58,12 @@
 				"inputType": "text",
 				"inputTooltip": "Optionally specify the active/current warehouse for the session",
 				"defaultValue": ""
+			},
+			{
+				"inputLabel": "Schema name",
+				"inputKeyword": "databaseName",
+				"inputType": "text",
+				"inputPlaceholder": "Optional"
 			}
 		]
 	},
