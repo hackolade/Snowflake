@@ -43,6 +43,12 @@ const connect = async (
 		databaseName,
 	},
 ) => {
+	if (connection) {
+		logger.log('info', 'connection already exists', 'Connection');
+
+		return connection;
+	}
+
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 	const timeout = _.toNumber(queryRequestTimeout) || 2 * 60 * 1000;
@@ -55,8 +61,8 @@ const connect = async (
 			`Auth type: ${authType}\n` +
 			`Username: ${username}\n` +
 			`Warehouse: ${warehouse}\n` +
-			`Role: ${role}\n`,
-		`Schema name: ${databaseName}`,
+			`Role: ${role}\n` +
+			`Database name: ${databaseName}`,
 		'Connection',
 	);
 
@@ -465,6 +471,7 @@ const disconnect = () => {
 			if (err) {
 				return reject(err);
 			}
+			connection = null;
 			resolve();
 		});
 	});
