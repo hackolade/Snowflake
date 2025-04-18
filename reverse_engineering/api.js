@@ -60,9 +60,10 @@ const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
 	try {
 		logger.clear();
 		await snowflakeHelper.connect(logger, connectionInfo);
-		const schemasInfo = await snowflakeHelper.getSchemasInfo();
+		const databaseName = connectionInfo.databaseName;
+		const schemasInfo = await snowflakeHelper.getSchemasInfo({ databaseName });
 		logger.log('info', { schemas: schemasInfo }, 'Found schemas');
-		const namesBySchemas = await snowflakeHelper.getEntitiesNames({ logger });
+		const namesBySchemas = await snowflakeHelper.getEntitiesNames({ databaseName, logger });
 
 		logger.log('info', { entities: namesBySchemas }, 'Found entities');
 
