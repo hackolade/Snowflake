@@ -60,10 +60,10 @@
 				"defaultValue": ""
 			},
 			{
-				"inputLabel": "Schema name",
+				"inputLabel": "Database name",
 				"inputKeyword": "databaseName",
 				"inputType": "text",
-				"inputPlaceholder": "Optional"
+				"inputTooltip": "Optionally specify the database name. If not provided, you will be asked for it after connection."
 			}
 		]
 	},
