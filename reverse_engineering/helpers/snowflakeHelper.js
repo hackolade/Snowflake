@@ -40,15 +40,8 @@ const connect = async (
 		name,
 		cloudPlatform,
 		queryRequestTimeout,
-		databaseName,
 	},
 ) => {
-	if (connection) {
-		logger.log('info', 'connection already exists', 'Connection');
-
-		return connection;
-	}
-
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 	const timeout = _.toNumber(queryRequestTimeout) || 2 * 60 * 1000;
@@ -61,8 +54,7 @@ const connect = async (
 			`Auth type: ${authType}\n` +
 			`Username: ${username}\n` +
 			`Warehouse: ${warehouse}\n` +
-			`Role: ${role}\n` +
-			`Database name: ${databaseName}`,
+			`Role: ${role}`,
 		'Connection',
 	);
 
@@ -471,7 +463,6 @@ const disconnect = () => {
 			if (err) {
 				return reject(err);
 			}
-			connection = null;
 			resolve();
 		});
 	});
@@ -492,20 +483,15 @@ const showTablesByDatabases = async databases =>
 				databases.map(database => execute(`SHOW TABLES IN DATABASE "${removeQuotes(database.name)}";`)),
 			);
 
-const showSchemasByDatabase = async databaseName =>
-	databaseName ? showSchemasInDatabase(databaseName) : showSchemas();
-
 const showDatabases = () => execute('SHOW DATABASES;');
 
 const showSchemas = () => execute('SHOW SCHEMAS;');
 
-const showSchemasInDatabase = databaseName => execute(`SHOW SCHEMAS IN DATABASE "${removeQuotes(databaseName)}";`);
+const showExternalTables = () => execute('SHOW EXTERNAL TABLES;');
 
-const showExternalTables = ({ options = '' } = {}) => execute(`SHOW EXTERNAL TABLES${options};`);
+const showViews = () => execute('SHOW VIEWS;');
 
-const showViews = ({ options = '' } = {}) => execute(`SHOW VIEWS${options};`);
-
-const showMaterializedViews = ({ options = '' } = {}) => execute(`SHOW MATERIALIZED VIEWS${options};`);
+const showMaterializedViews = () => execute('SHOW MATERIALIZED VIEWS;');
 
 const showIcebergTables = ({ options = '' } = {}) => execute(`SHOW ICEBERG TABLES${options};`);
 
@@ -521,8 +507,8 @@ const splitEntityNames = names => {
 
 const isView = name => name.slice(-4) === ' (v)';
 
-const getSchemasInfo = async databaseName => {
-	const schemas = await showSchemasByDatabase(databaseName).catch(err => [{ status: 'error', message: err.message }]);
+const getSchemasInfo = async () => {
+	const schemas = await showSchemas().catch(err => [{ status: 'error', message: err.message }]);
 
 	if (schemas[0]?.status === 'error') {
 		return schemas;
@@ -606,19 +592,19 @@ const logTablesMeta = async ({ logger, tables = [], icebergTables = [] }) => {
 	logger.log('info', combinedMeta, 'Tables metadata');
 };
 
-const getEntitiesNames = async ({ databaseName, logger }) => {
+const getEntitiesNames = async ({ logger }) => {
 	const logError = logErrorAndReturnEmptyArray({ logger, query: 'SHOW' });
-	const databaseQueryOptions = databaseName ? ` IN DATABASE "${removeQuotes(databaseName)}"` : '';
-	const databases = databaseName ? [{ name: databaseName }] : await showDatabases().catch(logError);
+
+	const databases = await showDatabases().catch(logError);
 	const tablesRows = await showTablesByDatabases(databases).catch(logError);
 	const flatTableRows = tablesRows.flatMap(row => row.value).filter(Boolean);
-	const icebergTables = await showIcebergTables({ options: databaseQueryOptions }).catch(logError);
+	const icebergTables = await showIcebergTables().catch(logError);
 
 	await logTablesMeta({ logger, tables: flatTableRows, icebergTables });
 
-	const externalTableRows = await showExternalTables({ options: databaseQueryOptions }).catch(logError);
-	const viewsRows = await showViews({ options: databaseQueryOptions }).catch(logError);
-	const materializedViewsRows = await showMaterializedViews({ options: databaseQueryOptions }).catch(logError);
+	const externalTableRows = await showExternalTables().catch(logError);
+	const viewsRows = await showViews().catch(logError);
+	const materializedViewsRows = await showMaterializedViews().catch(logError);
 
 	const entitiesRows = [
 		...flatTableRows,
@@ -640,7 +626,7 @@ const getEntitiesNames = async ({ databaseName, logger }) => {
 				return [
 					...buckets,
 					{
-						dbName: schema,
+						dbName: `${dbName}.${schema}`,
 						dbCollections: entities,
 						isEmpty: !entities.length,
 					},
@@ -650,17 +636,8 @@ const getEntitiesNames = async ({ databaseName, logger }) => {
 	}, []);
 };
 
-const getDatabaseNames = async ({ logger }) => {
-	const logError = logErrorAndReturnEmptyArray({ logger, query: 'SHOW' });
-	const databases = await showDatabases().catch(logError);
-
-	logger.log('info', { databases }, 'Found databases');
-
-	return databases.map(({ name }) => name);
-};
-
-const getFullEntityName = (databaseName, schemaName, tableName) => {
-	return [databaseName, schemaName, tableName].map(addQuotes).join('.');
+const getFullEntityName = (schemaName, tableName) => {
+	return [...schemaName.split('.'), tableName].map(addQuotes).join('.');
 };
 
 const addQuotes = string => {
@@ -1525,12 +1502,12 @@ const getFileFormats = async (dbName, schemaName) => {
 	);
 };
 
-const getContainerData = async ({ databaseName, schemaName, logger }) => {
-	if (containers[schemaName]) {
-		return containers[schemaName];
+const getContainerData = async ({ schema, logger }) => {
+	if (containers[schema]) {
+		return containers[schema];
 	}
-
-	const dbNameWithoutQuotes = removeQuotes(databaseName);
+	const [dbName, schemaName] = schema.split('.');
+	const dbNameWithoutQuotes = removeQuotes(dbName);
 
 	try {
 		const dbRows = await execute(
@@ -1542,13 +1519,13 @@ const getContainerData = async ({ databaseName, schemaName, logger }) => {
 		);
 		const isCaseSensitive = _.toUpper(schemaName) !== schemaName;
 		const schemaData = _.first(schemaRows);
-		const functions = await getFunctions(databaseName, schemaName);
-		const procedures = await getProcedures(databaseName, schemaName);
-		const stages = await getStages(databaseName, schemaName);
-		const sequences = await getSequences(databaseName, schemaName);
-		const fileFormats = await getFileFormats(databaseName, schemaName);
-		const tags = await getTags({ databaseName, schemaName, logger });
-		const schemaTags = await getSchemaTags({ databaseName, schemaName, logger });
+		const functions = await getFunctions(dbName, schemaName);
+		const procedures = await getProcedures(dbName, schemaName);
+		const stages = await getStages(dbName, schemaName);
+		const sequences = await getSequences(dbName, schemaName);
+		const fileFormats = await getFileFormats(dbName, schemaName);
+		const tags = await getTags({ dbName, schemaName, logger });
+		const schemaTags = await getSchemaTags({ dbName, schemaName, logger });
 
 		const data = {
 			transient: Boolean(_.get(schemaData, 'IS_TRANSIENT', false) && _.get(schemaData, 'IS_TRANSIENT') !== 'NO'),
@@ -1563,7 +1540,7 @@ const getContainerData = async ({ databaseName, schemaName, logger }) => {
 			tags,
 			schemaTags,
 		};
-		containers[schemaName] = data;
+		containers[schema] = data;
 
 		return data;
 	} catch (error) {
@@ -1587,11 +1564,9 @@ const getTagAllowedValues = ({ values, logger }) => {
 	}
 };
 
-const getTags = async ({ databaseName, schemaName, logger }) => {
+const getTags = async ({ dbName, schemaName, logger }) => {
 	try {
-		const rows = await execute(
-			`SHOW TAGS IN SCHEMA "${removeQuotes(databaseName)}"."${removeQuotes(schemaName)}";`,
-		);
+		const rows = await execute(`SHOW TAGS IN SCHEMA "${removeQuotes(dbName)}"."${removeQuotes(schemaName)}";`);
 
 		return rows.map(row => ({
 			name: row.name,
@@ -1605,10 +1580,10 @@ const getTags = async ({ databaseName, schemaName, logger }) => {
 	}
 };
 
-const getSchemaTags = async ({ databaseName, schemaName, logger }) => {
+const getSchemaTags = async ({ dbName, schemaName, logger }) => {
 	try {
 		const rows = await execute(
-			`SELECT TAG_DATABASE, TAG_SCHEMA, TAG_NAME, TAG_VALUE FROM TABLE("${removeQuotes(databaseName)}".information_schema.tag_references('"${removeQuotes(databaseName)}"."${removeQuotes(schemaName)}"', 'SCHEMA'));`,
+			`SELECT TAG_DATABASE, TAG_SCHEMA, TAG_NAME, TAG_VALUE FROM TABLE("${removeQuotes(dbName)}".information_schema.tag_references('"${removeQuotes(dbName)}"."${removeQuotes(schemaName)}"', 'SCHEMA'));`,
 		);
 
 		return rows.map(row => ({
@@ -1653,7 +1628,6 @@ module.exports = {
 	disconnect,
 	testConnection,
 	getEntitiesNames,
-	getDatabaseNames,
 	getDDL,
 	getViewDDL,
 	getSchemaDDL,
