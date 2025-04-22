@@ -84,7 +84,7 @@
 	"MODAL_WINDOW___CREATE_COLLECTION": "Create table",
 	"MODAL_WINDOW___CREATE_BUCKET": "Create schema",
 	"MODAL_WINDOW___ALL_COLLECTIONS": "and all nested tables",
-	"MODAL_WINDOW___CONNENTION_ERROR": "The Snowflake instance you are connected to does not contain any schemas.",
+	"MODAL_WINDOW___CONNENTION_ERROR": "The specified database does not exist or does not contain any schemas.",
 	"MODAL_WINDOW___CONTAIN_BUCKETS": "schemas",
 	"MODAL_WINDOW___CONTAIN_COLLECTIONS": "tables",
 	"MODAL_WINDOW___CONTAIN_BUCKET": "schemas",
