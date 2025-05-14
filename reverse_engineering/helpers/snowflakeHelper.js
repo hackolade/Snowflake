@@ -40,8 +40,15 @@ const connect = async (
 		name,
 		cloudPlatform,
 		queryRequestTimeout,
+		databaseName,
 	},
 ) => {
+	if (connection) {
+		logger.log('info', 'connection already exists', 'Connection');
+
+		return connection;
+	}
+
 	const account = getAccount(host);
 	const accessUrl = getAccessUrl(account);
 	const timeout = _.toNumber(queryRequestTimeout) || 2 * 60 * 1000;
@@ -471,15 +478,20 @@ const showTablesByDatabases = async databases =>
 				databases.map(database => execute(`SHOW TABLES IN DATABASE "${removeQuotes(database.name)}";`)),
 			);
 
+const showSchemasByDatabase = async databaseName =>
+	databaseName ? showSchemasInDatabase(databaseName) : showSchemas();
+
 const showDatabases = () => execute('SHOW DATABASES;');
 
 const showSchemas = () => execute('SHOW SCHEMAS;');
 
-const showExternalTables = () => execute('SHOW EXTERNAL TABLES;');
+const showSchemasInDatabase = databaseName => execute(`SHOW SCHEMAS IN DATABASE "${removeQuotes(databaseName)}";`);
 
-const showViews = () => execute('SHOW VIEWS;');
+const showExternalTables = ({ options = '' } = {}) => execute(`SHOW EXTERNAL TABLES${options};`);
 
-const showMaterializedViews = () => execute('SHOW MATERIALIZED VIEWS;');
+const showViews = ({ options = '' } = {}) => execute(`SHOW VIEWS${options};`);
+
+const showMaterializedViews = ({ options = '' } = {}) => execute(`SHOW MATERIALIZED VIEWS${options};`);
 
 const showIcebergTables = ({ options = '' } = {}) => execute(`SHOW ICEBERG TABLES${options};`);
 
@@ -495,8 +507,8 @@ const splitEntityNames = names => {
 
 const isView = name => name.slice(-4) === ' (v)';
 
-const getSchemasInfo = async () => {
-	const schemas = await showSchemas().catch(err => [{ status: 'error', message: err.message }]);
+const getSchemasInfo = async ({ databaseName }) => {
+	const schemas = await showSchemasByDatabase(databaseName).catch(err => [{ status: 'error', message: err.message }]);
 
 	if (schemas[0]?.status === 'error') {
 		return schemas;
@@ -580,19 +592,19 @@ const logTablesMeta = async ({ logger, tables = [], icebergTables = [] }) => {
 	logger.log('info', combinedMeta, 'Tables metadata');
 };
 
-const getEntitiesNames = async ({ logger }) => {
+const getEntitiesNames = async ({ databaseName, logger }) => {
 	const logError = logErrorAndReturnEmptyArray({ logger, query: 'SHOW' });
-
-	const databases = await showDatabases().catch(logError);
+	const databaseQueryOptions = databaseName ? ` IN DATABASE "${removeQuotes(databaseName)}"` : '';
+	const databases = databaseName ? [{ name: databaseName }] : await showDatabases().catch(logError);
 	const tablesRows = await showTablesByDatabases(databases).catch(logError);
 	const flatTableRows = tablesRows.flatMap(row => row.value).filter(Boolean);
-	const icebergTables = await showIcebergTables().catch(logError);
+	const icebergTables = await showIcebergTables({ options: databaseQueryOptions }).catch(logError);
 
 	await logTablesMeta({ logger, tables: flatTableRows, icebergTables });
 
-	const externalTableRows = await showExternalTables().catch(logError);
-	const viewsRows = await showViews().catch(logError);
-	const materializedViewsRows = await showMaterializedViews().catch(logError);
+	const externalTableRows = await showExternalTables({ options: databaseQueryOptions }).catch(logError);
+	const viewsRows = await showViews({ options: databaseQueryOptions }).catch(logError);
+	const materializedViewsRows = await showMaterializedViews({ options: databaseQueryOptions }).catch(logError);
 
 	const entitiesRows = [
 		...flatTableRows,
