@@ -3,7 +3,6 @@ const { commentDropStatements } = require('./helpers/commentHelpers/commentDropS
 const { DROP_STATEMENTS } = require('./helpers/constants');
 const { getAlterScript } = require('./helpers/alterScriptFromDeltaHelper');
 const { applyToInstance } = require('./helpers/applyToInstanceHelper');
-const { getSystemInfo } = require('../reverse_engineering/helpers/loggerHelper');
 const reApi = require('../reverse_engineering/api');
 
 module.exports = {
@@ -46,15 +45,6 @@ module.exports = {
 	},
 
 	applyToInstance(connectionInfo, logger, callback, app) {
-		logger.clear();
-		logger.log('info', getSystemInfo(connectionInfo.appVersion), 'Apply to instance');
-		logger.log(
-			'info',
-			_.omit(connectionInfo, 'script', 'containerData'),
-			'connectionInfo',
-			connectionInfo.hiddenKeys,
-		);
-
 		applyToInstance(connectionInfo, logger, app)
 			.then(result => {
 				callback(null, result);
