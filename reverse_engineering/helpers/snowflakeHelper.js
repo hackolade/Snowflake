@@ -53,19 +53,6 @@ const connect = async (
 	const accessUrl = getAccessUrl(account);
 	const timeout = _.toNumber(queryRequestTimeout) || 2 * 60 * 1000;
 
-	logger.log(
-		'info',
-		`Connection name: ${name}\n` +
-			`Cloud platform: ${cloudPlatform}\n` +
-			`Host: ${host}\n` +
-			`Auth type: ${authType}\n` +
-			`Username: ${username}\n` +
-			`Warehouse: ${warehouse}\n` +
-			`Role: ${role}\n` +
-			`Database name: ${databaseName}`,
-		'Connection',
-	);
-
 	const connectionFallbackStrategy = err => {
 		if (err.code !== CANT_REACH_SNOWFLAKE_ERROR_STATUS || hasCloudPlatform(account)) {
 			throw err;
