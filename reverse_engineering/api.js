@@ -1,8 +1,12 @@
+'use strict';
+
 const _ = require('lodash');
 const snowflakeHelper = require('./helpers/snowflakeHelper');
 const ssoHelper = require('./helpers/ssoHelper');
 
 const connect = async (connectionInfo, logger, cb) => {
+	logger.clear();
+	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 	try {
 		await snowflakeHelper.connect(logger, connectionInfo);
 		cb();
@@ -21,6 +25,8 @@ const disconnect = async (connectionInfo, logger, cb) => {
 };
 
 const testConnection = async (connectionInfo, logger, cb, app) => {
+	logger.clear();
+	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 	try {
 		if (connectionInfo.authType === 'externalbrowser') {
 			await getExternalBrowserUrl(connectionInfo, logger, cb);
@@ -52,6 +58,7 @@ const getDocumentKinds = (connectionInfo, logger, cb) => {
 
 const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
 	try {
+		logger.clear();
 		await snowflakeHelper.connect(logger, connectionInfo);
 		const databaseName = connectionInfo.databaseName;
 		const schemasInfo = await snowflakeHelper.getSchemasInfo({ databaseName });
@@ -68,6 +75,7 @@ const getDbCollectionsNames = async (connectionInfo, logger, cb) => {
 
 const getDbCollectionsData = async (data, logger, cb) => {
 	try {
+		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
 		const collections = data.collectionData.collections;
 		const dataBaseNames = data.collectionData.dataBaseNames;
 		const entitiesPromises = await dataBaseNames.reduce(async (packagesPromise, schema) => {
