@@ -4,6 +4,7 @@ const axios = require('axios');
 const uuid = require('uuid');
 const BSON = require('bson');
 const errorMessages = require('./errorMessages');
+const { escapeUrlIpV6WithBraces } = require('./escapeUrlIpV6WithBraces');
 
 const ALREADY_CONNECTED_STATUS = 405502;
 const CANT_REACH_SNOWFLAKE_ERROR_STATUS = 401001;
@@ -422,11 +423,12 @@ const getConnectionTimeoutError = timeout => {
 	return error;
 };
 
-const getAccount = hostUrl =>
-	(hostUrl || '')
-		.trim()
-		.replace(/\.snowflakecomputing\.com.*$/gi, '')
-		.replace(/^http(s)?:\/\//gi, '');
+const getAccount = hostUrl => {
+	const rawHostUrl = (hostUrl || '').trim();
+	const hostWithEscapedIp = escapeUrlIpV6WithBraces({ url: rawHostUrl });
+
+	return hostWithEscapedIp.replace(/\.snowflakecomputing\.com.*$/gi, '').replace(/^http(s)?:\/\//gi, '');
+};
 
 const getRole = role => {
 	if (!_.isString(role)) {
