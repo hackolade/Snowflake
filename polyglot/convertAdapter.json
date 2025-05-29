@@ -79,8 +79,7 @@
 			},
 			{
 				"from": {
-					"type": "document",
-					"childType": "variant"
+					"type": "variant"
 				},
 				"to": {
 					"type": "binary",
