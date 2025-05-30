@@ -76,6 +76,16 @@
 				"to": {
 					"hasMaxLength": true
 				}
+			},
+			{
+				"from": {
+					"type": "variant"
+				},
+				"to": {
+					"type": "binary",
+					"childType": "blob",
+					"mode": "variant"
+				}
 			}
 		]
 	}
