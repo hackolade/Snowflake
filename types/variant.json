@@ -10,7 +10,6 @@
 		"name": "variant",
 		"jsonRoot": true
 	},
-	"restrictNormalization": true,
 	"defaultValues": {
 		"primaryKey": false,
 		"mode": "var",
