@@ -79,12 +79,20 @@
 			},
 			{
 				"from": {
-					"type": "variant"
+					"type": "object"
 				},
 				"to": {
-					"type": "binary",
-					"childType": "blob",
-					"mode": "variant"
+					"type": "object",
+					"subtype": ""
+				}
+			},
+			{
+				"from": {
+					"type": "array"
+				},
+				"to": {
+					"type": "array",
+					"subtype": ""
 				}
 			}
 		]
