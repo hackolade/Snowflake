@@ -557,6 +557,8 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		createView(viewData, dbData, isActivated) {
+			const orReplace = preSpace(viewData.orReplace && 'OR REPLACE');
+			const ifNotExist = preSpace(viewData.ifNotExist && 'IF NOT EXISTS');
 			const schemaName = get(viewData, 'schemaData.schemaName');
 			const { columnList, tableColumns, tables } = viewData.keys.reduce(
 				(result, key) => {
@@ -618,6 +620,8 @@ module.exports = (baseProvider, options, app) => {
 				: undefined;
 
 			return assignTemplates(templates.createView, {
+				orReplace,
+				ifNotExist,
 				secure: preSpace(viewData.secure && 'SECURE'),
 				materialized: preSpace(viewData.materialized && 'MATERIALIZED'),
 				name: getFullName(schemaName, viewData.name),
@@ -887,7 +891,7 @@ module.exports = (baseProvider, options, app) => {
 				dynamic: firstTab.dynamic,
 				iceberg: firstTab.iceberg,
 				orReplace: firstTab.orReplace,
-				tableIfNotExists: firstTab.tableIfNotExists,
+				tableIfNotExists: firstTab.ifNotExist,
 				tableExtraProps: {
 					warehouse: firstTab.warehouse,
 					targetLag: firstTab.targetLag,
@@ -988,6 +992,8 @@ module.exports = (baseProvider, options, app) => {
 
 			return {
 				...viewData,
+				orReplace: firstTab.orReplace,
+				ifNotExist: firstTab.ifNotExist,
 				name: getName(firstTab.isCaseSensitive, viewData.name),
 				selectStatement: firstTab.selectStatement,
 				isCaseSensitive: firstTab.isCaseSensitive,

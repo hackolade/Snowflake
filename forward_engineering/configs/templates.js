@@ -63,7 +63,7 @@ module.exports = {
 		'ALTER TABLE IF EXISTS ${table_name} ADD ${constraint}FOREIGN KEY (${columns}) REFERENCES ${primary_table} (${primary_columns});',
 
 	createView:
-		'CREATE${secure}${materialized} VIEW IF NOT EXISTS ${name} (\n' +
+		'CREATE${orReplace}${secure}${materialized} VIEW${ifNotExist} ${name} (\n' +
 		'\t${column_list}\n' +
 		')\n${copy_grants}${comment}${tag}${clustering}AS ${select_statement};\n',
 
