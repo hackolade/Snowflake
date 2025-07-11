@@ -173,13 +173,13 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "orReplace",
 				"propertyType": "checkbox",
 				"disabledOnCondition": {
-					"key": "tableIfNotExists",
+					"key": "ifNotExist",
 					"value": true
 				}
 			},
 			{
 				"propertyName": "If not exist",
-				"propertyKeyword": "tableIfNotExists",
+				"propertyKeyword": "ifNotExist",
 				"propertyTooltip": "if the specified table already exists, the command should make no changes and return a message that the table exists, rather than terminating with an error. ",
 				"propertyType": "checkbox",
 				"disabledOnCondition": {
