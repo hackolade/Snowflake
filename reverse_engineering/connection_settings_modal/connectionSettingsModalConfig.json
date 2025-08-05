@@ -101,7 +101,8 @@
 				"options": [
 					{ "value": "credentials", "label": "Snowflake" },
 					{ "value": "okta", "label": "Native SSO (Okta only)" },
-					{ "value": "externalbrowser", "label": "Identity Provider SSO (via external browser)" }
+					{ "value": "externalbrowser", "label": "Identity Provider SSO (via external browser)" },
+					{ "value": "keyPair", "label": "Key-Pair" }
 				]
 			},
 			{
@@ -121,7 +122,7 @@
 				"inputType": "text",
 				"dependency": {
 					"key": "authType",
-					"value": "credentials"
+					"value": ["credentials", "keyPair"]
 				}
 			},
 			{
@@ -164,6 +165,28 @@
 				"inputType": "text",
 				"inputTooltip": "Required entry.  Or enter ALL to combine all your user roles",
 				"defaultValue": ""
+			},
+			{
+				"inputLabel": "Private Key",
+				"inputKeyword": "privateKeyPath",
+				"inputType": "file",
+				"inputPlaceholder": "Private Key",
+				"extensions": ["p8"],
+				"dependency": {
+					"key": "authType",
+					"value": ["keyPair"]
+				}
+			},
+			{
+				"inputLabel": "Passphrase",
+				"inputKeyword": "privateKeyPass",
+				"inputType": "text",
+				"inputTooltip": "Optional entry. Passphrase to the private key",
+				"defaultValue": "",
+				"dependency": {
+					"key": "authType",
+					"value": ["keyPair"]
+				}
 			}
 		]
 	}

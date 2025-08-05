@@ -41,6 +41,8 @@ const connect = async (
 		cloudPlatform,
 		queryRequestTimeout,
 		databaseName,
+		privateKeyPath,
+		privateKeyPass,
 	},
 ) => {
 	if (connection) {
@@ -119,6 +121,9 @@ const connect = async (
 			warehouse,
 			timeout,
 		});
+	}
+	if (authType === 'keyPair') {
+		authPromise = authByKeyPair({ account, role, timeout, username, privateKeyPath, privateKeyPass });
 	} else {
 		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
 	}
@@ -400,6 +405,18 @@ const getOktaAuthenticatorUrl = (authenticator = '') => {
 
 const authByCredentials = ({ account, username, password, role, timeout, warehouse }) => {
 	return connectWithTimeout({ account, username, password, role, timeout, warehouse });
+};
+
+const authByKeyPair = ({ account, role, timeout, username, privateKeyPath, privateKeyPass }) => {
+	return connectWithTimeout({
+		account,
+		role,
+		timeout,
+		username,
+		authenticator: 'SNOWFLAKE_JWT',
+		privateKeyPath,
+		...(privateKeyPass && { privateKeyPass }),
+	});
 };
 
 const connectWithTimeout = ({ timeout, ...options }, isErrorAllowed = () => false) => {
