@@ -3,7 +3,13 @@ const snowflake = require('snowflake-sdk');
 const axios = require('axios');
 const uuid = require('uuid');
 const BSON = require('bson');
-const errorMessages = require('./errorMessages');
+const errorMessages = require('./errorMessages.js');
+const { getRole, getAccountName, removeQuotes } = require('./common.js');
+const { authByOkta } = require('./connections/oktaConnection.js');
+const { authByExternalBrowser } = require('./connections/externalBrowserConnection.js');
+const { authByCredentials } = require('./connections/credentialsConnection.js');
+const { authByKeyPair } = require('./connections/keyPairConnection.js');
+const { getConnection, execute, disconnect } = require('./connections/connection.js');
 
 const ALREADY_CONNECTED_STATUS = 405502;
 const CANT_REACH_SNOWFLAKE_ERROR_STATUS = 401001;
@@ -20,9 +26,6 @@ const SECONDS_IN_DAY = 86400;
 const SECONDS_IN_HOUR = 3600;
 const SECONDS_IN_MINUTE = 60;
 
-const noConnectionError = { message: errorMessages.CONNECTION_ERROR };
-
-let connection;
 let containers = {};
 
 const connect = async (
@@ -41,8 +44,12 @@ const connect = async (
 		cloudPlatform,
 		queryRequestTimeout,
 		databaseName,
+		privateKeyPath,
+		privateKeyPass,
 	},
 ) => {
+	const connection = getConnection();
+
 	if (connection) {
 		logger.log('info', 'connection already exists', 'Connection');
 
@@ -96,7 +103,7 @@ const connect = async (
 
 	let authPromise;
 	if (authType === 'okta') {
-		return authByOkta(logger, {
+		return authByOkta({
 			account,
 			accessUrl,
 			username,
@@ -105,10 +112,11 @@ const connect = async (
 			role,
 			warehouse,
 			timeout,
+			logger,
 		}).catch(connectionFallbackStrategy);
 	}
 	if (authType === 'externalbrowser') {
-		authPromise = authByExternalBrowser(logger, {
+		authPromise = authByExternalBrowser({
 			account,
 			accessUrl,
 			token,
@@ -118,321 +126,15 @@ const connect = async (
 			role,
 			warehouse,
 			timeout,
+			logger,
 		});
+	} else if (authType === 'keyPair') {
+		authPromise = authByKeyPair({ account, role, timeout, username, privateKeyPath, privateKeyPass });
 	} else {
 		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
 	}
 
 	return authPromise.catch(connectionFallbackStrategy);
-};
-
-const authByOkta = async (
-	logger,
-	{ account, accessUrl, username, password, authenticator, role, timeout, warehouse = DEFAULT_WAREHOUSE },
-) => {
-	const oktaCredentialsError = { message: errorMessages.OKTA_CREDENTIALS_ERROR };
-
-	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
-	const accountName = getAccountName(account);
-	const ssoUrlsData = await axios.post(
-		`${accessUrl}/session/authenticator-request?Application=${HACKOLADE_APPLICATION}`,
-		{
-			data: {
-				ACCOUNT_NAME: accountName,
-				LOGIN_NAME: username,
-				AUTHENTICATOR: getOktaAuthenticatorUrl(authenticator),
-			},
-		},
-	);
-
-	logger.log('info', `Starting Okta connection...`, 'Connection');
-	const tokenUrl = _.get(ssoUrlsData, 'data.data.tokenUrl', '');
-	const authNUrl = tokenUrl.replace(/api\/v1\/.*/, 'api/v1/authn');
-	const ssoUrl = _.get(ssoUrlsData, 'data.data.ssoUrl', '');
-	logger.log('info', `Token URL: ${tokenUrl}\nSSO URL: ${ssoUrl}`, 'Connection');
-
-	if (!tokenUrl || !ssoUrl) {
-		return Promise.reject({ message: errorMessages.OKTA_SSO_ERROR });
-	}
-
-	const authNData = await axios
-		.post(authNUrl, {
-			username,
-			password,
-			options: {
-				multiOptionalFactorEnroll: false,
-				warnBeforePasswordExpired: false,
-			},
-		})
-		.catch(err => ({}));
-	const status = _.get(authNData, 'data.status', 'SUCCESS');
-	const authToken = _.get(authNData, 'data.sessionToken', '');
-	if (status.startsWith('MFA')) {
-		return Promise.reject({ message: errorMessages.OKTA_MFA_ERROR });
-	}
-
-	const identityProviderTokenData = await axios.post(tokenUrl, { username, password }).catch(err => {
-		return authToken ? {} : Promise.reject(oktaCredentialsError);
-	});
-
-	logger.log('info', `Successfully connected to Okta`, 'Connection');
-	const identityProviderToken = _.get(identityProviderTokenData, 'data.cookieToken', '') || authToken;
-	if (!identityProviderToken) {
-		return Promise.reject(oktaCredentialsError);
-	}
-
-	logger.log('info', `One-time IDP token has been provided`, 'Connection');
-
-	const samlUrl = `${ssoUrl}?onetimetoken=${encodeURIComponent(identityProviderToken)}&RelayState=${encodeURIComponent('/some/deep/link')}`;
-	const samlResponseData = await axios.get(samlUrl, { headers: { HTTP_HEADER_ACCEPT: '*/*' } });
-	const rawSamlResponse = _.get(samlResponseData, 'data', '');
-
-	if (!rawSamlResponse) {
-		logger.log('info', `Warning: RAW_SAML_RESPONSE is empty`, 'Connection');
-	} else {
-		logger.log('info', `RAW_SAML_RESPONSE has been provided`, 'Connection');
-	}
-
-	const requestId = uuid.v4();
-	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}&Application=${HACKOLADE_APPLICATION}`;
-	role = role || DEFAULT_ROLE;
-
-	authUrl += `&roleName=${encodeURIComponent(getRole(role))}`;
-	authUrl += `&warehouse=${encodeURIComponent(warehouse)}`;
-
-	const authData = await axios.post(authUrl, {
-		data: {
-			CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
-			CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
-			RAW_SAML_RESPONSE: rawSamlResponse,
-			LOGIN_NAME: username,
-			ACCOUNT_NAME: accountName,
-			CLIENT_ENVIRONMENT: {
-				APPLICATION: HACKOLADE_APPLICATION,
-			},
-		},
-	});
-	let tokensData = authData.data;
-	if (_.isString(tokensData)) {
-		try {
-			tokensData = JSON.parse(tokensData);
-		} catch (err) {
-			logger.log('error', 'Failed parsing of tokens', 'Connection');
-		}
-	}
-	if (!tokensData.success) {
-		return Promise.reject(tokensData.message);
-	}
-	const masterToken = _.get(tokensData, 'data.masterToken', '');
-	const sessionToken = _.get(tokensData, 'data.token', '');
-	logger.log('info', `Tokens have been provided`, 'Connection');
-
-	return connectWithTimeout(
-		{
-			accessUrl,
-			masterToken,
-			sessionToken,
-			account,
-			username,
-			password,
-			role,
-			warehouse,
-			timeout,
-			host: '',
-		},
-		error => error.code === ALREADY_CONNECTED_STATUS,
-	);
-};
-
-const authByExternalBrowser = async (
-	logger,
-	{ token, accessUrl, proofKey, username, account, role, timeout, warehouse = DEFAULT_WAREHOUSE },
-) => {
-	const accountName = getAccountName(account);
-	warehouse = _.trim(warehouse);
-	role = _.trim(role);
-
-	const requestId = uuid.v4();
-	let authUrl = `${accessUrl}/session/v1/login-request?request_id=${encodeURIComponent(requestId)}&Application=${HACKOLADE_APPLICATION}`;
-	role = role || DEFAULT_ROLE;
-	authUrl += `&roleName=${encodeURIComponent(getRole(role))}`;
-
-	const authData = await axios.post(
-		authUrl,
-		{
-			data: {
-				CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
-				CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
-				TOKEN: token,
-				AUTHENTICATOR: 'EXTERNALBROWSER',
-				PROOF_KEY: proofKey,
-				LOGIN_NAME: username,
-				ACCOUNT_NAME: accountName,
-				CLIENT_ENVIRONMENT: {
-					APPLICATION: HACKOLADE_APPLICATION,
-				},
-			},
-		},
-		{
-			headers: {
-				Accept: 'application/json',
-				Authorization: 'Basic',
-			},
-		},
-	);
-	let tokensData = authData.data;
-	if (_.isString(tokensData)) {
-		try {
-			tokensData = JSON.parse(tokensData);
-		} catch (err) {
-			logger.log('error', 'Failed parsing of tokens', 'Connection');
-		}
-	}
-	if (!tokensData.success) {
-		return Promise.reject(tokensData.message);
-	}
-	const masterToken = _.get(tokensData, 'data.masterToken', '');
-	const sessionToken = _.get(tokensData, 'data.token', '');
-	logger.log('info', `Tokens have been provided`, 'Connection');
-
-	await connectWithTimeout(
-		{
-			accessUrl,
-			masterToken,
-			sessionToken,
-			account,
-			username,
-			role,
-			warehouse,
-			password: 'password',
-			timeout,
-			host: '',
-		},
-		error => error.code === ALREADY_CONNECTED_STATUS,
-	);
-
-	return new Promise((resolve, reject) => {
-		execute(`USE WAREHOUSE "${removeQuotes(warehouse)}";`).then(resolve, async err => {
-			logger.log('error', err.message, 'Connection');
-			await execute(`USE ROLE "${role}"`).catch(err => {});
-			let userData = await execute(`DESC USER "${username}"`).catch(err => []);
-			userData = userData.filter(data => data.property !== 'PASSWORD');
-			logger.log('info', `User info: ${JSON.stringify(userData)}`, 'Connection');
-			let warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {
-				logger.log('error', err.message, 'Connection');
-				return [];
-			});
-			const roles = await execute(`SHOW ROLES;`).catch(err => {
-				logger.log('error', err.message, 'Connection');
-				return [];
-			});
-			const roleNames = roles.map(role => role.name);
-			const defaultRoleData = userData.find(data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_ROLE');
-			if (_.isEmpty(warehouses)) {
-				const userRole = _.get(defaultRoleData, 'value', '');
-				if (userRole !== 'null') {
-					await execute(`USE ROLE "${userRole}"`).catch(err => {});
-				}
-				warehouses = await execute(`SHOW WAREHOUSES;`).catch(err => {
-					logger.log('error', err.message, 'Connection');
-					return [];
-				});
-				if (_.isEmpty(warehouses)) {
-					reject('Warehouse is not available. Please check your role and warehouse');
-				}
-			}
-			const names = warehouses.map(wh => wh.name);
-
-			const defaultWarehouseData = userData.find(
-				data => _.toUpper(_.get(data, 'property')) === 'DEFAULT_WAREHOUSE',
-			);
-			const defaultUserWarehouse = _.get(defaultWarehouseData, 'value', '');
-			const defaultWarehouse = names.includes(defaultUserWarehouse) ? defaultUserWarehouse : _.first(names);
-
-			logger.log(
-				'info',
-				`Available warehouses: ${names.join()}; Available roles: ${roleNames.join()}`,
-				'Connection',
-			);
-			logger.log('info', `Fallback to ${defaultWarehouse} warehouse`, 'Connection');
-
-			const logError = err => logger.log('info', `WAREHOUSE error: ${err}`, 'Connection');
-
-			const logAndReturnEmptyArray = err => {
-				logError(err);
-				return [];
-			};
-
-			execute(`USE WAREHOUSE "${removeQuotes(defaultWarehouse)}";`).then(resolve, async err => {
-				if (err) {
-					logError(err);
-				}
-
-				const currentInfo = await execute(
-					`select current_warehouse() as warehouse, current_role() as role;`,
-				).catch(logAndReturnEmptyArray);
-
-				const infoRow = _.first(currentInfo);
-				const currentWarehouse = _.get(infoRow, 'WAREHOUSE', '');
-				const currentRole = _.get(infoRow, 'ROLE', '');
-				logger.log(
-					'info',
-					`Current warehouse: ${currentWarehouse}\n Current role: ${currentRole}`,
-					'Connection',
-				);
-				resolve();
-			});
-		});
-	});
-};
-
-const getOktaAuthenticatorUrl = (authenticator = '') => {
-	if (/^http(s)?/im.test(authenticator)) {
-		return authenticator;
-	}
-
-	if (/\.okta\.com\/?$/.test(authenticator)) {
-		return `https://${authenticator}`;
-	}
-
-	return `https://${authenticator}.okta.com`;
-};
-
-const authByCredentials = ({ account, username, password, role, timeout, warehouse }) => {
-	return connectWithTimeout({ account, username, password, role, timeout, warehouse });
-};
-
-const connectWithTimeout = ({ timeout, ...options }, isErrorAllowed = () => false) => {
-	const connectPromise = new Promise((resolve, reject) => {
-		connection = snowflake.createConnection(options);
-		connection.connect(err => {
-			if (err && !isErrorAllowed(err)) {
-				connection = null;
-				return reject(err);
-			}
-
-			resolve();
-		});
-	});
-
-	const timeoutPromise = new Promise((resolve, reject) =>
-		setTimeout(() => reject(getConnectionTimeoutError(timeout)), timeout),
-	);
-
-	return Promise.race([connectPromise, timeoutPromise]).catch(error => {
-		if (error.code === CONNECTION_TIMED_OUT_CODE) {
-			disconnect();
-		}
-
-		throw error;
-	});
-};
-
-const getConnectionTimeoutError = timeout => {
-	const error = new Error(`Connection timeout ${timeout} ms exceeded!`);
-	error.code = CONNECTION_TIMED_OUT_CODE;
-
-	return error;
 };
 
 const getAccount = hostUrl =>
@@ -441,40 +143,7 @@ const getAccount = hostUrl =>
 		.replace(/\.snowflakecomputing\.com.*$/gi, '')
 		.replace(/^http(s)?:\/\//gi, '');
 
-const getRole = role => {
-	if (!_.isString(role)) {
-		return role;
-	}
-
-	if (_.first(role) === '"' && _.last(role) === '"') {
-		return role;
-	}
-
-	if (/^[a-z][a-z\d]*$/i.test(role)) {
-		return role;
-	}
-
-	return `"${role}"`;
-};
-
 const getAccessUrl = account => `https://${account}.snowflakecomputing.com`;
-
-const getAccountName = account => _.toUpper(_.first(account.split('.')));
-
-const disconnect = () => {
-	if (!connection) {
-		return Promise.reject(noConnectionError);
-	}
-
-	return new Promise((resolve, reject) => {
-		connection.destroy(err => {
-			if (err) {
-				return reject(err);
-			}
-			resolve();
-		});
-	});
-};
 
 const testConnection = async (logger, info) => {
 	await connect(logger, info);
@@ -698,23 +367,6 @@ const getFirstObjectItem = object => {
 	const index = _.first(Object.keys(object));
 
 	return object[index];
-};
-
-const execute = command => {
-	if (!connection) {
-		return Promise.reject(noConnectionError);
-	}
-	return new Promise((resolve, reject) => {
-		connection.execute({
-			sqlText: command,
-			complete: (err, statement, rows) => {
-				if (err) {
-					return reject(err);
-				}
-				resolve(rows);
-			},
-		});
-	});
 };
 
 const getRowsCount = async tableName => {
@@ -965,10 +617,6 @@ const getJsonSchema = async (logger, limit, tableName) => {
 			},
 		};
 	}
-};
-
-const removeQuotes = str => {
-	return (str || '').replace(/^"([\s\S]*)"$/im, '$1');
 };
 
 const removeLinear = str => {
