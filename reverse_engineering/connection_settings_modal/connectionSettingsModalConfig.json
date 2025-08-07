@@ -180,7 +180,7 @@
 			{
 				"inputLabel": "Passphrase",
 				"inputKeyword": "privateKeyPass",
-				"inputType": "text",
+				"inputType": "password",
 				"inputTooltip": "Optional entry. Passphrase to the private key",
 				"defaultValue": "",
 				"dependency": {
