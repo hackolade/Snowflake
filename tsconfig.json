@@ -26,6 +26,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"typeRoots": ["./node_modules/@types", "./types"]
 	},
-	"include": ["reverse_engineering", "forward_engineering", "common/errorCodes.js", "common/errorMessages.js"],
+	"include": ["reverse_engineering", "forward_engineering", "common"],
 	"exclude": ["**/node_modules/**", "release/**/*"]
 }
