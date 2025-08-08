@@ -3,6 +3,8 @@
 const _ = require('lodash');
 const snowflakeHelper = require('./helpers/snowflakeHelper');
 const ssoHelper = require('./helpers/ssoHelper');
+const errorMessages = require('../common/errorMessages.js');
+const errorCodes = require('../common/errorCodes.js');
 
 const connect = async (connectionInfo, logger, cb) => {
 	logger.clear();
@@ -270,8 +272,16 @@ const getSampleDocSize = (count, recordSamplingSettings) => {
 };
 
 const handleError = (logger, error, cb) => {
-	const message = _.isString(error) ? error : _.get(error, 'message', 'Reverse Engineering error');
 	logger.log('error', { error }, 'Reverse Engineering error');
+
+	if (error.code === errorCodes.ERR_MISSING_PASSPHRASE || error.code === errorCodes.ERR_OSSL_BAD_DECRYPT) {
+		return cb({
+			message: errorMessages.KEY_PAIR_ERROR,
+			type: 'simpleError',
+		});
+	}
+
+	const message = _.isString(error) ? error : _.get(error, 'message', 'Reverse Engineering error');
 
 	return cb({ message });
 };
