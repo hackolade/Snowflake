@@ -12,7 +12,7 @@ const {
 	HACKOLADE_APPLICATION,
 } = require('./constants.js');
 const { getAccountName, getRole } = require('../common.js');
-const errorMessages = require('../errorMessages.js');
+const errorMessages = require('../../../common/errorMessages.js');
 
 const authByOkta = async ({
 	account,

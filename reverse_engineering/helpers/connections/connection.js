@@ -1,6 +1,6 @@
 const snowflake = require('snowflake-sdk');
 
-const errorMessages = require('../errorMessages.js');
+const errorMessages = require('../../../common/errorMessages.js');
 const { CONNECTION_TIMED_OUT_CODE } = require('./constants.js');
 
 const noConnectionError = { message: errorMessages.CONNECTION_ERROR };

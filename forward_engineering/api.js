@@ -1,9 +1,10 @@
 const _ = require('lodash');
-const { commentDropStatements } = require('./helpers/commentHelpers/commentDropStatements');
-const { DROP_STATEMENTS } = require('./helpers/constants');
-const { getAlterScript } = require('./helpers/alterScriptFromDeltaHelper');
-const { applyToInstance } = require('./helpers/applyToInstanceHelper');
-const reApi = require('../reverse_engineering/api');
+const { commentDropStatements } = require('./helpers/commentHelpers/commentDropStatements.js');
+const { DROP_STATEMENTS } = require('./helpers/constants.js');
+const { getAlterScript } = require('./helpers/alterScriptFromDeltaHelper.js');
+const { applyToInstance } = require('./helpers/applyToInstanceHelper.js');
+const reApi = require('../reverse_engineering/api.js');
+const { handleError } = require('./helpers/handleError.js');
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
@@ -57,14 +58,7 @@ module.exports = {
 			.then(result => {
 				callback(null, result);
 			})
-			.catch(error => {
-				const err = {
-					message: error.message,
-					stack: error.stack,
-				};
-				logger.log('error', err, 'Error when applying to instance');
-				callback(err);
-			});
+			.catch(error => handleError(logger, error, callback));
 	},
 
 	async getExternalBrowserUrl(connectionInfo, logger, cb, app) {
