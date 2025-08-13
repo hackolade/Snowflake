@@ -1,20 +1,23 @@
 const { getKeyPairConnectionErrorMessageByCode } = require('../../common/getKeyPairConnectionErrorMessageByCode.js');
 
-const handleError = (logger, error, callback) => {
-	logger.log('error', error, 'Error when applying to instance');
+const handleError = (logger, error, cb) => {
+	logger.log('error', { error }, 'Reverse Engineering error');
 
 	const keyPairConnectionErrorMessage = getKeyPairConnectionErrorMessageByCode(error.code);
 	if (keyPairConnectionErrorMessage) {
-		return callback({
+		return cb({
 			message: keyPairConnectionErrorMessage,
 			type: 'simpleError',
 		});
 	}
 
-	return callback({
-		message: error.message,
-		stack: error.stack,
-	});
+	if (typeof error === 'string') {
+		return cb({ message: error });
+	}
+
+	const message = error?.message ?? 'Reverse Engineering error';
+
+	return cb({ message });
 };
 
 module.exports = {
