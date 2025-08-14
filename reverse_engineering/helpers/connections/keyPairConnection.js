@@ -2,17 +2,18 @@ const fs = require('fs');
 const crypto = require('crypto');
 const { connectWithTimeout } = require('./connection.js');
 const errorCodes = require('../../../common/errorCodes.js');
+const errorMessages = require('../../../common/errorMessages.js');
+const { ConnectionError } = require('./connectionError.js');
 
-const authByKeyPair = ({ account, role, timeout, username, privateKeyPath, privateKeyPass }) => {
+const authByKeyPair = ({ account, role, timeout, username, privateKeyPath, privateKeyPass, logger }) => {
 	if (
 		!isValidPrivateKey({
 			privateKeyPath,
 			privateKeyPass,
+			logger,
 		})
 	) {
-		return Promise.reject({
-			code: errorCodes.ERR_INVALID_KEY_FILE,
-		});
+		throw new ConnectionError(errorMessages.KEY_PAIR_INVALID_FILE_ERROR, errorCodes.ERR_INVALID_KEY_FILE);
 	}
 
 	return connectWithTimeout({
@@ -26,7 +27,7 @@ const authByKeyPair = ({ account, role, timeout, username, privateKeyPath, priva
 	});
 };
 
-const isValidPrivateKey = ({ privateKeyPath, privateKeyPass }) => {
+const isValidPrivateKey = ({ privateKeyPath, privateKeyPass, logger }) => {
 	const textFilePrivateKeyFormat = 'pem';
 	const fileContent = fs.readFileSync(privateKeyPath, 'utf8');
 
@@ -39,6 +40,7 @@ const isValidPrivateKey = ({ privateKeyPath, privateKeyPass }) => {
 
 		return true;
 	} catch (error) {
+		logger.log('error', { error }, 'Connection error');
 		return false;
 	}
 };
