@@ -129,7 +129,7 @@ const connect = async (
 			logger,
 		});
 	} else if (authType === 'keyPair') {
-		authPromise = authByKeyPair({ account, role, timeout, username, privateKeyPath, privateKeyPass });
+		authPromise = authByKeyPair({ account, role, timeout, username, privateKeyPath, privateKeyPass, logger });
 	} else {
 		authPromise = authByCredentials({ account, username, password, role, warehouse, timeout });
 	}
