@@ -61,7 +61,7 @@
     "disabled": false,
     "dependencies": {
         "async": "3.2.6",
-        "axios": "1.7.7",
+        "axios": "1.12.1",
         "bson": "4.6.1",
         "lodash": "4.17.21",
         "snowflake-sdk": "2.0.2",
