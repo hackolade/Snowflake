@@ -566,7 +566,7 @@ module.exports = (baseProvider, options, app) => {
 						name: `${getName(viewData.isCaseSensitive, key.alias || key.name)}`,
 						isActivated: key.isActivated,
 						comment: preSpace(
-							key.definition.description &&
+							key.definition?.description &&
 								`COMMENT ${escapeString(scriptFormat, key.definition.description)}`,
 						),
 					});
