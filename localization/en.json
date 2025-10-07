@@ -16,7 +16,7 @@
 	"TOOLBAR___ADD_ATTRIBUTE": "Add Column",
 	"TOOLBAR___INSERT_FIELD": "Insert Column",
 	"TOOLBAR___APPEND_FIELD": "Append Column",
-	"TOOLBAR___TOGGLE_FIELD_DETAILS": "Toogle field details",
+	"TOOLBAR___FIELD_DETAILS": "Field details",
 	"TOOLBAR___SHOW_FOREIGN_MASTER": "Toggle foreign master",
 	"TOOLBAR___SHOW_MODEL_VIEW": "Toggle model views",
 	"TOOLBAR___DISTRIBUTE_ORTHOGONALLY": "Distribute tables orthogonally",
@@ -159,5 +159,20 @@
 	"FE_LEVEL_SELECTOR_TITLE": "File generation mode",
 	"FE_LEVEL_SELECTOR_MODEL": "Whole model",
 	"FE_LEVEL_SELECTOR_CONTAINER": "Schema",
-	"FE_LEVEL_SELECTOR_ENTITY": "Table"
+	"FE_LEVEL_SELECTOR_ENTITY": "Table",
+
+	"MAIN_MENU___ATTRIBUTES": "Columns in Table Boxes",
+	"MAIN_MENU___DESCRIPTIONS": "Description in Table Boxes",
+	"MAIN_MENU___HIDE_ALL_ATTRIBUTES": "Empty Table Boxes",
+	"MAIN_MENU___REQUIRED_ATTRIBUTES": "Required Columns",
+	"MAIN_MENU___NULLABLE_ATTRIBUTES": "Nullable Columns",
+	"TOOLBAR___ATTRIBUTES": "Columns in table boxes",
+	"TOOLBAR___DESCRIPTIONS": "Description in table boxes",
+	"TOOLBAR___HIDE_ALL_ATTRIBUTES": "Empty table boxes",
+	"TOOLBAR___REQUIRED_ATTRIBUTES": "Required columns",
+	"TOOLBAR___NULLABLE_ATTRIBUTES": "Nullable columns",
+	"MODAL_WINDOW___OPTIONS_DISPLAY_ERD_V_ENTITY_BOX_CONTENT": "Display of table box content",
+	"MODAL_WINDOW___OPTIONS_DISPLAY_ERD_V_FIELDS": "Columns",
+	"MODAL_WINDOW___OPTIONS_DISPLAY_REQUIRED_ATTRIBUTES": "Required columns",
+	"MODAL_WINDOW___OPTIONS_DISPLAY_NULLABLE_ATTRIBUTES": "Nullable columns"
 }
