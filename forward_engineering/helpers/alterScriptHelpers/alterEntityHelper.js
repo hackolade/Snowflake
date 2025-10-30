@@ -3,6 +3,7 @@ const { checkFieldPropertiesChanged, getNames, getBaseAndContainerNames } = requ
 const { createColumnDefinitionBySchema } = require('./createColumnDefinition');
 const { commentIfDeactivated } = require('../commentHelpers/commentDeactivatedHelper');
 const { getEntityName, getFullName, getName, toString } = require('../general');
+const { getModifyPkScripts } = require('./entityHelper/primaryKeyHelper');
 
 const getAddCollectionScript =
 	({ ddlProvider, scriptFormat }) =>
@@ -143,6 +144,26 @@ const getModifyColumnScript = collection => {
 	return [...renameColumnScripts, ...changeTypeScripts, ...changeTagScripts];
 };
 
+const getModifyCollectionKeysScript = collection => {
+	const modifyPkScriptDtos = getModifyPkScripts(collection);
+
+	return modifyPkScriptDtos
+		.flatMap(dto => {
+			if (!dto?.scripts) {
+				return [];
+			}
+			return dto.scripts.map(scriptObj => {
+				const script = scriptObj.script;
+				if (!script) {
+					return null;
+				}
+				// Handle deactivated scripts by commenting them out
+				return commentIfDeactivated(script, { isActivated: dto.isActivated });
+			});
+		})
+		.filter(Boolean);
+};
+
 module.exports = {
 	getAddCollectionScript,
 	getDeleteCollectionScript,
@@ -150,4 +171,5 @@ module.exports = {
 	getDeleteColumnScript,
 	getModifyColumnScript,
 	getModifyCollectionScript,
+	getModifyCollectionKeysScript,
 };

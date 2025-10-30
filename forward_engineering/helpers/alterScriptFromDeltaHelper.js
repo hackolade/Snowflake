@@ -10,6 +10,7 @@ const {
 	getAddColumnScript,
 	getDeleteColumnScript,
 	getModifyColumnScript,
+	getModifyCollectionKeysScript,
 } = require('./alterScriptHelpers/alterEntityHelper');
 const { getAddViewScript, getDeleteViewScript, getModifyViewScript } = require('./alterScriptHelpers/alterViewHelper');
 const { getAddTagScript, getDeleteTagScript, getModifyTagScript } = require('./alterScriptHelpers/alterTagHelper');
@@ -50,11 +51,13 @@ const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat
 		getDeleteCollectionScript,
 	);
 
+	const modifiedItems = getItems(collection, 'entities', 'modified', 'values');
 	const modifiedCollectionScripts = getCollectionScripts(
-		getItems(collection, 'entities', 'modified', 'values'),
+		modifiedItems,
 		'modified',
 		getModifyCollectionScript(ddlProvider),
 	);
+	const modifyCollectionKeysScripts = modifiedItems.flatMap(getModifyCollectionKeysScript);
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
@@ -64,15 +67,13 @@ const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat
 		getItems(collection, 'entities', 'deleted', 'values'),
 		getDeleteColumnScript,
 	);
-	const modifiedColumnScripts = getColumnScripts(
-		getItems(collection, 'entities', 'modified', 'values'),
-		getModifyColumnScript,
-	);
+	const modifiedColumnScripts = getColumnScripts(modifiedItems, getModifyColumnScript);
 
 	return {
 		addedCollectionScripts,
 		deletedCollectionScripts,
 		modifiedCollectionScripts,
+		modifyCollectionKeysScripts,
 		addedColumnScripts,
 		deletedColumnScripts,
 		modifiedColumnScripts,
@@ -148,6 +149,7 @@ const getAlterScript = ({ scriptFormat, collection, ddlProvider, app }) => {
 		'addedCollectionScripts',
 		'addedColumnScripts',
 		'modifiedCollectionScripts',
+		'modifyCollectionKeysScripts',
 		'modifiedColumnScripts',
 		'addedViewScripts',
 		'modifiedViewScripts',
