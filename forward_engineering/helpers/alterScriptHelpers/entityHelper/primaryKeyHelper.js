@@ -151,7 +151,6 @@ const getAddCompositePkScriptDtos = collection => {
 	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
-	const entityName = getEntityName(collectionSchema);
 	const isCaseSensitive = collectionSchema.isCaseSensitive;
 
 	const isContainerActivated = isParentContainerActivated(collection);
@@ -208,7 +207,6 @@ const getDropCompositePkScriptDtos = collection => {
 	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
-	const entityName = getEntityName(collectionSchema);
 	const isCaseSensitive = collectionSchema.isCaseSensitive;
 
 	const isContainerActivated = isParentContainerActivated(collection);
@@ -408,7 +406,6 @@ const getAddRegularPkScriptDtos = collection => {
 	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
-	const entityName = getEntityName(collectionSchema);
 	const isCaseSensitive = collectionSchema.isCaseSensitive;
 
 	const isContainerActivated = isParentContainerActivated(collection);
@@ -454,7 +451,6 @@ const getDropRegularPkScriptDtos = collection => {
 	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
-	const entityName = getEntityName(collectionSchema);
 	const isCaseSensitive = collectionSchema.isCaseSensitive;
 
 	const isContainerActivated = isParentContainerActivated(collection);
