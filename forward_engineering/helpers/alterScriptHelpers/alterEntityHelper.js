@@ -2,11 +2,12 @@ const _ = require('lodash');
 const { checkFieldPropertiesChanged, getNames, getBaseAndContainerNames } = require('./common');
 const { createColumnDefinitionBySchema } = require('./createColumnDefinition');
 const { commentIfDeactivated } = require('../commentHelpers/commentDeactivatedHelper');
-const { getEntityName, getFullName, getName } = require('../general');
+const { getEntityName, getFullName, getName, toString } = require('../general');
 const { getSetTagValue, getUnsetTagValue } = require('../../helpers/tagHelper');
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../../configs/templates');
 const { escapeString } = require('../../utils/escapeString');
+const { getModifyPkScripts } = require('./entityHelper/primaryKeyHelper');
 
 const getAddCollectionScript =
 	({ ddlProvider, scriptFormat }) =>
@@ -174,6 +175,26 @@ const getModifyColumnScript =
 		return [...renameColumnScripts, ...changeTypeScripts, ...changeTagScripts, ...modifyCommentScripts];
 	};
 
+const getModifyCollectionKeysScript = collection => {
+	const modifyPkScriptDtos = getModifyPkScripts(collection);
+
+	return modifyPkScriptDtos
+		.flatMap(dto => {
+			if (!dto?.scripts) {
+				return [];
+			}
+			return dto.scripts.map(scriptObj => {
+				const script = scriptObj.script;
+				if (!script) {
+					return null;
+				}
+				// Handle deactivated scripts by commenting them out
+				return commentIfDeactivated(script, { isActivated: dto.isActivated });
+			});
+		})
+		.filter(Boolean);
+};
+
 module.exports = {
 	getAddCollectionScript,
 	getDeleteCollectionScript,
@@ -181,4 +202,5 @@ module.exports = {
 	getDeleteColumnScript,
 	getModifyColumnScript,
 	getModifyCollectionScript,
+	getModifyCollectionKeysScript,
 };

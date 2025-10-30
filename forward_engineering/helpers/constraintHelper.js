@@ -7,10 +7,11 @@ const generateConstraint = ({ name, keys, keyType, isParentActivated, isCaseSens
 	if (atLeastOneActive && isParentActivated) {
 		finalStringOfKeys = foreignKeysToString(isCaseSensitive, keysAsStrings);
 	}
+
+	const contraintName = name && name !== 'undefined' ? `CONSTRAINT ${getName(isCaseSensitive, name)} ` : '';
+
 	return {
-		statement:
-			(name !== 'undefined' ? `CONSTRAINT ${getName(isCaseSensitive, name)} ` : '') +
-			`${keyType} (${finalStringOfKeys})`,
+		statement: contraintName + `${keyType} (${finalStringOfKeys})`,
 		isActivated: atLeastOneActive,
 	};
 };
