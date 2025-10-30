@@ -8,6 +8,7 @@ const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../../configs/templates');
 const { escapeString } = require('../../utils/escapeString');
 const { getModifyPkScripts } = require('./entityHelper/primaryKeyHelper');
+const { getModifyUkScripts } = require('./entityHelper/uniqueKeyHelper');
 
 const getAddCollectionScript =
 	({ ddlProvider, scriptFormat }) =>
@@ -177,8 +178,11 @@ const getModifyColumnScript =
 
 const getModifyCollectionKeysScript = collection => {
 	const modifyPkScriptDtos = getModifyPkScripts(collection);
+	const modifyUkScriptDtos = getModifyUkScripts(collection);
 
-	return modifyPkScriptDtos
+	const allScriptDtos = [...modifyPkScriptDtos, ...modifyUkScriptDtos];
+
+	return allScriptDtos
 		.flatMap(dto => {
 			if (!dto?.scripts) {
 				return [];

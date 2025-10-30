@@ -100,4 +100,8 @@ module.exports = {
 	createTag: 'CREATE${orReplace} TAG${ifNotExist} ${name}${allowedValues}${comment};\n',
 	dropTag: 'DROP TAG IF EXISTS ${name};\n',
 	alterTag: 'ALTER TAG${ifExists} ${name} ${option}${optionValue};\n',
+
+	alterTableAddConstraint: 'ALTER TABLE IF EXISTS ${tableName} ADD ${statement};',
+	alterTableDropNamedConstraint: 'ALTER TABLE IF EXISTS ${tableName} DROP CONSTRAINT ${constraintName};',
+	alterTableDropStatement: 'ALTER TABLE IF EXISTS ${tableName} DROP ${statement};',
 };
