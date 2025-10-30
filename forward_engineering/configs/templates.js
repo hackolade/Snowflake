@@ -62,6 +62,8 @@ module.exports = {
 	alterTableForeignKey:
 		'ALTER TABLE IF EXISTS ${table_name} ADD ${constraint}FOREIGN KEY (${columns}) REFERENCES ${primary_table} (${primary_columns});',
 
+	dropForeignKey: 'ALTER TABLE IF EXISTS ${tableName} DROP CONSTRAINT ${constraintName};',
+
 	createView:
 		'CREATE${orReplace}${secure}${materialized} VIEW${ifNotExist} ${name} (\n' +
 		'\t${column_list}\n' +
