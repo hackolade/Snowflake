@@ -148,7 +148,7 @@ const getAddCompositePkScriptDtos = collection => {
 		}
 	}
 
-	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+	const collectionSchema = { ...collection, ..._.omit(collection?.role, 'properties') };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 	const isCaseSensitive = collectionSchema.isCaseSensitive;
@@ -204,7 +204,7 @@ const getDropCompositePkScriptDtos = collection => {
 		}
 	}
 
-	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+	const collectionSchema = { ...collection, ..._.omit(collection?.role, 'properties') };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 	const isCaseSensitive = collectionSchema.isCaseSensitive;
@@ -403,7 +403,7 @@ const wasRegularPkChangedInTransitionFromRegularToComposite = (columnJsonSchema,
  * @return {Array<KeyScriptModificationDto>}
  */
 const getAddRegularPkScriptDtos = collection => {
-	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+	const collectionSchema = { ...collection, ..._.omit(collection?.role, 'properties') };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 	const isCaseSensitive = collectionSchema.isCaseSensitive;
@@ -448,7 +448,7 @@ const getAddRegularPkScriptDtos = collection => {
  * @return {Array<KeyScriptModificationDto>}
  */
 const getDropRegularPkScriptDtos = collection => {
-	const collectionSchema = { ...collection, ...(_.omit(collection?.role, 'properties') || {}) };
+	const collectionSchema = { ...collection, ..._.omit(collection?.role, 'properties') };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
 	const isCaseSensitive = collectionSchema.isCaseSensitive;
