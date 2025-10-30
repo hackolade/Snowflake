@@ -67,7 +67,7 @@ const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat
 		getItems(collection, 'entities', 'deleted', 'values'),
 		getDeleteColumnScript,
 	);
-	const modifiedColumnScripts = getColumnScripts(modifiedItems, getModifyColumnScript);
+	const modifiedColumnScripts = getColumnScripts(modifiedItems, getModifyColumnScript({ scriptFormat }));
 
 	return {
 		addedCollectionScripts,
