@@ -49,6 +49,13 @@ const {
 const { generateConstraint } = require('./helpers/constraintHelper');
 const getFormatTypeOptions = require('./helpers/getFormatTypeOptions');
 const { getStageCopyOptions } = require('./helpers/getStageCopyOptions');
+const {
+	getTagStatement,
+	getTagAllowedValues,
+	getTagKeyValues,
+	prepareObjectTagsData,
+	isEmptyTags,
+} = require('./helpers/tagHelper');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
@@ -98,12 +105,6 @@ module.exports = (baseProvider, options, app) => {
 		assignTemplates,
 		tab,
 	});
-
-	const { getTagStatement, getTagAllowedValues, getTagKeyValues, prepareObjectTagsData, isEmptyTags } =
-		require('./helpers/tagHelper')({
-			getName,
-			toString,
-		});
 
 	const getOutOfLineConstraints = (
 		isParentActivated,
@@ -1229,6 +1230,19 @@ module.exports = (baseProvider, options, app) => {
 			});
 
 			return statements.join('');
+		},
+
+		/**
+		 * Drop a foreign key constraint from a table
+		 * @param {string} tableName - Fully qualified table name
+		 * @param {string} constraintName - Name of the foreign key constraint
+		 * @returns {string}
+		 */
+		dropForeignKey(tableName, constraintName) {
+			return assignTemplates(templates.dropForeignKey, {
+				tableName,
+				constraintName,
+			});
 		},
 	};
 };

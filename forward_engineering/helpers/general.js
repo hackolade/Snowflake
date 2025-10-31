@@ -149,7 +149,8 @@ const checkIfForeignKeyActivated = fkData =>
 	checkAllKeysActivated(fkData.foreignKey) &&
 	checkAllKeysActivated(fkData.primaryKey) &&
 	fkData.primaryTableActivated &&
-	fkData.foreignTableActivated;
+	fkData.foreignTableActivated &&
+	fkData.isActivated;
 
 const viewColumnsToString = (keys, isParentActivated) => {
 	const mergeCommentWithName = ({ name, comment }) => (comment ? `${name}${comment}` : name);
@@ -242,6 +243,26 @@ const getGroupItemsByCompMode = ({ newItems = [], oldItems = [] }) => {
 	};
 };
 
+/**
+ * Check if an object in delta model is activated
+ * @param {Object} modelObject - The model object (collection, view, etc.)
+ * @return {boolean}
+ */
+const isObjectInDeltaModelActivated = modelObject => {
+	return modelObject.compMod?.isActivated?.new ?? modelObject.role?.isActivated;
+};
+
+/**
+ * Check if the parent container (bucket/schema/database) is activated
+ * @param {Object} collection - The collection object
+ * @return {boolean}
+ */
+const isParentContainerActivated = collection => {
+	return (
+		collection?.compMod?.bucketProperties?.isActivated ?? collection?.role?.compMod?.bucketProperties?.isActivated
+	);
+};
+
 module.exports = {
 	escape,
 	toString,
@@ -263,4 +284,6 @@ module.exports = {
 	getDbName,
 	addQuotes,
 	getGroupItemsByCompMode,
+	isObjectInDeltaModelActivated,
+	isParentContainerActivated,
 };
