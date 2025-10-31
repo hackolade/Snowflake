@@ -22,14 +22,12 @@ const computeConstraintChanges = (currentRequiredColumnNames, previousRequiredCo
 	const toAdd = new Set();
 	const toRemove = new Set();
 
-	// Find columns to add constraint (in current but not in previous)
 	for (const columnName of currentSet) {
 		if (!previousSet.has(columnName)) {
 			toAdd.add(columnName);
 		}
 	}
 
-	// Find columns to remove constraint (in previous but not in current)
 	for (const columnName of previousSet) {
 		if (!currentSet.has(columnName)) {
 			toRemove.add(columnName);
