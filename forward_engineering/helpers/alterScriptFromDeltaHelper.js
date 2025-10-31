@@ -73,7 +73,7 @@ const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat
 		getItems(collection, 'entities', 'deleted', 'values'),
 		getDeleteColumnScript,
 	);
-	const modifiedColumnScripts = getColumnScripts(modifiedItems, getModifyColumnScript({ scriptFormat }));
+	const modifiedColumnScripts = modifiedItems.flatMap(getModifyColumnScript({ scriptFormat }));
 
 	return {
 		addedCollectionScripts,
