@@ -16,7 +16,7 @@ const getAddCollectionScript =
 		const { schemaName, databaseName } = getBaseAndContainerNames(collection, getName);
 		const jsonSchema = {
 			...collection,
-			...(_.omit(collection?.role, 'properties') || {}),
+			..._.omit(collection?.role, 'properties'),
 		};
 		const columnDefinitions = _.toPairs(jsonSchema.properties).map(([name, column]) =>
 			createColumnDefinitionBySchema({
@@ -47,7 +47,7 @@ const getAddCollectionScript =
 const getDeleteCollectionScript = collection => {
 	const jsonData = {
 		...collection,
-		...(_.omit(collection?.role, 'properties') || {}),
+		..._.omit(collection?.role, 'properties'),
 	};
 	const { schemaName, databaseName, tableName } = getNames(jsonData, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
@@ -66,7 +66,7 @@ const getAddColumnScript =
 	collection => {
 		const collectionSchema = {
 			...collection,
-			...(_.omit(collection?.role, 'properties') || {}),
+			..._.omit(collection?.role, 'properties'),
 		};
 		const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 		const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
@@ -92,7 +92,7 @@ const getAddColumnScript =
 const getDeleteColumnScript = collection => {
 	const collectionSchema = {
 		...collection,
-		...(_.omit(collection?.role, 'properties') || {}),
+		..._.omit(collection?.role, 'properties'),
 	};
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
@@ -165,9 +165,9 @@ const getModifyColumnScript =
 
 				// new or modified comment
 				if (oldComment !== comment) {
-					return assignTemplates(templates.alterTable, {
-						name: fullName,
-						action: `MODIFY COLUMN ${columnName} COMMENT = ${escapeString(scriptFormat, comment)}`,
+					return assignTemplates(templates.columnComment, {
+						fullName: `${fullName}.${columnName}`,
+						comment: escapeString(scriptFormat, comment),
 					});
 				}
 			})
