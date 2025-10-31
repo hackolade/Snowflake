@@ -9,6 +9,7 @@ const templates = require('../../configs/templates');
 const { escapeString } = require('../../utils/escapeString');
 const { getModifyPkScripts } = require('./entityHelper/primaryKeyHelper');
 const { getModifyUkScripts } = require('./entityHelper/uniqueKeyHelper');
+const { getModifyNotNullColumnsScriptDtos } = require('./columnHelpers/notNullConstraintHelper');
 
 const getAddCollectionScript =
 	({ ddlProvider, scriptFormat }) =>
@@ -173,7 +174,29 @@ const getModifyColumnScript =
 			})
 			.filter(Boolean);
 
-		return [...renameColumnScripts, ...changeTypeScripts, ...changeTagScripts, ...modifyCommentScripts];
+		const modifyNotNullScriptDtos = getModifyNotNullColumnsScriptDtos(collection, fullName);
+		const modifyNotNullScripts = modifyNotNullScriptDtos
+			.flatMap(dto => {
+				if (!dto?.scripts) {
+					return [];
+				}
+				return dto.scripts.map(scriptObj => {
+					const script = scriptObj.script;
+					if (!script) {
+						return null;
+					}
+					return commentIfDeactivated(script, { isActivated: dto.isActivated });
+				});
+			})
+			.filter(Boolean);
+
+		return [
+			...renameColumnScripts,
+			...changeTypeScripts,
+			...modifyNotNullScripts,
+			...changeTagScripts,
+			...modifyCommentScripts,
+		];
 	};
 
 const getModifyCollectionKeysScript = collection => {
