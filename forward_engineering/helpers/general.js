@@ -149,7 +149,8 @@ const checkIfForeignKeyActivated = fkData =>
 	checkAllKeysActivated(fkData.foreignKey) &&
 	checkAllKeysActivated(fkData.primaryKey) &&
 	fkData.primaryTableActivated &&
-	fkData.foreignTableActivated;
+	fkData.foreignTableActivated &&
+	fkData.isActivated;
 
 const viewColumnsToString = (keys, isParentActivated) => {
 	const mergeCommentWithName = ({ name, comment }) => (comment ? `${name}${comment}` : name);

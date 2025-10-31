@@ -14,6 +14,12 @@ const {
 } = require('./alterScriptHelpers/alterEntityHelper');
 const { getAddViewScript, getDeleteViewScript, getModifyViewScript } = require('./alterScriptHelpers/alterViewHelper');
 const { getAddTagScript, getDeleteTagScript, getModifyTagScript } = require('./alterScriptHelpers/alterTagHelper');
+const {
+	getAddForeignKeyScriptDtos,
+	getDeleteForeignKeyScriptDtos,
+	getModifyForeignKeyScriptDtos,
+} = require('./alterScriptHelpers/alterForeignKeyHelper');
+const { commentIfDeactivated } = require('./commentHelpers/commentDeactivatedHelper');
 
 const getItems = (collection, nameProperty, modify, objectMethod) =>
 	[]
@@ -131,12 +137,59 @@ const getAlterTagsScripts = ({ collection, ddlProvider, app }) => {
 	return { addedTagsScripts, deletedTagsScripts, modifiedTagsScripts };
 };
 
+/**
+ * @returns {{ addedFkScripts: string[], deletedFkScripts: string[], modifiedFkScripts: string[] }}
+ */
+const getAlterForeignKeysScripts = ({ collection, ddlProvider }) => {
+	const addedRelationships = getItems(collection, 'relationships', 'added', 'values').filter(
+		rel => rel.role?.compMod?.created,
+	);
+
+	const deletedRelationships = getItems(collection, 'relationships', 'deleted', 'values').filter(
+		rel => rel.role?.compMod?.deleted,
+	);
+
+	const modifiedRelationships = getItems(collection, 'relationships', 'modified', 'values').filter(
+		rel => rel.role?.compMod?.modified,
+	);
+
+	const addedFkScriptDtos = getAddForeignKeyScriptDtos(ddlProvider)(addedRelationships);
+	const deletedFkScriptDtos = getDeleteForeignKeyScriptDtos(ddlProvider)(deletedRelationships);
+	const modifiedFkScriptDtos = getModifyForeignKeyScriptDtos(ddlProvider)(modifiedRelationships);
+
+	// Convert AlterScriptDto objects to strings, commenting out deactivated scripts
+	const convertDtosToScripts = dtos => {
+		return dtos
+			.flatMap(dto => {
+				if (!dto?.scripts) {
+					return [];
+				}
+				return dto.scripts.map(scriptObj => {
+					const script = scriptObj.script;
+					if (!script) {
+						return null;
+					}
+					// Handle deactivated scripts by commenting them out
+					return commentIfDeactivated(script, { isActivated: dto.isActivated });
+				});
+			})
+			.filter(Boolean);
+	};
+
+	const addedFkScripts = convertDtosToScripts(addedFkScriptDtos);
+	const deletedFkScripts = convertDtosToScripts(deletedFkScriptDtos);
+	const modifiedFkScripts = convertDtosToScripts(modifiedFkScriptDtos);
+
+	return { addedFkScripts, deletedFkScripts, modifiedFkScripts };
+};
+
 const getAlterScript = ({ scriptFormat, collection, ddlProvider, app }) => {
 	const script = {
 		...getAlterCollectionsScripts({ collection, ddlProvider, app, scriptFormat }),
 		...getAlterContainersScripts(collection, ddlProvider, app),
 		...getAlterViewsScripts({ schema: collection, ddlProvider, app }),
 		...getAlterTagsScripts({ collection, ddlProvider, app }),
+		...getAlterForeignKeysScripts({ collection, ddlProvider }),
 	};
 	return [
 		'addedTagsScripts',
@@ -146,6 +199,7 @@ const getAlterScript = ({ scriptFormat, collection, ddlProvider, app }) => {
 		'deletedViewScripts',
 		'deletedCollectionScripts',
 		'deletedColumnScripts',
+		'deletedFkScripts',
 		'addedCollectionScripts',
 		'addedColumnScripts',
 		'modifiedCollectionScripts',
@@ -153,6 +207,8 @@ const getAlterScript = ({ scriptFormat, collection, ddlProvider, app }) => {
 		'modifiedColumnScripts',
 		'addedViewScripts',
 		'modifiedViewScripts',
+		'addedFkScripts',
+		'modifiedFkScripts',
 		'deletedTagsScripts',
 		'deletedContainerScripts',
 	]

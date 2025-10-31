@@ -1231,5 +1231,18 @@ module.exports = (baseProvider, options, app) => {
 
 			return statements.join('');
 		},
+
+		/**
+		 * Drop a foreign key constraint from a table
+		 * @param {string} tableName - Fully qualified table name
+		 * @param {string} constraintName - Name of the foreign key constraint
+		 * @returns {string}
+		 */
+		dropForeignKey(tableName, constraintName) {
+			return assignTemplates(templates.dropForeignKey, {
+				tableName,
+				constraintName,
+			});
+		},
 	};
 };
