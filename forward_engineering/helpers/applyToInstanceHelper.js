@@ -5,7 +5,7 @@ const snowflakeHelper = require('../../reverse_engineering/helpers/snowflakeHelp
 const createQueries = (script = '') => {
 	return script
 		.split(';')
-		.filter(Boolean)
+		.filter(query => query.trim())
 		.map(query => `${query.trim()};`)
 		.filter(query => !queryIsDeactivated(query));
 };
