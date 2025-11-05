@@ -106,6 +106,16 @@ module.exports = (baseProvider, options, app) => {
 		tab,
 	});
 
+	const hasActiveConstraints = ({
+		foreignKeyConstraints = [],
+		compositePrimaryKeys = [],
+		compositeUniqueKeys = [],
+	}) => {
+		return [...foreignKeyConstraints, ...compositePrimaryKeys, ...compositeUniqueKeys].some(
+			constraint => constraint.isActivated,
+		);
+	};
+
 	const getOutOfLineConstraints = (
 		isParentActivated,
 		foreignKeyConstraints = [],
@@ -117,7 +127,7 @@ module.exports = (baseProvider, options, app) => {
 				isParentActivated ? commentIfDeactivated(constraint.statement, constraint) : constraint.statement,
 		);
 
-		return !isEmpty(constraints) ? ',\n\t\t' + constraints.join(',\n\t\t') : '';
+		return isEmpty(constraints) ? '' : '\n\t\t' + constraints.join(',\n\t\t');
 	};
 
 	function insertNewlinesAtEdges(input) {
@@ -356,7 +366,6 @@ module.exports = (baseProvider, options, app) => {
 			const copyOptions = tab(getCopyOptions(tableData.copyOptions), ' ');
 			const atOrBefore = tab(getAtOrBefore(tableData.cloneParams), ' ');
 			const columns = tableData.columns.map(column => commentIfDeactivated(column.statement, column));
-			const columnDefinitions = joinActivatedAndDeactivatedStatements({ statements: columns, indent: '\n\t\t' });
 			const tagsStatement = getTagStatement({
 				tags: tableData.tableTags,
 				isCaseSensitive: tableData.isCaseSensitive,
@@ -446,7 +455,11 @@ module.exports = (baseProvider, options, app) => {
 					),
 					orReplace,
 					tableIfNotExists,
-					column_definitions: columnDefinitions,
+					column_definitions: joinActivatedAndDeactivatedStatements({
+						statements: columns,
+						indent: '\n\t\t',
+						keepLastDelimiter: hasActiveConstraints(tableData),
+					}),
 					out_of_line_constraints: getOutOfLineConstraints(
 						isActivated,
 						tableData.foreignKeyConstraints,
@@ -466,7 +479,11 @@ module.exports = (baseProvider, options, app) => {
 					[clusterKeys, stageFileFormat, copyOptions, dataRetentionTime, copyGrants, tagsStatement],
 					comment,
 				),
-				column_definitions: columnDefinitions,
+				column_definitions: joinActivatedAndDeactivatedStatements({
+					statements: columns,
+					indent: '\n\t\t',
+					keepLastDelimiter: hasActiveConstraints(tableData),
+				}),
 				out_of_line_constraints: getOutOfLineConstraints(
 					isActivated,
 					tableData.foreignKeyConstraints,
