@@ -108,10 +108,10 @@ module.exports = (baseProvider, options, app) => {
 
 	const hasActiveConstraints = ({
 		foreignKeyConstraints = [],
-		primaryKeyConstraints = [],
-		uniqueKeyConstraints = [],
+		compositePrimaryKeys = [],
+		compositeUniqueKeys = [],
 	}) => {
-		return [...foreignKeyConstraints, ...primaryKeyConstraints, ...uniqueKeyConstraints].some(
+		return [...foreignKeyConstraints, ...compositePrimaryKeys, ...compositeUniqueKeys].some(
 			constraint => constraint.isActivated,
 		);
 	};
