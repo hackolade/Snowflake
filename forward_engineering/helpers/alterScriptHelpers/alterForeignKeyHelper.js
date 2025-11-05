@@ -41,7 +41,7 @@ const getAddSingleForeignKeyStatementDto = ddlProvider => relationship => {
 		{
 			schemaName: compMod?.child?.bucket?.name || '',
 			databaseName: compMod?.child?.bucket?.database || '',
-			isCaseSensitive: compMod?.child?.collection?.isCaseSensitive,
+			isCaseSensitive: compMod?.child?.bucket?.isCaseSensitive,
 		},
 	);
 };

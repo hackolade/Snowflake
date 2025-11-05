@@ -528,14 +528,17 @@ module.exports = (baseProvider, options, app) => {
 			const primaryKeys = isRelationActivated
 				? foreignKeysToString(fkData.primaryTableIsCaseSensitive, fkData.primaryKey)
 				: foreignActiveKeysToString(fkData.primaryTableIsCaseSensitive, fkData.primaryKey);
-
+			const tableName = getFullName(
+				getFullName(
+					getName(schemaData.isCaseSensitive, schemaData.databaseName),
+					getName(schemaData.isCaseSensitive, fkData.primarySchemaName || schemaData.schemaName),
+				),
+				getName(fkData.primaryTableIsCaseSensitive, fkData.primaryTable),
+			);
 			const foreignKeyStatement = assignTemplates(templates.createTableForeignKey, {
 				constraint: fkData.name ? `CONSTRAINT ${getName(schemaData.isCaseSensitive, fkData.name)} ` : '',
 				columns: foreignKeys,
-				primary_table: getFullName(
-					getName(schemaData.isCaseSensitive, fkData.primarySchemaName || schemaData.schemaName),
-					getName(fkData.primaryTableIsCaseSensitive, fkData.primaryTable),
-				),
+				primary_table: tableName,
 				primary_columns: primaryKeys,
 			});
 
@@ -554,17 +557,21 @@ module.exports = (baseProvider, options, app) => {
 				? foreignKeysToString(fkData.primaryTableIsCaseSensitive, fkData.primaryKey)
 				: foreignActiveKeysToString(fkData.primaryTableIsCaseSensitive, fkData.primaryKey);
 
+			const database = getName(schemaData.isCaseSensitive, schemaData.databaseName);
+			const tableName = getFullName(
+				getFullName(database, getName(schemaData.isCaseSensitive, fkData.foreignSchemaName)),
+				getName(fkData.foreignTableIsCaseSensitive, fkData.foreignTable),
+			);
+			const primaryTable = getFullName(
+				getFullName(database, getName(schemaData.isCaseSensitive, fkData.primarySchemaName)),
+				getName(fkData.primaryTableIsCaseSensitive, fkData.primaryTable),
+			);
+
 			const foreignKeyStatement = assignTemplates(templates.alterTableForeignKey, {
 				constraint: fkData.name ? `CONSTRAINT ${getName(schemaData.isCaseSensitive, fkData.name)} ` : '',
-				table_name: getFullName(
-					fkData.foreignSchemaName,
-					getName(fkData.foreignTableIsCaseSensitive, fkData.foreignTable),
-				),
+				table_name: tableName,
 				columns: foreignKeys,
-				primary_table: getFullName(
-					fkData.primarySchemaName,
-					getName(fkData.primaryTableIsCaseSensitive, fkData.primaryTable),
-				),
+				primary_table: primaryTable,
 				primary_columns: primaryKeys,
 			});
 
