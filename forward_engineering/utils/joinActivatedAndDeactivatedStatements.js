@@ -30,18 +30,25 @@ const getDelimiter = ({ index, numberOfStatements, lastIndexOfActivatedStatement
  * }}
  * @return {string}
  * */
-const joinActivatedAndDeactivatedStatements = ({ statements = [], delimiter = ',', indent = '\n' }) => {
+const joinActivatedAndDeactivatedStatements = ({
+	statements = [],
+	delimiter = ',',
+	indent = '\n',
+	keepLastDelimiter = false,
+}) => {
 	const lastIndexOfActivatedStatement = statements.findLastIndex(statement => !statement.startsWith('//'));
 	const numberOfStatements = statements.length;
 
 	return statements
 		.map((statement, index) => {
-			const currentDelimiter = getDelimiter({
-				index,
-				numberOfStatements,
-				lastIndexOfActivatedStatement,
-				delimiter,
-			});
+			const currentDelimiter = keepLastDelimiter
+				? delimiter
+				: getDelimiter({
+						index,
+						numberOfStatements,
+						lastIndexOfActivatedStatement,
+						delimiter,
+					});
 
 			return statement + currentDelimiter;
 		})
