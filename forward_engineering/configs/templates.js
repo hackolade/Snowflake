@@ -107,5 +107,5 @@ module.exports = {
 	alterTableDropNamedConstraint: 'ALTER TABLE IF EXISTS ${tableName} DROP CONSTRAINT ${constraintName};',
 	alterTableDropStatement: 'ALTER TABLE IF EXISTS ${tableName} DROP ${statement};',
 
-	columnComment: 'COMMENT ON COLUMN ${fullName} IS ${comment}',
+	columnComment: 'COMMENT ON COLUMN ${fullName} IS ${comment};',
 };
