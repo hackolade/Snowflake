@@ -1,5 +1,6 @@
 const { prepareContainerLevelData } = require('./common');
-const { getDbName } = require('../general');
+const { getDbName, isObjectInDeltaModelActivated } = require('../general');
+const { commentIfDeactivated } = require('../commentHelpers/commentDeactivatedHelper');
 
 const getAddContainerScript = ddlProvider => container => {
 	const containerData = { ...container.role, name: getDbName(container.role) };
@@ -17,8 +18,8 @@ const getDeleteContainerScript = ddlProvider => container => {
 
 const getModifyContainerScript = ddlProvider => container => {
 	const preparedData = ddlProvider.hydrateAlterSchema(container);
-
-	return ddlProvider.alterSchema(preparedData);
+	const isActivated = isObjectInDeltaModelActivated(container);
+	return commentIfDeactivated(ddlProvider.alterSchema(preparedData), { isActivated });
 };
 
 module.exports = {

@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const { getNames, getBaseAndContainerNames } = require('./common');
-const { getFullName, getName } = require('../general');
+const { getFullName, getName, isParentContainerActivated, isObjectInDeltaModelActivated } = require('../general');
+const { commentIfDeactivated } = require('../commentHelpers/commentDeactivatedHelper');
 
 const getViewName = view => view?.code || view.name || '';
 
@@ -42,8 +43,8 @@ const getDeleteViewScript = view => {
 
 const getModifyViewScript = ddlProvider => view => {
 	const data = ddlProvider.hydrateAlterView(view);
-
-	return ddlProvider.alterView(data);
+	const isActivated = isParentContainerActivated(view) && isObjectInDeltaModelActivated(view);
+	return commentIfDeactivated(ddlProvider.alterView(data), { isActivated });
 };
 
 const getKeys = ({ viewSchema, collectionRefsDefinitionsMap, ddlProvider, mapProperties }) => {

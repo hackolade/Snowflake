@@ -2,7 +2,14 @@ const _ = require('lodash');
 const { checkFieldPropertiesChanged, getNames, getBaseAndContainerNames } = require('./common');
 const { createColumnDefinitionBySchema } = require('./createColumnDefinition');
 const { commentIfDeactivated } = require('../commentHelpers/commentDeactivatedHelper');
-const { getEntityName, getFullName, getName, toString } = require('../general');
+const {
+	getEntityName,
+	getFullName,
+	getName,
+	toString,
+	isParentContainerActivated,
+	isObjectInDeltaModelActivated,
+} = require('../general');
 const { getSetTagValue, getUnsetTagValue } = require('../../helpers/tagHelper');
 const assignTemplates = require('../../utils/assignTemplates');
 const templates = require('../../configs/templates');
@@ -58,8 +65,8 @@ const getDeleteCollectionScript = collection => {
 
 const getModifyCollectionScript = ddlProvider => collection => {
 	const data = ddlProvider.hydrateAlertTable(collection);
-
-	return ddlProvider.alterTable(data);
+	const isActivated = isParentContainerActivated(collection) && isObjectInDeltaModelActivated(collection);
+	return commentIfDeactivated(ddlProvider.alterTable(data), { isActivated });
 };
 
 const getAddColumnScript =
@@ -120,6 +127,7 @@ const getModifyColumnScript =
 					`ALTER TABLE IF EXISTS ${fullName} RENAME COLUMN ${jsonSchema.compMod.oldField.name} TO ${jsonSchema.compMod.newField.name};`,
 			);
 
+		const isParentActivated = isParentContainerActivated(collection) && isObjectInDeltaModelActivated(collection);
 		const nameToJsonSchemaPairs = _.toPairs(collection.properties);
 
 		const changeTypeScripts = nameToJsonSchemaPairs
@@ -166,9 +174,12 @@ const getModifyColumnScript =
 
 				// new or modified comment
 				if (oldComment !== comment) {
-					return assignTemplates(templates.columnComment, {
+					const statement = assignTemplates(templates.columnComment, {
 						fullName: `${fullName}.${columnName}`,
 						comment: escapeString(scriptFormat, comment),
+					});
+					return commentIfDeactivated(statement, {
+						isActivated: jsonSchema.isActivated && isParentActivated,
 					});
 				}
 			})
