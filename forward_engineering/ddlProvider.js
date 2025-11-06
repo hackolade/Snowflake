@@ -584,7 +584,6 @@ module.exports = (baseProvider, options, app) => {
 		createView(viewData, dbData, isActivated) {
 			const orReplace = preSpace(viewData.orReplace && 'OR REPLACE');
 			const ifNotExist = preSpace(viewData.ifNotExist && 'IF NOT EXISTS');
-			const schemaName = get(viewData, 'schemaData.schemaName');
 			const { columnList, tableColumns, tables } = viewData.keys.reduce(
 				(result, key) => {
 					result.columnList.push({
@@ -649,7 +648,7 @@ module.exports = (baseProvider, options, app) => {
 				ifNotExist,
 				secure: preSpace(viewData.secure && 'SECURE'),
 				materialized: preSpace(viewData.materialized && 'MATERIALIZED'),
-				name: getFullName(schemaName, viewData.name),
+				name: viewData.fullName,
 				column_list: viewColumnsToString(columnList, isActivated),
 				copy_grants: viewData.copyGrants ? 'COPY GRANTS\n' : '',
 				comment: viewData.comment ? `COMMENT=${escapeString(scriptFormat, viewData.comment)}\n` : '',
@@ -721,7 +720,7 @@ module.exports = (baseProvider, options, app) => {
 			return {
 				schemaName: getName(containerData.isCaseSensitive, containerData.name),
 				isCaseSensitive: containerData.isCaseSensitive,
-				databaseName: containerData.database,
+				databaseName: getName(containerData.isCaseSensitive, containerData.database),
 				comment: containerData.description,
 				transient: containerData.transient,
 				managedAccess: containerData.managedAccess,
@@ -1013,7 +1012,7 @@ module.exports = (baseProvider, options, app) => {
 			const firstTab = entityData[0];
 			const { databaseName, schemaName } = viewData.schemaData;
 			const viewName = getName(firstTab.isCaseSensitive, viewData.name);
-			const fullName = getFullName(databaseName, getFullName(schemaName, viewName));
+			const fullName = getFullName(getFullName(databaseName, schemaName), viewName);
 
 			return {
 				...viewData,
