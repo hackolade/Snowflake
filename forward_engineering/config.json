@@ -49,6 +49,7 @@
 			}
 		]
 	},
+	"externalBrowserPort": 8080,
 	"additionalOptions": [
 		{
 			"id": "applyDropStatements",
