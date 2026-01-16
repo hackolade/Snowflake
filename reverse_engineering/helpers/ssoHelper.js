@@ -4,6 +4,9 @@ const snowflakeHelper = require('./snowflakeHelper');
 const ssoAuthenticatorError = { message: "Can't get SSO URL. Please, check the SAML settings" };
 
 const getSsoUrlData = async (logger, { host, redirectPort = 8080 }) => {
+	logger.log('info', `Starting SSO connection...`, 'Connection');
+	logger.log('info', `Redirect port: ${redirectPort}`, 'Connection');
+
 	const account = snowflakeHelper.getAccount(host);
 	const accessUrl = snowflakeHelper.getAccessUrl(account);
 	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request`, {
@@ -12,8 +15,6 @@ const getSsoUrlData = async (logger, { host, redirectPort = 8080 }) => {
 			BROWSER_MODE_REDIRECT_PORT: redirectPort,
 		},
 	});
-
-	logger.log('info', `Starting SSO connection...`, 'Connection');
 
 	const ssoUrl = _.get(ssoUrlsData, 'data.data.ssoUrl', '');
 	const proofKey = _.get(ssoUrlsData, 'data.data.proofKey', '');
