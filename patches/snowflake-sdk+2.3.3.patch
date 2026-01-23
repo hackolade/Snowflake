@@ -1,0 +1,64 @@
+diff --git a/node_modules/snowflake-sdk/dist/lib/agent/crl_fetcher.js b/node_modules/snowflake-sdk/dist/lib/agent/crl_fetcher.js
+index 1424f11..dd0ffd1 100644
+--- a/node_modules/snowflake-sdk/dist/lib/agent/crl_fetcher.js
++++ b/node_modules/snowflake-sdk/dist/lib/agent/crl_fetcher.js
+@@ -5,8 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.PENDING_FETCH_REQUESTS = void 0;
+ exports.getCrl = getCrl;
++const { hckFetch } = require('@hackolade/fetch');
+ const asn1_js_rfc5280_1 = __importDefault(require("asn1.js-rfc5280"));
+-const axios_1 = __importDefault(require("axios"));
++const axios_1 = __importDefault(require("axios").create({
++    adapter: 'fetch',
++    env: {
++        fetch: hckFetch,
++        Request: null,
++        Response: null,
++    }
++}));
+ const logger_1 = __importDefault(require("../logger"));
+ const global_config_typed_1 = __importDefault(require("../global_config_typed"));
+ const crl_cache_1 = require("./crl_cache");
+diff --git a/node_modules/snowflake-sdk/dist/lib/http/base.js b/node_modules/snowflake-sdk/dist/lib/http/base.js
+index 7320edb..cb750e0 100644
+--- a/node_modules/snowflake-sdk/dist/lib/http/base.js
++++ b/node_modules/snowflake-sdk/dist/lib/http/base.js
+@@ -3,7 +3,15 @@ const zlib = require('zlib');
+ const Util = require('../util');
+ const Logger = require('../logger');
+ const ExecutionTimer = require('../logger/execution_timer');
+-const axios = require('axios');
++const { hckFetch } = require('@hackolade/fetch');
++const axios = require('axios').create({
++    adapter: 'fetch',
++    env: {
++        fetch: hckFetch,
++        Request: null,
++        Response: null,
++    }
++});
+ const URL = require('node:url').URL;
+ const requestUtil = require('./request_util');
+ const DEFAULT_REQUEST_TIMEOUT = 360000;
+diff --git a/node_modules/snowflake-sdk/dist/lib/http/node_untyped.js b/node_modules/snowflake-sdk/dist/lib/http/node_untyped.js
+index a361cbb..3e68446 100644
+--- a/node_modules/snowflake-sdk/dist/lib/http/node_untyped.js
++++ b/node_modules/snowflake-sdk/dist/lib/http/node_untyped.js
+@@ -90,15 +90,7 @@ function isBypassProxy(proxy, destination, agentId) {
+  * @inheritDoc
+  */
+ NodeHttpClient.prototype.getAgent = function (parsedUrl, proxy, mock) {
+-    Logger.getInstance().trace('Agent[url: %s] - getting an agent instance.', RequestUtil.describeURL(parsedUrl.href));
+-    if (!proxy && GlobalConfig.isEnvProxyActive()) {
+-        const isHttps = parsedUrl.protocol === 'https:';
+-        proxy = ProxyUtil.getProxyFromEnv(isHttps);
+-        if (proxy) {
+-            Logger.getInstance().debug('Agent[url: %s] - proxy info loaded from the environment variable. Proxy host: %s', RequestUtil.describeURL(parsedUrl.href), proxy.host);
+-        }
+-    }
+-    return getProxyAgent(proxy, parsedUrl, parsedUrl.href, mock, this._connectionConfig);
++    return null;
+ };
+ function getProxyAgent(proxyOptions, parsedUrl, destination, mock, connectionConfig) {
+     Logger.getInstance().trace('Agent[url: %s] - getting a proxy agent instance.', RequestUtil.describeURL(parsedUrl.href));

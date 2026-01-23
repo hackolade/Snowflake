@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const axios = require('axios');
+const { hckFetch } = require('@hackolade/fetch');
 const uuid = require('uuid');
 
 const {
@@ -34,9 +34,9 @@ const authByExternalBrowser = async ({
 	role = role || DEFAULT_ROLE;
 	authUrl += `&roleName=${encodeURIComponent(getRole(role))}`;
 
-	const authData = await axios.post(
-		authUrl,
-		{
+	const authData = await hckFetch(authUrl, {
+		method: 'POST',
+		body: JSON.stringify({
 			data: {
 				CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
 				CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
@@ -49,15 +49,23 @@ const authByExternalBrowser = async ({
 					APPLICATION: HACKOLADE_APPLICATION,
 				},
 			},
+		}),
+		headers: {
+			Accept: 'application/json',
+			Authorization: 'Basic',
+			'Content-Type': 'application/json',
 		},
-		{
-			headers: {
-				Accept: 'application/json',
-				Authorization: 'Basic',
-			},
-		},
-	);
-	let tokensData = authData.data;
+	});
+
+	if (!authData.ok) {
+		return Promise.reject(
+			new Error(
+				`Error while authenticating via external browser. Status ${authData.status} ${authData.statusText}`,
+			),
+		);
+	}
+
+	let tokensData = await authData.json();
 	if (_.isString(tokensData)) {
 		try {
 			tokensData = JSON.parse(tokensData);
