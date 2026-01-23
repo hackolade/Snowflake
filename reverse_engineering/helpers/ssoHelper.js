@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const { hckFetch } = require('@hackolade/fetch');
 const snowflakeHelper = require('./snowflakeHelper');
-const errorMessages = require('common/errorMessages');
+const errorMessages = require('../../common/errorMessages.js');
 
 const getSsoUrlData = async (logger, { host, redirectPort = 8080 }) => {
 	logger.log('info', `Starting SSO connection...`, 'Connection');

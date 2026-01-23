@@ -38,6 +38,12 @@ esbuild
 			}),
 			copy({
 				assets: {
+					from: [path.join('node_modules', '@hackolade', 'fetch', 'dist', 'cjs', '**', '*')],
+					to: [path.join('node_modules', '@hackolade', 'fetch', 'dist', 'cjs')],
+				},
+			}),
+			copy({
+				assets: {
 					from: [path.join('node_modules', '@hackolade', 'fetch', 'package.json')],
 					to: [path.join('node_modules', '@hackolade', 'fetch', 'package.json')],
 				},

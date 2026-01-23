@@ -13,7 +13,7 @@ const {
 
 const { getAccountName, getRole, removeQuotes } = require('../common');
 const { connectWithTimeout, execute } = require('./connection');
-const errorMessages = require('common/errorMessages');
+const errorMessages = require('../../../common/errorMessages.js');
 
 const authByExternalBrowser = async ({
 	token,
