@@ -36,6 +36,18 @@ esbuild
 					to: [path.join('node_modules', 'lodash')],
 				},
 			}),
+			copy({
+				assets: {
+					from: [path.join('node_modules', '@hackolade', 'fetch', 'package.json')],
+					to: [path.join('node_modules', '@hackolade', 'fetch', 'package.json')],
+				},
+			}),
+			copy({
+				assets: {
+					from: [path.join('node_modules', '@hackolade', 'fetch', 'LICENSE')],
+					to: [path.join('node_modules', '@hackolade', 'fetch')],
+				},
+			}),
 			copyFolderFiles({
 				fromPath: __dirname,
 				targetFolderPath: RELEASE_FOLDER_PATH,

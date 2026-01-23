@@ -87,9 +87,7 @@ const authByOkta = async ({
 		},
 	})
 		.then(res => (res.ok ? res.json() : Promise.reject()))
-		.catch(err => {
-			return authToken ? {} : Promise.reject(oktaCredentialsError);
-		});
+		.catch(err => (authToken ? {} : Promise.reject(oktaCredentialsError)));
 
 	logger.log('info', `Successfully connected to Okta`, 'Connection');
 	const identityProviderToken = _.get(identityProviderTokenData, 'cookieToken', '') || authToken;
