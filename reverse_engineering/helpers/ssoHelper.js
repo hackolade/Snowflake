@@ -1,7 +1,7 @@
 const _ = require('lodash');
-const axios = require('axios');
+const { hckFetch } = require('@hackolade/fetch');
 const snowflakeHelper = require('./snowflakeHelper');
-const ssoAuthenticatorError = { message: "Can't get SSO URL. Please, check the SAML settings" };
+const errorMessages = require('../../common/errorMessages.js');
 
 const getSsoUrlData = async (logger, { host, redirectPort = 8080 }) => {
 	logger.log('info', `Starting SSO connection...`, 'Connection');
@@ -9,19 +9,33 @@ const getSsoUrlData = async (logger, { host, redirectPort = 8080 }) => {
 
 	const account = snowflakeHelper.getAccount(host);
 	const accessUrl = snowflakeHelper.getAccessUrl(account);
-	const ssoUrlsData = await axios.post(`${accessUrl}/session/authenticator-request`, {
-		data: {
-			AUTHENTICATOR: 'EXTERNALBROWSER',
-			BROWSER_MODE_REDIRECT_PORT: redirectPort,
+	const response = await hckFetch(`${accessUrl}/session/authenticator-request`, {
+		method: 'POST',
+		body: JSON.stringify({
+			data: {
+				AUTHENTICATOR: 'EXTERNALBROWSER',
+				BROWSER_MODE_REDIRECT_PORT: redirectPort,
+			},
+		}),
+		headers: {
+			'Content-Type': 'application/json',
 		},
 	});
 
-	const ssoUrl = _.get(ssoUrlsData, 'data.data.ssoUrl', '');
-	const proofKey = _.get(ssoUrlsData, 'data.data.proofKey', '');
+	if (!response.ok) {
+		return Promise.reject(
+			new Error(errorMessages.SSO_REQUEST_ERROR + `Status ${response.status} ${response.statusText}`),
+		);
+	}
+
+	const responseData = await response.json();
+
+	const ssoUrl = _.get(responseData, 'data.ssoUrl', '');
+	const proofKey = _.get(responseData, 'data.proofKey', '');
 	logger.log('info', `SSO URL: ${ssoUrl}`, 'Connection');
 
 	if (!ssoUrl) {
-		return Promise.reject(ssoAuthenticatorError);
+		return Promise.reject(new Error(errorMessages.SSO_URL_ERROR));
 	}
 
 	return { url: ssoUrl, proofKey };

@@ -1,6 +1,5 @@
 const _ = require('lodash');
-const snowflake = require('snowflake-sdk');
-const axios = require('axios');
+const { hckFetch } = require('@hackolade/fetch');
 const uuid = require('uuid');
 
 const {
@@ -30,49 +29,68 @@ const authByOkta = async ({
 
 	logger.log('info', `Authenticator: ${authenticator}`, 'Connection');
 	const accountName = getAccountName(account);
-	const ssoUrlsData = await axios.post(
+	const ssoUrlsResponse = await hckFetch(
 		`${accessUrl}/session/authenticator-request?Application=${HACKOLADE_APPLICATION}`,
 		{
-			data: {
-				ACCOUNT_NAME: accountName,
-				LOGIN_NAME: username,
-				AUTHENTICATOR: getOktaAuthenticatorUrl(authenticator),
+			method: 'POST',
+			body: JSON.stringify({
+				data: {
+					ACCOUNT_NAME: accountName,
+					LOGIN_NAME: username,
+					AUTHENTICATOR: getOktaAuthenticatorUrl(authenticator),
+				},
+			}),
+			headers: {
+				'Content-Type': 'application/json',
 			},
 		},
 	);
+	const ssoUrlsData = await ssoUrlsResponse.json();
 
 	logger.log('info', `Starting Okta connection...`, 'Connection');
-	const tokenUrl = _.get(ssoUrlsData, 'data.data.tokenUrl', '');
+	const tokenUrl = _.get(ssoUrlsData, 'data.tokenUrl', '');
 	const authNUrl = tokenUrl.replace(/api\/v1\/.*/, 'api/v1/authn');
-	const ssoUrl = _.get(ssoUrlsData, 'data.data.ssoUrl', '');
+	const ssoUrl = _.get(ssoUrlsData, 'data.ssoUrl', '');
 	logger.log('info', `Token URL: ${tokenUrl}\nSSO URL: ${ssoUrl}`, 'Connection');
 
 	if (!tokenUrl || !ssoUrl) {
 		return Promise.reject({ message: errorMessages.OKTA_SSO_ERROR });
 	}
 
-	const authNData = await axios
-		.post(authNUrl, {
+	const authNData = await hckFetch(authNUrl, {
+		method: 'POST',
+		body: JSON.stringify({
 			username,
 			password,
 			options: {
 				multiOptionalFactorEnroll: false,
 				warnBeforePasswordExpired: false,
 			},
-		})
+		}),
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	})
+		.then(res => (res.ok ? res.json() : {}))
 		.catch(err => ({}));
-	const status = _.get(authNData, 'data.status', 'SUCCESS');
-	const authToken = _.get(authNData, 'data.sessionToken', '');
+	const status = _.get(authNData, 'status', 'SUCCESS');
+	const authToken = _.get(authNData, 'sessionToken', '');
 	if (status.startsWith('MFA')) {
 		return Promise.reject({ message: errorMessages.OKTA_MFA_ERROR });
 	}
 
-	const identityProviderTokenData = await axios.post(tokenUrl, { username, password }).catch(err => {
-		return authToken ? {} : Promise.reject(oktaCredentialsError);
-	});
+	const identityProviderTokenData = await hckFetch(tokenUrl, {
+		method: 'POST',
+		body: JSON.stringify({ username, password }),
+		headers: {
+			'Content-Type': 'application/json',
+		},
+	})
+		.then(res => (res.ok ? res.json() : Promise.reject()))
+		.catch(err => (authToken ? {} : Promise.reject(oktaCredentialsError)));
 
 	logger.log('info', `Successfully connected to Okta`, 'Connection');
-	const identityProviderToken = _.get(identityProviderTokenData, 'data.cookieToken', '') || authToken;
+	const identityProviderToken = _.get(identityProviderTokenData, 'cookieToken', '') || authToken;
 	if (!identityProviderToken) {
 		return Promise.reject(oktaCredentialsError);
 	}
@@ -80,8 +98,13 @@ const authByOkta = async ({
 	logger.log('info', `One-time IDP token has been provided`, 'Connection');
 
 	const samlUrl = `${ssoUrl}?onetimetoken=${encodeURIComponent(identityProviderToken)}&RelayState=${encodeURIComponent('/some/deep/link')}`;
-	const samlResponseData = await axios.get(samlUrl, { headers: { HTTP_HEADER_ACCEPT: '*/*' } });
-	const rawSamlResponse = _.get(samlResponseData, 'data', '');
+	const samlResponse = await hckFetch(samlUrl, {
+		method: 'GET',
+		headers: {
+			Accept: '*/*',
+		},
+	});
+	const rawSamlResponse = samlResponse.ok ? await samlResponse.text() : '';
 
 	if (!rawSamlResponse) {
 		logger.log('info', `Warning: RAW_SAML_RESPONSE is empty`, 'Connection');
@@ -96,19 +119,25 @@ const authByOkta = async ({
 	authUrl += `&roleName=${encodeURIComponent(getRole(role))}`;
 	authUrl += `&warehouse=${encodeURIComponent(warehouse)}`;
 
-	const authData = await axios.post(authUrl, {
-		data: {
-			CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
-			CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
-			RAW_SAML_RESPONSE: rawSamlResponse,
-			LOGIN_NAME: username,
-			ACCOUNT_NAME: accountName,
-			CLIENT_ENVIRONMENT: {
-				APPLICATION: HACKOLADE_APPLICATION,
+	const authResponse = await hckFetch(authUrl, {
+		method: 'POST',
+		body: JSON.stringify({
+			data: {
+				CLIENT_APP_ID: DEFAULT_CLIENT_APP_ID,
+				CLIENT_APP_VERSION: DEFAULT_CLIENT_APP_VERSION,
+				RAW_SAML_RESPONSE: rawSamlResponse,
+				LOGIN_NAME: username,
+				ACCOUNT_NAME: accountName,
+				CLIENT_ENVIRONMENT: {
+					APPLICATION: HACKOLADE_APPLICATION,
+				},
 			},
+		}),
+		headers: {
+			'Content-Type': 'application/json',
 		},
 	});
-	let tokensData = authData.data;
+	let tokensData = await authResponse.json();
 	if (_.isString(tokensData)) {
 		try {
 			tokensData = JSON.parse(tokensData);

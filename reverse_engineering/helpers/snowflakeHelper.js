@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const snowflake = require('snowflake-sdk');
-const axios = require('axios');
 const uuid = require('uuid');
 const BSON = require('bson');
 const errorMessages = require('../../common/errorMessages.js');
