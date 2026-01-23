@@ -9,4 +9,7 @@ module.exports = {
 	KEY_PAIR_USERNAME_ERROR: 'Incorrect username was specified.',
 	KEY_PAIR_INVALID_FILE_ERROR:
 		"The selected file is not a valid key. Please choose a valid key file, check it's passphrase and try again.",
+	EXTERNAL_BROWSER_ERROR: 'Error while authenticating via external browser.',
+	SSO_REQUEST_ERROR: 'Cannot obtain the SSO URL.',
+	SSO_URL_ERROR: 'The SSO URL is nt provided in the JSON response',
 };

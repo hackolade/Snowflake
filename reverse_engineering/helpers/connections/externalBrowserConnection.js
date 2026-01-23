@@ -13,6 +13,7 @@ const {
 
 const { getAccountName, getRole, removeQuotes } = require('../common');
 const { connectWithTimeout, execute } = require('./connection');
+const errorMessages = require('common/errorMessages');
 
 const authByExternalBrowser = async ({
 	token,
@@ -59,9 +60,7 @@ const authByExternalBrowser = async ({
 
 	if (!authData.ok) {
 		return Promise.reject(
-			new Error(
-				`Error while authenticating via external browser. Status ${authData.status} ${authData.statusText}`,
-			),
+			new Error(errorMessages.EXTERNAL_BROWSER_ERROR + ` Status ${authData.status} ${authData.statusText}`),
 		);
 	}
 

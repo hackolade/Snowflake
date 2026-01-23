@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const { hckFetch } = require('@hackolade/fetch');
 const snowflakeHelper = require('./snowflakeHelper');
+const errorMessages = require('common/errorMessages');
 
 const getSsoUrlData = async (logger, { host, redirectPort = 8080 }) => {
 	logger.log('info', `Starting SSO connection...`, 'Connection');
@@ -22,7 +23,9 @@ const getSsoUrlData = async (logger, { host, redirectPort = 8080 }) => {
 	});
 
 	if (!response.ok) {
-		return Promise.reject(new Error(`Cannot obtain the SSO URL. Status ${response.status} ${response.statusText}`));
+		return Promise.reject(
+			new Error(errorMessages.SSO_REQUEST_ERROR + `Status ${response.status} ${response.statusText}`),
+		);
 	}
 
 	const responseData = await response.json();
@@ -32,7 +35,7 @@ const getSsoUrlData = async (logger, { host, redirectPort = 8080 }) => {
 	logger.log('info', `SSO URL: ${ssoUrl}`, 'Connection');
 
 	if (!ssoUrl) {
-		return Promise.reject(new Error(`The SSO URL is nt provided in the JSON response`));
+		return Promise.reject(new Error(errorMessages.SSO_URL_ERROR));
 	}
 
 	return { url: ssoUrl, proofKey };
