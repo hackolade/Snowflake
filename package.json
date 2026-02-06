@@ -97,5 +97,8 @@
         "lint-staged": "^16.2.7",
         "prettier": "^3.7.4",
         "simple-git-hooks": "2.11.1"
+    },
+    "overrides": {
+        "fast-xml-parser": "5.3.4"
     }
 }
