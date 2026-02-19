@@ -250,7 +250,8 @@
 								"markdown": false,
 								"template": "codeEditor",
 								"templateOptions": {
-									"editorDialect": "sql"
+									"editorDialect": "sql",
+									"customScriptVariables": true
 								}
 							}
 						]
@@ -268,7 +269,8 @@
 								"markdown": false,
 								"template": "codeEditor",
 								"templateOptions": {
-									"editorDialect": "sql"
+									"editorDialect": "sql",
+									"customScriptVariables": true
 								}
 							}
 						]
