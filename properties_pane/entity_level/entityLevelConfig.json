@@ -116,1658 +116,1658 @@ making sure that you maintain a proper JSON format.
 */
 
 [
-	{
-		"lowerTab": "Details",
-		"structure": [
-			{
-				"propertyName": "Case sensitive",
-				"propertyKeyword": "isCaseSensitive",
-				"propertyType": "checkbox"
-			},
-			{
-				"propertyName": "Comments",
-				"propertyKeyword": "description",
-				"propertyTooltip": "comments",
-				"addTimestampButton": false,
-				"propertyType": "details",
-				"template": "textarea"
-			},
-			{
-				"propertyName": "Table role",
-				"propertyKeyword": "tableRole",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": ["Dimension", "Fact", "Outrigger", "Staging"],
-				"dependency": {
-					"level": "model",
-					"key": "modelingMethodology",
-					"value": "Dimensional"
-				}
-			},
-			{
-				"propertyName": "Vault component",
-				"propertyKeyword": "vaultComponent",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": ["Hub", "Link", "Satellite", "Bridge", "Point in Time", "Reference"],
-				"dependency": {
-					"level": "model",
-					"key": "modelingMethodology",
-					"value": "Vault"
-				}
-			},
-			{
-				"propertyName": "Dynamic",
-				"propertyKeyword": "dynamic",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
-				}
-			},
-			{
-				"propertyName": "Or replace",
-				"propertyKeyword": "orReplace",
-				"propertyType": "checkbox",
-				"disabledOnCondition": {
-					"key": "ifNotExist",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "If not exist",
-				"propertyKeyword": "ifNotExist",
-				"propertyTooltip": "if the specified table already exists, the command should make no changes and return a message that the table exists, rather than terminating with an error. ",
-				"propertyType": "checkbox",
-				"disabledOnCondition": {
-					"key": "orReplace",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Iceberg",
-				"propertyKeyword": "iceberg",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "external",
-							"value": true
-						},
-						{
-							"key": "transient",
-							"value": true
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "External volume",
-				"propertyKeyword": "externalVolume",
-				"propertyTooltip": "Specifies the identifier (name) for the external volume where the Iceberg table stores its metadata files and data in Parquet format. Iceberg metadata and manifest files store the table schema, partitions, snapshots, and other metadata.",
-				"propertyType": "text",
-				"dependency": {
-					"key": "iceberg",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Catalog management",
-				"propertyKeyword": "catalogMgmt",
-				"propertyType": "select",
-				"options": ["snowflake", "external"],
-				"dependency": {
-					"key": "iceberg",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "External catalog",
-				"propertyKeyword": "catalogExternal",
-				"propertyTooltip": "Specifies the identifier (name) of the catalog integration for this table.",
-				"propertyType": "select",
-				"options": ["glue", "iceberg files", "delta files", "iceberg rest"],
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "catalogMgmt",
-							"value": "external"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Catalog",
-				"propertyKeyword": "catalog",
-				"propertyType": "text",
-				"defaultValue": "snowflake",
-				"disabled": true,
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "catalogMgmt",
-							"value": "snowflake"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Catalog",
-				"propertyKeyword": "catalog",
-				"propertyTooltip": "Specifies the catalog integration name.",
-				"propertyType": "text",
-				"defaultValue": "",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "catalogMgmt",
-							"value": "external"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Base location",
-				"propertyKeyword": "baseLocation",
-				"propertyTooltip": "The path to a directory where Snowflake can write data and metadata files for the table.",
-				"propertyType": "text",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"type": "or",
-							"values": [
-								{
-									"key": "catalog",
-									"value": "snowflake"
-								},
-								{
-									"key": "catalogExternal",
-									"value": "delta files"
-								}
-							]
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Catalog Sync",
-				"propertyKeyword": "catalogSync",
-				"propertyTooltip": "Optionally specifies the name of a catalog integration configured for Polaris Catalog.",
-				"propertyType": "text",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "catalog",
-							"value": "snowflake"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Storage serialization policy",
-				"propertyKeyword": "storageSerializationPolicy",
-				"propertyTooltip": "Specifies the storage serialization policy for the table. If not specified at table creation, the table inherits the value set at the schema, database, or account level. If the value isn’t specified at any level, the table uses the default value.",
-				"propertyType": "select",
-				"defaultValue": "optimized",
-				"options": ["optimized", "compatible"],
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "catalog",
-							"value": "snowflake"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Change tracking",
-				"propertyKeyword": "changeTracking",
-				"propertyTooltip": "Specifies whether to enable change tracking on the table.",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "catalog",
-							"value": "snowflake"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Default DDL collation",
-				"propertyKeyword": "defaultDdlCollation",
-				"propertyTooltip": "Specifies a default collation specification for the columns in the table, including columns added to the table in the future.",
-				"propertyType": "text",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "catalog",
-							"value": "snowflake"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Catalog table name",
-				"propertyKeyword": "catalogTableName",
-				"propertyTooltip": "Specifies the table name as recognized by the AWS Glue Data Catalog. ",
-				"propertyType": "text",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"type": "or",
-							"values": [
-								{
-									"key": "catalogExternal",
-									"value": "glue"
-								},
-								{
-									"key": "catalogExternal",
-									"value": "iceberg rest"
-								}
-							]
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Catalog namespace",
-				"propertyKeyword": "catalogNamespace",
-				"propertyTooltip": "Optionally specifies the namespace (for example, my_database) for the REST catalog source, and overrides the default catalog namespace specified with the catalog integration.",
-				"propertyType": "text",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"type": "or",
-							"values": [
-								{
-									"key": "catalogExternal",
-									"value": "glue"
-								},
-								{
-									"key": "catalogExternal",
-									"value": "iceberg rest"
-								}
-							]
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Metadata file path",
-				"propertyKeyword": "metadataFilePath",
-				"propertyTooltip": "Specifies the relative path of the Iceberg metadata file to use for column definitions.",
-				"propertyType": "text",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "catalogExternal",
-							"value": "iceberg files"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Replace invalid characters",
-				"propertyKeyword": "replaceInvalidCharacters",
-				"propertyTooltip": "Specifies whether to replace invalid UTF-8 characters with the Unicode replacement character in query results.",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"type": "or",
-							"values": [
-								{
-									"key": "catalogExternal",
-									"value": "glue"
-								},
-								{
-									"key": "catalogExternal",
-									"value": "iceberg files"
-								},
-								{
-									"key": "catalogExternal",
-									"value": "delta files"
-								},
-								{
-									"key": "catalogExternal",
-									"value": "iceberg rest"
-								}
-							]
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Auto refresh",
-				"propertyKeyword": "autoRefresh",
-				"propertyTooltip": "Specifies whether Snowflake should automatically poll the external Iceberg catalog associated with the table for metadata updates when you use automated refresh.",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "and",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"type": "or",
-							"values": [
-								{
-									"key": "catalogExternal",
-									"value": "glue"
-								},
-								{
-									"key": "catalogExternal",
-									"value": "iceberg rest"
-								}
-							]
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Target Lag",
-				"propertyKeyword": "targetLag",
-				"propertyType": "block",
-				"structure": [
-					{
-						"propertyName": "Time span",
-						"propertyKeyword": "targetLagTimeSpan",
-						"propertyType": "select",
-						"options": ["seconds", "minutes", "hours", "days"]
-					},
-					{
-						"propertyName": "Amount",
-						"propertyKeyword": "targetLagAmount",
-						"propertyType": "numeric"
-					},
-					{
-						"propertyName": "Downstream",
-						"propertyKeyword": "targetLagDownstream",
-						"propertyType": "checkbox"
-					}
-				],
-				"dependency": {
-					"key": "dynamic",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Warehouse",
-				"propertyKeyword": "warehouse",
-				"propertyType": "text",
-				"dependency": {
-					"key": "dynamic",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Temporary",
-				"propertyKeyword": "temporary",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "dynamic",
-							"value": true
-						},
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "external",
-							"value": true
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Transient",
-				"propertyKeyword": "transient",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "external",
-							"value": true
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Refresh Mode",
-				"propertyKeyword": "refreshMode",
-				"propertyType": "select",
-				"options": ["", "auto", "full", "incremental"],
-				"dependency": {
-					"key": "dynamic",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Initialize",
-				"propertyKeyword": "initialize",
-				"propertyType": "select",
-				"options": ["", "on_create", "on_schedule"],
-				"dependency": {
-					"key": "dynamic",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "External",
-				"propertyKeyword": "external",
-				"propertyType": "checkbox",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "dynamic",
-							"value": true
-						},
-						{
-							"key": "iceberg",
-							"value": true
-						},
-						{
-							"key": "transient",
-							"value": true
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Cluster by",
-				"propertyKeyword": "clusteringKey",
-				"propertyType": "group",
-				"dependency": {
-					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
-				},
-				"structure": [
-					{
-						"propertyName": "Expression",
-						"propertyKeyword": "expression",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Key",
-						"propertyKeyword": "clusteringKey",
-						"propertyType": "compositeKeySetter",
-						"disabledItemStrategy": "default",
-						"abbr": "CK",
-						"setPrimaryKey": false,
-						"template": "collectiontree",
-						"isCompositeKey": true,
-						"templateOptions": {
-							"maxFields": 1
-						}
-					}
-				]
-			},
-			{
-				"propertyName": "Partition by",
-				"propertyKeyword": "partitioningKey",
-				"propertyType": "primaryKeySetter",
-				"abbr": "PK",
-				"dependency": {
-					"key": "external",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "With location",
-				"propertyType": "block",
-				"propertyKeyword": "location",
-				"propertyTooltip": "",
-				"dependency": {
-					"key": "external",
-					"value": true
-				},
-				"structure": [
-					{
-						"propertyName": "Namespace",
-						"propertyKeyword": "namespace",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Path",
-						"propertyKeyword": "path",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					}
-				]
-			},
-			{
-				"propertyName": "Stage file format",
-				"propertyKeyword": "fileFormat",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": ["", "CSV", "JSON", "AVRO", "ORC", "PARQUET", "XML", "custom"],
-				"dependency": {
-					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
-				}
-			},
-			{
-				"propertyName": "External file format",
-				"propertyKeyword": "externalFileFormat",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "select",
-				"options": ["", "CSV", "JSON", "AVRO", "ORC", "PARQUET", "XML", "custom"],
-				"dependency": {
-					"key": "external",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Custom file format name",
-				"propertyKeyword": "customFileFormatName",
-				"propertyTooltip": "",
-				"propertyType": "text",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "fileFormat",
-							"value": "custom"
-						},
-						{
-							"key": "externalFileFormat",
-							"value": "custom"
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Format type options",
-				"propertyType": "block",
-				"propertyKeyword": "formatTypeOptions",
-				"propertyTooltip": "",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "fileFormat",
-							"value": "CSV"
-						},
-						{
-							"key": "externalFileFormat",
-							"value": "CSV"
-						}
-					]
-				},
-				"defaultValue": {
-					"COMPRESSION": "AUTO",
-					"RECORD_DELIMITER": "\\r\\n",
-					"FIELD_DELIMITER": ",",
-					"FILE_EXTENSION": "NONE",
-					"SKIP_HEADER": 0,
-					"DATE_FORMAT": "AUTO",
-					"TIME_FORMAT": "AUTO",
-					"TIMESTAMP_FORMAT": "AUTO",
-					"BINARY_FORMAT": "HEX",
-					"ESCAPE": "NONE",
-					"ESCAPE_UNENCLOSED_FIELD": "\\",
-					"TRIM_SPACE": false,
-					"FIELD_OPTIONALLY_ENCLOSED_BY": "NONE",
-					"NULL_IF": [{ "NULL_IF_item": "\\N" }],
-					"ERROR_ON_COLUMN_COUNT_MISMATCH": true,
-					"VALIDATE_UTF8": true,
-					"EMPTY_FIELD_AS_NULL": true,
-					"SKIP_BYTE_ORDER_MARK": true,
-					"ENCODING": "UTF8",
-					"SNAPPY_COMPRESSION": true,
-					"BINARY_AS_TEXT": true,
-					"ON_ERROR": "ABORT_STATEMENT"
-				},
-				"structure": [
-					{
-						"propertyName": "Compression",
-						"propertyKeyword": "COMPRESSION",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
-					},
-					{
-						"propertyName": "Record delimiter",
-						"propertyKeyword": "RECORD_DELIMITER",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Field delimiter",
-						"propertyKeyword": "FIELD_DELIMITER",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "File extension",
-						"propertyKeyword": "FILE_EXTENSION",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Skip header",
-						"propertyKeyword": "SKIP_HEADER",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"minValue": 0,
-						"maxValue": 1,
-						"step": 1
-					},
-					{
-						"propertyName": "Date format",
-						"propertyKeyword": "DATE_FORMAT",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Time format",
-						"propertyKeyword": "TIME_FORMAT",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Timestamp format",
-						"propertyKeyword": "TIMESTAMP_FORMAT",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Binary format",
-						"propertyKeyword": "BINARY_FORMAT",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["HEX", "BASE64", "UTF8"]
-					},
-					{
-						"propertyName": "Escape character",
-						"propertyKeyword": "ESCAPE",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Escape unenclosed field",
-						"propertyKeyword": "ESCAPE_UNENCLOSED_FIELD",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Trim space",
-						"propertyKeyword": "TRIM_SPACE",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Field optionally enclosed by",
-						"propertyKeyword": "FIELD_OPTIONALLY_ENCLOSED_BY",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "NULL if",
-						"propertyType": "group",
-						"propertyKeyword": "NULL_IF",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "value",
-								"propertyKeyword": "NULL_IF_item",
-								"propertyTooltip": "",
-								"propertyType": "text"
-							}
-						]
-					},
-					{
-						"propertyName": "Error on column count mismatch",
-						"propertyKeyword": "ERROR_ON_COLUMN_COUNT_MISMATCH",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Validate UTF8",
-						"propertyKeyword": "VALIDATE_UTF8",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Empty field as NULL",
-						"propertyKeyword": "EMPTY_FIELD_AS_NULL",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Skip byte order mark",
-						"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Encoding",
-						"propertyKeyword": "ENCODING",
-						"propertyType": "text"
-					}
-				]
-			},
-			{
-				"propertyName": "Format type options",
-				"propertyType": "block",
-				"propertyKeyword": "formatTypeOptions",
-				"propertyTooltip": "",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "fileFormat",
-							"value": "JSON"
-						},
-						{
-							"key": "externalFileFormat",
-							"value": "JSON"
-						}
-					]
-				},
-				"defaultValue": {
-					"COMPRESSION": "GZIP",
-					"FILE_EXTENSION": "JSON"
-				},
-				"structure": [
-					{
-						"propertyName": "Compression",
-						"propertyKeyword": "COMPRESSION",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
-					},
-					{
-						"propertyName": "File extension",
-						"propertyKeyword": "FILE_EXTENSION",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Enable octal",
-						"propertyKeyword": "ENABLE_OCTAL",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Allow duplicate",
-						"propertyKeyword": "ALLOW_DUPLICATE",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Strip outer array",
-						"propertyKeyword": "STRIP_OUTER_ARRAY",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Strip NULL values",
-						"propertyKeyword": "STRIP_NULL_VALUES",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Ignore UTF8 errors",
-						"propertyKeyword": "IGNORE_UTF8_ERRORS",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Skip byte order mark",
-						"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
-						"propertyType": "checkbox"
-					}
-				]
-			},
-			{
-				"propertyName": "Format type options",
-				"propertyType": "block",
-				"propertyKeyword": "formatTypeOptions",
-				"propertyTooltip": "",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "fileFormat",
-							"value": "AVRO"
-						},
-						{
-							"key": "externalFileFormat",
-							"value": "AVRO"
-						}
-					]
-				},
-				"structure": [
-					{
-						"propertyName": "Compression",
-						"propertyKeyword": "COMPRESSION",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
-					}
-				]
-			},
-			{
-				"propertyName": "Format type options",
-				"propertyType": "block",
-				"propertyKeyword": "formatTypeOptions",
-				"propertyTooltip": "",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "fileFormat",
-							"value": "ORC"
-						},
-						{
-							"key": "externalFileFormat",
-							"value": "ORC"
-						}
-					]
-				},
-				"defaultValue": {
-					"NULL_IF": [{ "NULL_IF_item": "\\N" }]
-				},
-				"structure": [
-					{
-						"propertyName": "Trim space",
-						"propertyKeyword": "TRIM_SPACE",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "NULL if",
-						"propertyType": "group",
-						"propertyKeyword": "NULL_IF",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "value",
-								"propertyKeyword": "NULL_IF_item",
-								"propertyTooltip": "",
-								"propertyType": "text"
-							}
-						]
-					}
-				]
-			},
-			{
-				"propertyName": "Format type options",
-				"propertyType": "block",
-				"propertyKeyword": "formatTypeOptions",
-				"propertyTooltip": "",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "fileFormat",
-							"value": "PARQUET"
-						},
-						{
-							"key": "externalFileFormat",
-							"value": "PARQUET"
-						}
-					]
-				},
-				"structure": [
-					{
-						"propertyName": "Compression",
-						"propertyKeyword": "COMPRESSION",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["AUTO", "LZO", "SNAPPY", "NONE"]
-					},
-					{
-						"propertyName": "Snappy compression",
-						"propertyKeyword": "SNAPPY_COMPRESSION",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Binary as text",
-						"propertyKeyword": "BINARY_AS_TEXT",
-						"propertyType": "checkbox"
-					}
-				]
-			},
-			{
-				"propertyName": "Format type options",
-				"propertyType": "block",
-				"propertyKeyword": "formatTypeOptions",
-				"propertyTooltip": "",
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"key": "fileFormat",
-							"value": "XML"
-						},
-						{
-							"key": "externalFileFormat",
-							"value": "XML"
-						}
-					]
-				},
-				"structure": [
-					{
-						"propertyName": "Compression",
-						"propertyKeyword": "COMPRESSION",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
-					},
-					{
-						"propertyName": "Ignore UTF8 errors",
-						"propertyKeyword": "IGNORE_UTF8_ERRORS",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Preserve space",
-						"propertyKeyword": "PRESERVE_SPACE",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Strip outer element",
-						"propertyKeyword": "STRIP_OUTER_ELEMENT",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Disable Snowflake data",
-						"propertyKeyword": "DISABLE_SNOWFLAKE_DATA",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Disable auto convert",
-						"propertyKeyword": "DISABLE_AUTO_CONVERT",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Skip byte order mark",
-						"propertyKeyword": "SKIP_BYTE_ORDER_MARK",
-						"propertyType": "checkbox"
-					}
-				]
-			},
-			{
-				"propertyName": "Stage copy options",
-				"propertyKeyword": "stageCopyOptions",
-				"dependency": {
-					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
-				},
-				"propertyType": "block",
-				"structure": [
-					{
-						"propertyName": "On-error",
-						"propertyKeyword": "ON_ERROR",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["CONTINUE", "SKIP_FILE", "SKIP_FILE_<num>", "SKIP_FILE_<num>%", "ABORT_STATEMENT"]
-					},
-					{
-						"propertyName": "Skip-file num",
-						"propertyKeyword": "skipFileNum",
-						"propertyValidate": true,
-						"propertyType": "numeric",
-						"valueType": "number",
-						"minValue": 0,
-						"dependency": {
-							"key": "ON_ERROR",
-							"value": "SKIP_FILE_<num>"
-						}
-					},
-					{
-						"propertyName": "Skip-file num %",
-						"propertyKeyword": "skipFileNumPct",
-						"propertyValidate": true,
-						"propertyType": "numeric",
-						"valueType": "number",
-						"minValue": 0,
-						"maxValue": 100,
-						"dependency": {
-							"key": "ON_ERROR",
-							"value": "SKIP_FILE_<num>%"
-						}
-					},
-					{
-						"propertyName": "Size limit",
-						"propertyKeyword": "sizeLimit",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Size limit num",
-						"propertyKeyword": "SIZE_LIMIT",
-						"propertyValidate": true,
-						"propertyType": "numeric",
-						"valueType": "number",
-						"minValue": 1,
-						"dependency": {
-							"key": "sizeLimit",
-							"value": true
-						}
-					},
-					{
-						"propertyName": "Purge",
-						"propertyKeyword": "PURGE",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Return failed only",
-						"propertyKeyword": "RETURN_FAILED_ONLY",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Match by column name",
-						"propertyKeyword": "MATCH_BY_COLUMN_NAME",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["NONE", "CASE_SENSITIVE", "CASE_INSENSITIVE"]
-					},
-					{
-						"propertyName": "Enforce length",
-						"propertyKeyword": "ENFORCE_LENGTH",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Truncate columns",
-						"propertyKeyword": "TRUNCATECOLUMNS",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Load uncertain files",
-						"propertyKeyword": "LOAD_UNCERTAIN_FILES",
-						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Force",
-						"propertyKeyword": "FORCE",
-						"propertyType": "checkbox"
-					}
-				]
-			},
-			{
-				"propertyName": "Data retention in days",
-				"propertyKeyword": "DATA_RETENTION_TIME_IN_DAYS",
-				"propertyTooltip": "Number of days for which Snowflake retains historical data for performing Time Travel actions (SELECT, CLONE, UNDROP) on the object. A value of 0 effectively disables Time Travel for the specified database, schema, or table",
-				"propertyValidate": true,
-				"propertyType": "numeric",
-				"valueType": "number",
-				"minValue": 0,
-				"maxValue": 90,
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"type": "and",
-							"values": [
-								{
-									"type": "not",
-									"values": {
-										"key": "external",
-										"value": true
-									}
-								},
-								{
-									"type": "not",
-									"values": {
-										"key": "iceberg",
-										"value": true
-									}
-								}
-							]
-						},
-						{
-							"type": "and",
-							"values": [
-								{
-									"key": "iceberg",
-									"value": true
-								},
-								{
-									"key": "catalogMgmt",
-									"value": "snowflake"
-								}
-							]
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Max data extension time in days",
-				"propertyKeyword": "MAX_DATA_EXTENSION_TIME_IN_DAYS",
-				"propertyTooltip": "The maximum number of days Snowflake can extend the data retention period for tables to ingest streaming data to prevent streams from becoming stale. This parameter does not apply to a database created from a share since it is read-only.",
-				"propertyValidate": true,
-				"propertyType": "numeric",
-				"valueType": "number",
-				"minValue": 0,
-				"maxValue": 90,
-				"dependency": {
-					"type": "or",
-					"values": [
-						{
-							"type": "and",
-							"values": [
-								{
-									"type": "not",
-									"values": {
-										"key": "external",
-										"value": true
-									}
-								},
-								{
-									"type": "not",
-									"values": {
-										"key": "iceberg",
-										"value": true
-									}
-								}
-							]
-						},
-						{
-							"type": "and",
-							"values": [
-								{
-									"key": "iceberg",
-									"value": true
-								},
-								{
-									"key": "catalogMgmt",
-									"value": "snowflake"
-								}
-							]
-						}
-					]
-				}
-			},
-			{
-				"propertyName": "Like",
-				"propertyKeyword": "like",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "selecthashed",
-				"template": "entities",
-				"withEmptyOption": true,
-				"excludeCurrent": true,
-				"dependency": {
-					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
-				}
-			},
-			{
-				"propertyName": "Clone",
-				"propertyKeyword": "clone",
-				"propertyTooltip": "Select from list of options",
-				"propertyType": "selecthashed",
-				"template": "entities",
-				"withEmptyOption": true,
-				"excludeCurrent": true,
-				"dependency": {
-					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
-				}
-			},
-			{
-				"propertyName": "Clone parameters",
-				"propertyType": "block",
-				"propertyKeyword": "cloneParams",
-				"propertyTooltip": "",
-				"dependency": {
-					"type": "not",
-					"values": [
-						{
-							"key": "clone",
-							"exist": false
-						},
-						{
-							"key": "clone",
-							"value": ""
-						}
-					]
-				},
-				"structure": [
-					{
-						"propertyName": "At or before",
-						"propertyKeyword": "atOrBefore",
-						"propertyTooltip": "Select from list of options",
-						"propertyType": "select",
-						"options": ["at", "before"]
-					},
-					{
-						"propertyName": "Timestamp",
-						"propertyKeyword": "cloneTimestamp",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Offset",
-						"propertyKeyword": "cloneOffset",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Statement",
-						"propertyKeyword": "cloneStatement",
-						"propertyType": "text"
-					}
-				]
-			},
-			{
-				"propertyName": "As Select Statement",
-				"propertyKeyword": "selectStatement",
-				"propertyType": "details",
-				"template": "textarea",
-				"markdown": false
-			},
-			{
-				"propertyName": "Refresh on create",
-				"propertyKeyword": "REFRESH_ON_CREATE",
-				"propertyType": "checkbox",
-				"dependency": {
-					"key": "external",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Auto refresh",
-				"propertyKeyword": "AUTO_REFRESH",
-				"propertyType": "checkbox",
-				"dependency": {
-					"key": "external",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Regex pattern",
-				"propertyKeyword": "PATTERN",
-				"propertyType": "text",
-				"dependency": {
-					"key": "external",
-					"value": true
-				}
-			},
-			{
-				"propertyName": "Copy grants",
-				"propertyKeyword": "copyGrants",
-				"propertyType": "checkbox"
-			},
-			{
-				"propertyName": "Table Tags",
-				"propertyKeyword": "tableTags",
-				"propertyTooltip": "",
-				"propertyType": "group",
-				"groupItemLimit": 50,
-				"helpUrl": "https://hackolade.com/help/Snowflake.html#Tags",
-				"structure": [
-					{
-						"propertyName": "Tag name",
-						"propertyKeyword": "tagName",
-						"propertyTooltip": "",
-						"propertyType": "selecthashed",
-						"withEmptyOption": true,
-						"propertySource": {
-							"level": "container",
-							"source": "tags.*.name"
-						}
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "selecthashed",
-						"withEmptyOption": true,
-						"propertySource": {
-							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
-						},
-						"dependency": {
-							"type": "and",
-							"values": [
-								{
-									"type": "not",
-									"values": [
-										{
-											"level": "container",
-											"source": "tags.${tagName}",
-											"key": "allowedValues",
-											"isEmpty": true
-										}
-									]
-								},
-								{
-									"level": "container",
-									"source": "tags.${tagName}",
-									"key": "allowedValues",
-									"exist": true
-								}
-							]
-						},
-						"shouldValidate": true,
-						"validation": {
-							"required": true
-						}
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "text",
-						"propertySource": {
-							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
-						},
-						"dependency": {
-							"type": "and",
-							"values": [
-								{
-									"key": "tagName",
-									"pattern": "^.+$"
-								},
-								{
-									"type": "or",
-									"values": [
-										{
-											"level": "container",
-											"source": "tags.${tagName}",
-											"key": "allowedValues",
-											"isEmpty": true
-										},
-										{
-											"type": "not",
-											"values": [
-												{
-													"level": "container",
-													"source": "tags.${tagName}",
-													"key": "allowedValues",
-													"exist": true
-												}
-											]
-										}
-									]
-								}
-							]
-						},
-						"shouldValidate": true,
-						"validation": {
-							"required": true,
-							"regex": "^.{0,256}$"
-						}
-					},
-					{
-						"propertyName": "Value",
-						"propertyKeyword": "tagValue",
-						"propertyTooltip": "",
-						"propertyType": "select",
-						"disabled": true,
-						"dependency": {
-							"type": "or",
-							"values": [
-								{
-									"key": "tagName",
-									"exist": false
-								},
-								{
-									"key": "tagName",
-									"pattern": "^$"
-								}
-							]
-						}
-					}
-				]
-			},
-			{
-				"propertyName": "Remarks",
-				"propertyKeyword": "comments",
-				"shouldValidate": false,
-				"propertyTooltip": "remarks",
-				"addTimestampButton": true,
-				"propertyType": "details",
-				"template": "textarea",
-				"valueType": "string"
-			},
-			{
-				"propertyName": "Custom scripts",
-				"propertyType": "block",
-				"propertyKeyword": "customScripts",
-				"propertyTooltip": "",
-				"structure": [
-					{
-						"propertyName": "Before CREATE TABLE",
-						"propertyKeyword": "beforeCreateEntity",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					},
-					{
-						"propertyName": "After CREATE TABLE",
-						"propertyKeyword": "afterCreateEntity",
-						"propertyType": "block",
-						"propertyTooltip": "",
-						"structure": [
-							{
-								"propertyName": "Script",
-								"propertyKeyword": "script",
-								"propertyType": "details",
-								"markdown": false,
-								"template": "codeEditor",
-								"templateOptions": {
-									"editorDialect": "sql",
-									"customScriptVariables": true
-								}
-							}
-						]
-					}
-				]
-			}
-		],
-		"columnsRatio": [3.7, 5]
-	},
-	{
-		"lowerTab": "Composite keys",
-		"structure": [
-			{
-				"propertyName": "Primary key",
-				"propertyType": "group",
-				"groupItemLimit": 1,
-				"propertyKeyword": "primaryKey",
-				"propertyTooltip": {
-					"disabled": [
-						{
-							"tooltip": "Remove the existing single column primary key definition prior to unlock the possibility to create a composite primary key definition for this table",
-							"dependency": {
-								"type": "and",
-								"values": [
-									{
-										"level": "children",
-										"key": "primaryKey",
-										"value": true
-									},
-									{
-										"type": "not",
-										"values": {
-											"level": "children",
-											"key": "compositePrimaryKey",
-											"value": true
-										}
-									}
-								]
-							}
-						},
-						{
-							"tooltip": "Remove or update the existing composite primary key definition prior to unlock the possibility to create a new composite primary key definition for this table",
-							"dependency": {
-								"key": "primaryKey",
-								"minLength": 1
-							}
-						}
-					]
-				},
-				"disabledOnCondition": [
-					{
-						"level": "children",
-						"value": {
-							"type": "and",
-							"values": [
-								{
-									"key": "primaryKey",
-									"value": true
-								},
-								{
-									"type": "or",
-									"values": [
-										{
-											"key": "compositePrimaryKey",
-											"value": false
-										},
-										{
-											"key": "compositePrimaryKey",
-											"exist": false
-										}
-									]
-								},
-								{
-									"type": "or",
-									"values": [
-										{
-											"key": "compositeUniqueKey",
-											"value": false
-										},
-										{
-											"key": "compositeUniqueKey",
-											"exist": false
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"structure": [
-					{
-						"propertyName": "Constraint name",
-						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Key",
-						"propertyKeyword": "compositePrimaryKey",
-						"propertyType": "primaryKeySetter",
-						"abbr": "pk",
-						"attributeList": []
-					}
-				]
-			},
-			{
-				"propertyName": "Unique key",
-				"propertyType": "group",
-				"propertyKeyword": "uniqueKey",
-				"propertyTooltip": "",
-				"structure": [
-					{
-						"propertyName": "Constraint name",
-						"propertyKeyword": "constraintName",
-						"propertyTooltip": "",
-						"propertyType": "text"
-					},
-					{
-						"propertyName": "Key",
-						"propertyKeyword": "compositeUniqueKey",
-						"propertyType": "compositeKeySetter",
-						"disabledItemStrategy": "default",
-						"setPrimaryKey": false,
-						"abbr": " ",
-						"attributeList": [],
-						"template": "collectiontree",
-						"isCompositeKey": true
-					},
-					{
-						"propertyName": "Alternate key",
-						"propertyKeyword": "alternateKey",
-						"propertyTooltip": "",
-						"propertyType": "checkbox",
-						"setFieldPropertyBy": "compositeUniqueKey"
-					}
-				]
-			}
-		]
-	}
+  {
+    "lowerTab": "Details",
+    "structure": [
+      {
+        "propertyName": "Case sensitive",
+        "propertyKeyword": "isCaseSensitive",
+        "propertyType": "checkbox"
+      },
+      {
+        "propertyName": "Comments",
+        "propertyKeyword": "description",
+        "propertyTooltip": "comments",
+        "addTimestampButton": false,
+        "propertyType": "details",
+        "template": "textarea"
+      },
+      {
+        "propertyName": "Table role",
+        "propertyKeyword": "tableRole",
+        "propertyTooltip": "Select from list of options",
+        "propertyType": "select",
+        "options": ["Dimension", "Fact", "Outrigger", "Staging"],
+        "dependency": {
+          "level": "model",
+          "key": "modelingMethodology",
+          "value": "Dimensional"
+        }
+      },
+      {
+        "propertyName": "Vault component",
+        "propertyKeyword": "vaultComponent",
+        "propertyTooltip": "Select from list of options",
+        "propertyType": "select",
+        "options": ["Hub", "Link", "Satellite", "Bridge", "Point in Time", "Reference"],
+        "dependency": {
+          "level": "model",
+          "key": "modelingMethodology",
+          "value": "Vault"
+        }
+      },
+      {
+        "propertyName": "Dynamic",
+        "propertyKeyword": "dynamic",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "external",
+            "value": true
+          }
+        }
+      },
+      {
+        "propertyName": "Or replace",
+        "propertyKeyword": "orReplace",
+        "propertyType": "checkbox",
+        "disabledOnCondition": {
+          "key": "ifNotExist",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "If not exist",
+        "propertyKeyword": "ifNotExist",
+        "propertyTooltip": "if the specified table already exists, the command should make no changes and return a message that the table exists, rather than terminating with an error. ",
+        "propertyType": "checkbox",
+        "disabledOnCondition": {
+          "key": "orReplace",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Iceberg",
+        "propertyKeyword": "iceberg",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "external",
+              "value": true
+            },
+            {
+              "key": "transient",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "External volume",
+        "propertyKeyword": "externalVolume",
+        "propertyTooltip": "Specifies the identifier (name) for the external volume where the Iceberg table stores its metadata files and data in Parquet format. Iceberg metadata and manifest files store the table schema, partitions, snapshots, and other metadata.",
+        "propertyType": "text",
+        "dependency": {
+          "key": "iceberg",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Catalog management",
+        "propertyKeyword": "catalogMgmt",
+        "propertyType": "select",
+        "options": ["snowflake", "external"],
+        "dependency": {
+          "key": "iceberg",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "External catalog",
+        "propertyKeyword": "catalogExternal",
+        "propertyTooltip": "Specifies the identifier (name) of the catalog integration for this table.",
+        "propertyType": "select",
+        "options": ["glue", "iceberg files", "delta files", "iceberg rest"],
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "catalogMgmt",
+              "value": "external"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Catalog",
+        "propertyKeyword": "catalog",
+        "propertyType": "text",
+        "defaultValue": "snowflake",
+        "disabled": true,
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "catalogMgmt",
+              "value": "snowflake"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Catalog",
+        "propertyKeyword": "catalog",
+        "propertyTooltip": "Specifies the catalog integration name.",
+        "propertyType": "text",
+        "defaultValue": "",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "catalogMgmt",
+              "value": "external"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Base location",
+        "propertyKeyword": "baseLocation",
+        "propertyTooltip": "The path to a directory where Snowflake can write data and metadata files for the table.",
+        "propertyType": "text",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "type": "or",
+              "values": [
+                {
+                  "key": "catalog",
+                  "value": "snowflake"
+                },
+                {
+                  "key": "catalogExternal",
+                  "value": "delta files"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Catalog Sync",
+        "propertyKeyword": "catalogSync",
+        "propertyTooltip": "Optionally specifies the name of a catalog integration configured for Polaris Catalog.",
+        "propertyType": "text",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "catalog",
+              "value": "snowflake"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Storage serialization policy",
+        "propertyKeyword": "storageSerializationPolicy",
+        "propertyTooltip": "Specifies the storage serialization policy for the table. If not specified at table creation, the table inherits the value set at the schema, database, or account level. If the value isn’t specified at any level, the table uses the default value.",
+        "propertyType": "select",
+        "defaultValue": "optimized",
+        "options": ["optimized", "compatible"],
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "catalog",
+              "value": "snowflake"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Change tracking",
+        "propertyKeyword": "changeTracking",
+        "propertyTooltip": "Specifies whether to enable change tracking on the table.",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "catalog",
+              "value": "snowflake"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Default DDL collation",
+        "propertyKeyword": "defaultDdlCollation",
+        "propertyTooltip": "Specifies a default collation specification for the columns in the table, including columns added to the table in the future.",
+        "propertyType": "text",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "catalog",
+              "value": "snowflake"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Catalog table name",
+        "propertyKeyword": "catalogTableName",
+        "propertyTooltip": "Specifies the table name as recognized by the AWS Glue Data Catalog. ",
+        "propertyType": "text",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "type": "or",
+              "values": [
+                {
+                  "key": "catalogExternal",
+                  "value": "glue"
+                },
+                {
+                  "key": "catalogExternal",
+                  "value": "iceberg rest"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Catalog namespace",
+        "propertyKeyword": "catalogNamespace",
+        "propertyTooltip": "Optionally specifies the namespace (for example, my_database) for the REST catalog source, and overrides the default catalog namespace specified with the catalog integration.",
+        "propertyType": "text",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "type": "or",
+              "values": [
+                {
+                  "key": "catalogExternal",
+                  "value": "glue"
+                },
+                {
+                  "key": "catalogExternal",
+                  "value": "iceberg rest"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Metadata file path",
+        "propertyKeyword": "metadataFilePath",
+        "propertyTooltip": "Specifies the relative path of the Iceberg metadata file to use for column definitions.",
+        "propertyType": "text",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "catalogExternal",
+              "value": "iceberg files"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Replace invalid characters",
+        "propertyKeyword": "replaceInvalidCharacters",
+        "propertyTooltip": "Specifies whether to replace invalid UTF-8 characters with the Unicode replacement character in query results.",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "type": "or",
+              "values": [
+                {
+                  "key": "catalogExternal",
+                  "value": "glue"
+                },
+                {
+                  "key": "catalogExternal",
+                  "value": "iceberg files"
+                },
+                {
+                  "key": "catalogExternal",
+                  "value": "delta files"
+                },
+                {
+                  "key": "catalogExternal",
+                  "value": "iceberg rest"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Auto refresh",
+        "propertyKeyword": "autoRefresh",
+        "propertyTooltip": "Specifies whether Snowflake should automatically poll the external Iceberg catalog associated with the table for metadata updates when you use automated refresh.",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "and",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "type": "or",
+              "values": [
+                {
+                  "key": "catalogExternal",
+                  "value": "glue"
+                },
+                {
+                  "key": "catalogExternal",
+                  "value": "iceberg rest"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Target Lag",
+        "propertyKeyword": "targetLag",
+        "propertyType": "block",
+        "structure": [
+          {
+            "propertyName": "Time span",
+            "propertyKeyword": "targetLagTimeSpan",
+            "propertyType": "select",
+            "options": ["seconds", "minutes", "hours", "days"]
+          },
+          {
+            "propertyName": "Amount",
+            "propertyKeyword": "targetLagAmount",
+            "propertyType": "numeric"
+          },
+          {
+            "propertyName": "Downstream",
+            "propertyKeyword": "targetLagDownstream",
+            "propertyType": "checkbox"
+          }
+        ],
+        "dependency": {
+          "key": "dynamic",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Warehouse",
+        "propertyKeyword": "warehouse",
+        "propertyType": "text",
+        "dependency": {
+          "key": "dynamic",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Temporary",
+        "propertyKeyword": "temporary",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "dynamic",
+              "value": true
+            },
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "external",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Transient",
+        "propertyKeyword": "transient",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "external",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Refresh Mode",
+        "propertyKeyword": "refreshMode",
+        "propertyType": "select",
+        "options": ["", "auto", "full", "incremental"],
+        "dependency": {
+          "key": "dynamic",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Initialize",
+        "propertyKeyword": "initialize",
+        "propertyType": "select",
+        "options": ["", "on_create", "on_schedule"],
+        "dependency": {
+          "key": "dynamic",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "External",
+        "propertyKeyword": "external",
+        "propertyType": "checkbox",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "dynamic",
+              "value": true
+            },
+            {
+              "key": "iceberg",
+              "value": true
+            },
+            {
+              "key": "transient",
+              "value": true
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Cluster by",
+        "propertyKeyword": "clusteringKey",
+        "propertyType": "group",
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "external",
+            "value": true
+          }
+        },
+        "structure": [
+          {
+            "propertyName": "Expression",
+            "propertyKeyword": "expression",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Key",
+            "propertyKeyword": "clusteringKey",
+            "propertyType": "compositeKeySetter",
+            "disabledItemStrategy": "default",
+            "abbr": "CK",
+            "setPrimaryKey": false,
+            "template": "collectiontree",
+            "isCompositeKey": true,
+            "templateOptions": {
+              "maxFields": 1
+            }
+          }
+        ]
+      },
+      {
+        "propertyName": "Partition by",
+        "propertyKeyword": "partitioningKey",
+        "propertyType": "primaryKeySetter",
+        "abbr": "PK",
+        "dependency": {
+          "key": "external",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "With location",
+        "propertyType": "block",
+        "propertyKeyword": "location",
+        "propertyTooltip": "",
+        "dependency": {
+          "key": "external",
+          "value": true
+        },
+        "structure": [
+          {
+            "propertyName": "Namespace",
+            "propertyKeyword": "namespace",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Path",
+            "propertyKeyword": "path",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          }
+        ]
+      },
+      {
+        "propertyName": "Stage file format",
+        "propertyKeyword": "fileFormat",
+        "propertyTooltip": "Select from list of options",
+        "propertyType": "select",
+        "options": ["", "CSV", "JSON", "AVRO", "ORC", "PARQUET", "XML", "custom"],
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "external",
+            "value": true
+          }
+        }
+      },
+      {
+        "propertyName": "External file format",
+        "propertyKeyword": "externalFileFormat",
+        "propertyTooltip": "Select from list of options",
+        "propertyType": "select",
+        "options": ["", "CSV", "JSON", "AVRO", "ORC", "PARQUET", "XML", "custom"],
+        "dependency": {
+          "key": "external",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Custom file format name",
+        "propertyKeyword": "customFileFormatName",
+        "propertyTooltip": "",
+        "propertyType": "text",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "fileFormat",
+              "value": "custom"
+            },
+            {
+              "key": "externalFileFormat",
+              "value": "custom"
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Format type options",
+        "propertyType": "block",
+        "propertyKeyword": "formatTypeOptions",
+        "propertyTooltip": "",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "fileFormat",
+              "value": "CSV"
+            },
+            {
+              "key": "externalFileFormat",
+              "value": "CSV"
+            }
+          ]
+        },
+        "defaultValue": {
+          "COMPRESSION": "AUTO",
+          "RECORD_DELIMITER": "\\r\\n",
+          "FIELD_DELIMITER": ",",
+          "FILE_EXTENSION": "NONE",
+          "SKIP_HEADER": 0,
+          "DATE_FORMAT": "AUTO",
+          "TIME_FORMAT": "AUTO",
+          "TIMESTAMP_FORMAT": "AUTO",
+          "BINARY_FORMAT": "HEX",
+          "ESCAPE": "NONE",
+          "ESCAPE_UNENCLOSED_FIELD": "\\",
+          "TRIM_SPACE": false,
+          "FIELD_OPTIONALLY_ENCLOSED_BY": "NONE",
+          "NULL_IF": [{ "NULL_IF_item": "\\N" }],
+          "ERROR_ON_COLUMN_COUNT_MISMATCH": true,
+          "VALIDATE_UTF8": true,
+          "EMPTY_FIELD_AS_NULL": true,
+          "SKIP_BYTE_ORDER_MARK": true,
+          "ENCODING": "UTF8",
+          "SNAPPY_COMPRESSION": true,
+          "BINARY_AS_TEXT": true,
+          "ON_ERROR": "ABORT_STATEMENT"
+        },
+        "structure": [
+          {
+            "propertyName": "Compression",
+            "propertyKeyword": "COMPRESSION",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
+          },
+          {
+            "propertyName": "Record delimiter",
+            "propertyKeyword": "RECORD_DELIMITER",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Field delimiter",
+            "propertyKeyword": "FIELD_DELIMITER",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "File extension",
+            "propertyKeyword": "FILE_EXTENSION",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Skip header",
+            "propertyKeyword": "SKIP_HEADER",
+            "propertyType": "numeric",
+            "valueType": "number",
+            "minValue": 0,
+            "maxValue": 1,
+            "step": 1
+          },
+          {
+            "propertyName": "Date format",
+            "propertyKeyword": "DATE_FORMAT",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Time format",
+            "propertyKeyword": "TIME_FORMAT",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Timestamp format",
+            "propertyKeyword": "TIMESTAMP_FORMAT",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Binary format",
+            "propertyKeyword": "BINARY_FORMAT",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["HEX", "BASE64", "UTF8"]
+          },
+          {
+            "propertyName": "Escape character",
+            "propertyKeyword": "ESCAPE",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Escape unenclosed field",
+            "propertyKeyword": "ESCAPE_UNENCLOSED_FIELD",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Trim space",
+            "propertyKeyword": "TRIM_SPACE",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Field optionally enclosed by",
+            "propertyKeyword": "FIELD_OPTIONALLY_ENCLOSED_BY",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "NULL if",
+            "propertyType": "group",
+            "propertyKeyword": "NULL_IF",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "value",
+                "propertyKeyword": "NULL_IF_item",
+                "propertyTooltip": "",
+                "propertyType": "text"
+              }
+            ]
+          },
+          {
+            "propertyName": "Error on column count mismatch",
+            "propertyKeyword": "ERROR_ON_COLUMN_COUNT_MISMATCH",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Validate UTF8",
+            "propertyKeyword": "VALIDATE_UTF8",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Empty field as NULL",
+            "propertyKeyword": "EMPTY_FIELD_AS_NULL",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Skip byte order mark",
+            "propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Encoding",
+            "propertyKeyword": "ENCODING",
+            "propertyType": "text"
+          }
+        ]
+      },
+      {
+        "propertyName": "Format type options",
+        "propertyType": "block",
+        "propertyKeyword": "formatTypeOptions",
+        "propertyTooltip": "",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "fileFormat",
+              "value": "JSON"
+            },
+            {
+              "key": "externalFileFormat",
+              "value": "JSON"
+            }
+          ]
+        },
+        "defaultValue": {
+          "COMPRESSION": "GZIP",
+          "FILE_EXTENSION": "JSON"
+        },
+        "structure": [
+          {
+            "propertyName": "Compression",
+            "propertyKeyword": "COMPRESSION",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
+          },
+          {
+            "propertyName": "File extension",
+            "propertyKeyword": "FILE_EXTENSION",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Enable octal",
+            "propertyKeyword": "ENABLE_OCTAL",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Allow duplicate",
+            "propertyKeyword": "ALLOW_DUPLICATE",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Strip outer array",
+            "propertyKeyword": "STRIP_OUTER_ARRAY",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Strip NULL values",
+            "propertyKeyword": "STRIP_NULL_VALUES",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Ignore UTF8 errors",
+            "propertyKeyword": "IGNORE_UTF8_ERRORS",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Skip byte order mark",
+            "propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+            "propertyType": "checkbox"
+          }
+        ]
+      },
+      {
+        "propertyName": "Format type options",
+        "propertyType": "block",
+        "propertyKeyword": "formatTypeOptions",
+        "propertyTooltip": "",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "fileFormat",
+              "value": "AVRO"
+            },
+            {
+              "key": "externalFileFormat",
+              "value": "AVRO"
+            }
+          ]
+        },
+        "structure": [
+          {
+            "propertyName": "Compression",
+            "propertyKeyword": "COMPRESSION",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
+          }
+        ]
+      },
+      {
+        "propertyName": "Format type options",
+        "propertyType": "block",
+        "propertyKeyword": "formatTypeOptions",
+        "propertyTooltip": "",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "fileFormat",
+              "value": "ORC"
+            },
+            {
+              "key": "externalFileFormat",
+              "value": "ORC"
+            }
+          ]
+        },
+        "defaultValue": {
+          "NULL_IF": [{ "NULL_IF_item": "\\N" }]
+        },
+        "structure": [
+          {
+            "propertyName": "Trim space",
+            "propertyKeyword": "TRIM_SPACE",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "NULL if",
+            "propertyType": "group",
+            "propertyKeyword": "NULL_IF",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "value",
+                "propertyKeyword": "NULL_IF_item",
+                "propertyTooltip": "",
+                "propertyType": "text"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "propertyName": "Format type options",
+        "propertyType": "block",
+        "propertyKeyword": "formatTypeOptions",
+        "propertyTooltip": "",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "fileFormat",
+              "value": "PARQUET"
+            },
+            {
+              "key": "externalFileFormat",
+              "value": "PARQUET"
+            }
+          ]
+        },
+        "structure": [
+          {
+            "propertyName": "Compression",
+            "propertyKeyword": "COMPRESSION",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["AUTO", "LZO", "SNAPPY", "NONE"]
+          },
+          {
+            "propertyName": "Snappy compression",
+            "propertyKeyword": "SNAPPY_COMPRESSION",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Binary as text",
+            "propertyKeyword": "BINARY_AS_TEXT",
+            "propertyType": "checkbox"
+          }
+        ]
+      },
+      {
+        "propertyName": "Format type options",
+        "propertyType": "block",
+        "propertyKeyword": "formatTypeOptions",
+        "propertyTooltip": "",
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "key": "fileFormat",
+              "value": "XML"
+            },
+            {
+              "key": "externalFileFormat",
+              "value": "XML"
+            }
+          ]
+        },
+        "structure": [
+          {
+            "propertyName": "Compression",
+            "propertyKeyword": "COMPRESSION",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["AUTO", "GZIP", "BZ2", "BROTLI", "ZSTD", "DEFLATE", "RAW_DEFLATE", "NONE"]
+          },
+          {
+            "propertyName": "Ignore UTF8 errors",
+            "propertyKeyword": "IGNORE_UTF8_ERRORS",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Preserve space",
+            "propertyKeyword": "PRESERVE_SPACE",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Strip outer element",
+            "propertyKeyword": "STRIP_OUTER_ELEMENT",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Disable Snowflake data",
+            "propertyKeyword": "DISABLE_SNOWFLAKE_DATA",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Disable auto convert",
+            "propertyKeyword": "DISABLE_AUTO_CONVERT",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Skip byte order mark",
+            "propertyKeyword": "SKIP_BYTE_ORDER_MARK",
+            "propertyType": "checkbox"
+          }
+        ]
+      },
+      {
+        "propertyName": "Stage copy options",
+        "propertyKeyword": "stageCopyOptions",
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "external",
+            "value": true
+          }
+        },
+        "propertyType": "block",
+        "structure": [
+          {
+            "propertyName": "On-error",
+            "propertyKeyword": "ON_ERROR",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["CONTINUE", "SKIP_FILE", "SKIP_FILE_<num>", "SKIP_FILE_<num>%", "ABORT_STATEMENT"]
+          },
+          {
+            "propertyName": "Skip-file num",
+            "propertyKeyword": "skipFileNum",
+            "propertyValidate": true,
+            "propertyType": "numeric",
+            "valueType": "number",
+            "minValue": 0,
+            "dependency": {
+              "key": "ON_ERROR",
+              "value": "SKIP_FILE_<num>"
+            }
+          },
+          {
+            "propertyName": "Skip-file num %",
+            "propertyKeyword": "skipFileNumPct",
+            "propertyValidate": true,
+            "propertyType": "numeric",
+            "valueType": "number",
+            "minValue": 0,
+            "maxValue": 100,
+            "dependency": {
+              "key": "ON_ERROR",
+              "value": "SKIP_FILE_<num>%"
+            }
+          },
+          {
+            "propertyName": "Size limit",
+            "propertyKeyword": "sizeLimit",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Size limit num",
+            "propertyKeyword": "SIZE_LIMIT",
+            "propertyValidate": true,
+            "propertyType": "numeric",
+            "valueType": "number",
+            "minValue": 1,
+            "dependency": {
+              "key": "sizeLimit",
+              "value": true
+            }
+          },
+          {
+            "propertyName": "Purge",
+            "propertyKeyword": "PURGE",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Return failed only",
+            "propertyKeyword": "RETURN_FAILED_ONLY",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Match by column name",
+            "propertyKeyword": "MATCH_BY_COLUMN_NAME",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["NONE", "CASE_SENSITIVE", "CASE_INSENSITIVE"]
+          },
+          {
+            "propertyName": "Enforce length",
+            "propertyKeyword": "ENFORCE_LENGTH",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Truncate columns",
+            "propertyKeyword": "TRUNCATECOLUMNS",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Load uncertain files",
+            "propertyKeyword": "LOAD_UNCERTAIN_FILES",
+            "propertyType": "checkbox"
+          },
+          {
+            "propertyName": "Force",
+            "propertyKeyword": "FORCE",
+            "propertyType": "checkbox"
+          }
+        ]
+      },
+      {
+        "propertyName": "Data retention in days",
+        "propertyKeyword": "DATA_RETENTION_TIME_IN_DAYS",
+        "propertyTooltip": "Number of days for which Snowflake retains historical data for performing Time Travel actions (SELECT, CLONE, UNDROP) on the object. A value of 0 effectively disables Time Travel for the specified database, schema, or table",
+        "propertyValidate": true,
+        "propertyType": "numeric",
+        "valueType": "number",
+        "minValue": 0,
+        "maxValue": 90,
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "type": "and",
+              "values": [
+                {
+                  "type": "not",
+                  "values": {
+                    "key": "external",
+                    "value": true
+                  }
+                },
+                {
+                  "type": "not",
+                  "values": {
+                    "key": "iceberg",
+                    "value": true
+                  }
+                }
+              ]
+            },
+            {
+              "type": "and",
+              "values": [
+                {
+                  "key": "iceberg",
+                  "value": true
+                },
+                {
+                  "key": "catalogMgmt",
+                  "value": "snowflake"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Max data extension time in days",
+        "propertyKeyword": "MAX_DATA_EXTENSION_TIME_IN_DAYS",
+        "propertyTooltip": "The maximum number of days Snowflake can extend the data retention period for tables to ingest streaming data to prevent streams from becoming stale. This parameter does not apply to a database created from a share since it is read-only.",
+        "propertyValidate": true,
+        "propertyType": "numeric",
+        "valueType": "number",
+        "minValue": 0,
+        "maxValue": 90,
+        "dependency": {
+          "type": "or",
+          "values": [
+            {
+              "type": "and",
+              "values": [
+                {
+                  "type": "not",
+                  "values": {
+                    "key": "external",
+                    "value": true
+                  }
+                },
+                {
+                  "type": "not",
+                  "values": {
+                    "key": "iceberg",
+                    "value": true
+                  }
+                }
+              ]
+            },
+            {
+              "type": "and",
+              "values": [
+                {
+                  "key": "iceberg",
+                  "value": true
+                },
+                {
+                  "key": "catalogMgmt",
+                  "value": "snowflake"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "propertyName": "Like",
+        "propertyKeyword": "like",
+        "propertyTooltip": "Select from list of options",
+        "propertyType": "selecthashed",
+        "template": "entities",
+        "withEmptyOption": true,
+        "excludeCurrent": true,
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "external",
+            "value": true
+          }
+        }
+      },
+      {
+        "propertyName": "Clone",
+        "propertyKeyword": "clone",
+        "propertyTooltip": "Select from list of options",
+        "propertyType": "selecthashed",
+        "template": "entities",
+        "withEmptyOption": true,
+        "excludeCurrent": true,
+        "dependency": {
+          "type": "not",
+          "values": {
+            "key": "external",
+            "value": true
+          }
+        }
+      },
+      {
+        "propertyName": "Clone parameters",
+        "propertyType": "block",
+        "propertyKeyword": "cloneParams",
+        "propertyTooltip": "",
+        "dependency": {
+          "type": "not",
+          "values": [
+            {
+              "key": "clone",
+              "exist": false
+            },
+            {
+              "key": "clone",
+              "value": ""
+            }
+          ]
+        },
+        "structure": [
+          {
+            "propertyName": "At or before",
+            "propertyKeyword": "atOrBefore",
+            "propertyTooltip": "Select from list of options",
+            "propertyType": "select",
+            "options": ["at", "before"]
+          },
+          {
+            "propertyName": "Timestamp",
+            "propertyKeyword": "cloneTimestamp",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Offset",
+            "propertyKeyword": "cloneOffset",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Statement",
+            "propertyKeyword": "cloneStatement",
+            "propertyType": "text"
+          }
+        ]
+      },
+      {
+        "propertyName": "As Select Statement",
+        "propertyKeyword": "selectStatement",
+        "propertyType": "details",
+        "template": "textarea",
+        "markdown": false
+      },
+      {
+        "propertyName": "Refresh on create",
+        "propertyKeyword": "REFRESH_ON_CREATE",
+        "propertyType": "checkbox",
+        "dependency": {
+          "key": "external",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Auto refresh",
+        "propertyKeyword": "AUTO_REFRESH",
+        "propertyType": "checkbox",
+        "dependency": {
+          "key": "external",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Regex pattern",
+        "propertyKeyword": "PATTERN",
+        "propertyType": "text",
+        "dependency": {
+          "key": "external",
+          "value": true
+        }
+      },
+      {
+        "propertyName": "Copy grants",
+        "propertyKeyword": "copyGrants",
+        "propertyType": "checkbox"
+      },
+      {
+        "propertyName": "Table Tags",
+        "propertyKeyword": "tableTags",
+        "propertyTooltip": "",
+        "propertyType": "group",
+        "groupItemLimit": 50,
+        "helpUrl": "https://hackolade.com/help/Snowflake.html#Tags",
+        "structure": [
+          {
+            "propertyName": "Tag name",
+            "propertyKeyword": "tagName",
+            "propertyTooltip": "",
+            "propertyType": "selecthashed",
+            "withEmptyOption": true,
+            "propertySource": {
+              "level": "container",
+              "source": "tags.*.name"
+            }
+          },
+          {
+            "propertyName": "Value",
+            "propertyKeyword": "tagValue",
+            "propertyTooltip": "",
+            "propertyType": "selecthashed",
+            "withEmptyOption": true,
+            "propertySource": {
+              "level": "container",
+              "source": "tags.${tagName}.allowedValues.*.value"
+            },
+            "dependency": {
+              "type": "and",
+              "values": [
+                {
+                  "type": "not",
+                  "values": [
+                    {
+                      "level": "container",
+                      "source": "tags.${tagName}",
+                      "key": "allowedValues",
+                      "isEmpty": true
+                    }
+                  ]
+                },
+                {
+                  "level": "container",
+                  "source": "tags.${tagName}",
+                  "key": "allowedValues",
+                  "exist": true
+                }
+              ]
+            },
+            "shouldValidate": true,
+            "validation": {
+              "required": true
+            }
+          },
+          {
+            "propertyName": "Value",
+            "propertyKeyword": "tagValue",
+            "propertyTooltip": "",
+            "propertyType": "text",
+            "propertySource": {
+              "level": "container",
+              "source": "tags.${tagName}.allowedValues.*.value"
+            },
+            "dependency": {
+              "type": "and",
+              "values": [
+                {
+                  "key": "tagName",
+                  "pattern": "^.+$"
+                },
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "level": "container",
+                      "source": "tags.${tagName}",
+                      "key": "allowedValues",
+                      "isEmpty": true
+                    },
+                    {
+                      "type": "not",
+                      "values": [
+                        {
+                          "level": "container",
+                          "source": "tags.${tagName}",
+                          "key": "allowedValues",
+                          "exist": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "shouldValidate": true,
+            "validation": {
+              "required": true,
+              "regex": "^.{0,256}$"
+            }
+          },
+          {
+            "propertyName": "Value",
+            "propertyKeyword": "tagValue",
+            "propertyTooltip": "",
+            "propertyType": "select",
+            "disabled": true,
+            "dependency": {
+              "type": "or",
+              "values": [
+                {
+                  "key": "tagName",
+                  "exist": false
+                },
+                {
+                  "key": "tagName",
+                  "pattern": "^$"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "propertyName": "Custom scripts",
+        "propertyType": "block",
+        "propertyKeyword": "customScripts",
+        "propertyTooltip": "",
+        "structure": [
+          {
+            "propertyName": "Before CREATE TABLE",
+            "propertyKeyword": "beforeCreateEntity",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          },
+          {
+            "propertyName": "After CREATE TABLE",
+            "propertyKeyword": "afterCreateEntity",
+            "propertyType": "block",
+            "propertyTooltip": "",
+            "structure": [
+              {
+                "propertyName": "Script",
+                "propertyKeyword": "script",
+                "propertyType": "details",
+                "markdown": false,
+                "template": "codeEditor",
+                "templateOptions": {
+                  "editorDialect": "sql",
+                  "customScriptVariables": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "propertyName": "Remarks",
+        "propertyKeyword": "comments",
+        "shouldValidate": false,
+        "propertyTooltip": "remarks",
+        "addTimestampButton": true,
+        "propertyType": "details",
+        "template": "textarea",
+        "valueType": "string"
+      }
+    ],
+    "columnsRatio": [3.7, 5]
+  },
+  {
+    "lowerTab": "Composite keys",
+    "structure": [
+      {
+        "propertyName": "Primary key",
+        "propertyType": "group",
+        "groupItemLimit": 1,
+        "propertyKeyword": "primaryKey",
+        "propertyTooltip": {
+          "disabled": [
+            {
+              "tooltip": "Remove the existing single column primary key definition prior to unlock the possibility to create a composite primary key definition for this table",
+              "dependency": {
+                "type": "and",
+                "values": [
+                  {
+                    "level": "children",
+                    "key": "primaryKey",
+                    "value": true
+                  },
+                  {
+                    "type": "not",
+                    "values": {
+                      "level": "children",
+                      "key": "compositePrimaryKey",
+                      "value": true
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "tooltip": "Remove or update the existing composite primary key definition prior to unlock the possibility to create a new composite primary key definition for this table",
+              "dependency": {
+                "key": "primaryKey",
+                "minLength": 1
+              }
+            }
+          ]
+        },
+        "disabledOnCondition": [
+          {
+            "level": "children",
+            "value": {
+              "type": "and",
+              "values": [
+                {
+                  "key": "primaryKey",
+                  "value": true
+                },
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "key": "compositePrimaryKey",
+                      "value": false
+                    },
+                    {
+                      "key": "compositePrimaryKey",
+                      "exist": false
+                    }
+                  ]
+                },
+                {
+                  "type": "or",
+                  "values": [
+                    {
+                      "key": "compositeUniqueKey",
+                      "value": false
+                    },
+                    {
+                      "key": "compositeUniqueKey",
+                      "exist": false
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "structure": [
+          {
+            "propertyName": "Constraint name",
+            "propertyKeyword": "constraintName",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Key",
+            "propertyKeyword": "compositePrimaryKey",
+            "propertyType": "primaryKeySetter",
+            "abbr": "pk",
+            "attributeList": []
+          }
+        ]
+      },
+      {
+        "propertyName": "Unique key",
+        "propertyType": "group",
+        "propertyKeyword": "uniqueKey",
+        "propertyTooltip": "",
+        "structure": [
+          {
+            "propertyName": "Constraint name",
+            "propertyKeyword": "constraintName",
+            "propertyTooltip": "",
+            "propertyType": "text"
+          },
+          {
+            "propertyName": "Key",
+            "propertyKeyword": "compositeUniqueKey",
+            "propertyType": "compositeKeySetter",
+            "disabledItemStrategy": "default",
+            "setPrimaryKey": false,
+            "abbr": " ",
+            "attributeList": [],
+            "template": "collectiontree",
+            "isCompositeKey": true
+          },
+          {
+            "propertyName": "Alternate key",
+            "propertyKeyword": "alternateKey",
+            "propertyTooltip": "",
+            "propertyType": "checkbox",
+            "setFieldPropertyBy": "compositeUniqueKey"
+          }
+        ]
+      }
+    ]
+  }
 ]
