@@ -595,10 +595,7 @@ module.exports = (baseProvider, options, app) => {
 						),
 					});
 					result.tableColumns.push({
-						name: `${getName(viewData.isCaseSensitive, key.entityName)}.${getName(
-							viewData.isCaseSensitive,
-							key.name,
-						)}`,
+						name: `${getName(viewData.isCaseSensitive, key.entityName)}.${getName(viewData.isCaseSensitive, key.name)}`,
 						isActivated: key.isActivated,
 					});
 
@@ -1046,6 +1043,10 @@ module.exports = (baseProvider, options, app) => {
 
 		commentIfDeactivated(statement, data, isPartOfLine) {
 			return commentIfDeactivated(statement, data, isPartOfLine);
+		},
+
+		commentStatement(statement) {
+			return commentIfDeactivated(statement, { isActivated: false });
 		},
 
 		alterTable(data) {
