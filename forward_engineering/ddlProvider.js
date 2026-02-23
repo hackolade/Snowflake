@@ -1049,6 +1049,10 @@ module.exports = (baseProvider, options, app) => {
 			return commentIfDeactivated(statement, { isActivated: false });
 		},
 
+		prepareName(name, params = {}) {
+			return getName(params.isCaseSensitive, name);
+		},
+
 		alterTable(data) {
 			if (data.iceberg) {
 				return '// Dynamic Iceberg tables are currently only supported for CREATE statements. Specifying DYNAMIC ICEBERG in any other command (for example, ALTER DYNAMIC ICEBERG TABLE <name>) results in an error.';
