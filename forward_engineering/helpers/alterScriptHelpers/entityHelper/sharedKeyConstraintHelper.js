@@ -68,7 +68,7 @@ const wasCompositeKeyChangedInTransitionFromCompositeToRegular = (collection, co
 	}
 
 	const idOfKeyColumn = idsOfColumns[0];
-	const newColumnJsonSchema = Object.values(collection.properties).find(
+	const newColumnJsonSchema = Object.values(collection.role.properties).find(
 		columnJsonSchema => columnJsonSchema.GUID === idOfKeyColumn,
 	);
 
