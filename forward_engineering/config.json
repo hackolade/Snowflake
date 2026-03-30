@@ -444,5 +444,65 @@
 				}
 			]
 		}
-	]
+	],
+	"dataHub": {
+		"urn": "urn:li:dataPlatform:snowflake",
+		"containers": [
+			{
+				"type": "Database",
+				"source": "container",
+				"properties": {
+					"name": "database"
+				}
+			},
+			"Schema"
+		],
+		"datasets": ["Table", "View"],
+		"typeMapping": {
+			"DATE": "DateType",
+			"BIGINT": "NumberType",
+			"BINARY": "BytesType",
+			"BOOLEAN": "BooleanType",
+			"CHAR": "StringType",
+			"CHARACTER": "StringType",
+			"DATETIME": "TimeType",
+			"DEC": "NumberType",
+			"DECIMAL": "NumberType",
+			"NUMERIC": "NumberType",
+			"DOUBLE": "NumberType",
+			"DOUBLE PRECISION": "NumberType",
+			"FIXED": "NumberType",
+			"FLOAT": "NumberType",
+			"FLOAT4": "NumberType",
+			"FLOAT8": "NumberType",
+			"INT": "NumberType",
+			"INTEGER": "NumberType",
+			"NUMBER": "NumberType",
+			"OBJECT": "RecordType",
+			"REAL": "NumberType",
+			"BYTEINT": "NumberType",
+			"SMALLINT": "NumberType",
+			"STRING": "StringType",
+			"TEXT": "StringType",
+			"TIME": "TimeType",
+			"TIMESTAMP": "TimeType",
+			"TIMESTAMP_TZ": "TimeType",
+			"TIMESTAMP_LTZ": "TimeType",
+			"TIMESTAMP_NTZ": "TimeType",
+			"TINYINT": "NumberType",
+			"VARBINARY": "BytesType",
+			"VARCHAR": "StringType",
+			"CHARACTER VARYING": "StringType",
+			"VARIANT": "RecordType",
+			"ARRAY": "ArrayType",
+			"GEOGRAPHY": "NullType"
+		},
+		"options": {
+			"convertUrnsToLowerCase": {
+				"use": true,
+				"default": true
+			}
+		},
+		"viewLanguage": "SQL"
+	}
 }
