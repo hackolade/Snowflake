@@ -1,0 +1,104 @@
+diff --git a/node_modules/snowflake-sdk/dist/lib/agent/crl_validator/crl_fetcher.js b/node_modules/snowflake-sdk/dist/lib/agent/crl_validator/crl_fetcher.js
+index be70497..56b74b6 100644
+--- a/node_modules/snowflake-sdk/dist/lib/agent/crl_validator/crl_fetcher.js
++++ b/node_modules/snowflake-sdk/dist/lib/agent/crl_validator/crl_fetcher.js
+@@ -6,8 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.PENDING_FETCH_REQUESTS = void 0;
+ exports.resetCrlCacheCleaner = resetCrlCacheCleaner;
+ exports.getCrl = getCrl;
++const { hckFetch } = require('@hackolade/fetch');
+ const asn1_js_rfc5280_1 = __importDefault(require("asn1.js-rfc5280"));
+-const axios_1 = __importDefault(require("axios"));
++const axios_1 = __importDefault(require("axios").create({
++    adapter: 'fetch',
++    env: {
++        fetch: hckFetch,
++        Request: null,
++        Response: null,
++    }
++}));
+ const logger_1 = __importDefault(require("../../logger"));
+ const global_config_typed_1 = __importDefault(require("../../global_config_typed"));
+ const crl_cache_1 = require("./crl_cache");
+diff --git a/node_modules/snowflake-sdk/dist/lib/http/axios_instance.js b/node_modules/snowflake-sdk/dist/lib/http/axios_instance.js
+index e09430b..9ee9c35 100644
+--- a/node_modules/snowflake-sdk/dist/lib/http/axios_instance.js
++++ b/node_modules/snowflake-sdk/dist/lib/http/axios_instance.js
+@@ -36,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
++const { hckFetch } = require('@hackolade/fetch');
+ const axios_1 = __importDefault(require("axios"));
+ const Util = __importStar(require("../util"));
+ const logger_1 = __importDefault(require("../logger"));
+@@ -46,7 +47,14 @@ const DEFAULT_SNOWFLAKE_RETRY_CONFIG = {
+     sleepCap: 16,
+     includeRetryReason: false,
+ };
+-const axios = axios_1.default.create();
++const axios = axios_1.default.create({
++    adapter: 'fetch',
++    env: {
++        fetch: hckFetch,
++        Request: null,
++        Response: null,
++    }
++});
+ axios.interceptors.request.use((config) => {
+     if (!config.useSnowflakeRetryMiddleware) {
+         return config;
+diff --git a/node_modules/snowflake-sdk/dist/lib/http/node_untyped.js b/node_modules/snowflake-sdk/dist/lib/http/node_untyped.js
+index 3a94c3d..36a4cd5 100644
+--- a/node_modules/snowflake-sdk/dist/lib/http/node_untyped.js
++++ b/node_modules/snowflake-sdk/dist/lib/http/node_untyped.js
+@@ -72,15 +72,7 @@ function isBypassProxy(proxy, destination, agentId) {
+  * @inheritDoc
+  */
+ NodeHttpClient.prototype.getAgent = function (parsedUrl, proxy, mock) {
+-    Logger.getInstance().trace('Agent[url: %s] - getting an agent instance.', RequestUtil.describeURL(parsedUrl.href));
+-    if (!proxy && GlobalConfig.isEnvProxyActive()) {
+-        const isHttps = parsedUrl.protocol === 'https:';
+-        proxy = ProxyUtil.getProxyFromEnv(isHttps);
+-        if (proxy) {
+-            Logger.getInstance().debug('Agent[url: %s] - proxy info loaded from the environment variable. Proxy host: %s', RequestUtil.describeURL(parsedUrl.href), proxy.host);
+-        }
+-    }
+-    return getProxyAgent(proxy, parsedUrl, parsedUrl.href, mock, this._connectionConfig);
++    return null;
+ };
+ function getProxyAgent(proxyOptions, parsedUrl, destination, mock, connectionConfig) {
+     Logger.getInstance().trace('Agent[url: %s] - getting a proxy agent instance.', RequestUtil.describeURL(parsedUrl.href));
+diff --git a/node_modules/snowflake-sdk/dist/lib/minicore/minicore.js b/node_modules/snowflake-sdk/dist/lib/minicore/minicore.js
+index c288916..a97a284 100644
+--- a/node_modules/snowflake-sdk/dist/lib/minicore/minicore.js
++++ b/node_modules/snowflake-sdk/dist/lib/minicore/minicore.js
+@@ -14,27 +14,7 @@ exports.minicoreStatus = {
+     errorType: null,
+     errorDetails: null,
+ };
+-if (process.env.SNOWFLAKE_DISABLE_MINICORE) {
+-    exports.minicoreStatus.errorType = 'Minicore is disabled with SNOWFLAKE_DISABLE_MINICORE env variable';
+-}
+-else {
+-    try {
+-        exports.minicoreStatus.binaryName = getBinaryName();
+-        // eval('require') prevents bundlers (esbuild, webpack, etc.) from statically analyzing
+-        // and attempting to bundle .node native addon files
+-        // oxlint-disable-next-line no-eval
+-        const minicoreModule = eval('require')(`./binaries/${exports.minicoreStatus.binaryName}`);
+-        exports.minicoreStatus.version = minicoreModule.sfCoreFullVersion();
+-    }
+-    catch (error) {
+-        exports.minicoreStatus.errorType = isBinaryIgnoredByBundlers(error)
+-            ? 'Binary is missing from the bundle'
+-            : 'Failed to load binary';
+-        if (error instanceof Error) {
+-            exports.minicoreStatus.errorDetails = error;
+-        }
+-    }
+-}
++exports.minicoreStatus.errorType = 'Minicore is disabled with SNOWFLAKE_DISABLE_MINICORE env variable';
+ // NOTE:
+ // Custom loader instead of napi-rs autogenerated binding file because:
+ // - napi-rs tries to require(process.env.NAPI_RS_NATIVE_LIBRARY_PATH) which might be a security risk
