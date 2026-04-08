@@ -64,6 +64,12 @@ class DataHubProvider {
 	decorateType({ type, columnDefinition }) {
 		const columnDefinitionHelper = getColumnDefinitionHelper(this.#appInstance);
 
+		if (['VARCHAR', 'STRING', 'TEXT'].includes(type) && !columnDefinition.length) {
+			columnDefinition.length = 16777216;
+		} else if (['CHAR', 'CHARACTER'].includes(type) && !columnDefinition.length) {
+			columnDefinition.length = 1;
+		}
+
 		return columnDefinitionHelper.decorateType(type, columnDefinition);
 	}
 
