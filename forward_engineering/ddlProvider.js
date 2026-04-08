@@ -57,6 +57,7 @@ const {
 	isEmptyTags,
 } = require('./helpers/tagHelper');
 const { createView, hydrateView, hydrateViewColumn } = require('./helpers/viewHelper');
+const { hydrateJsonSchemaColumn } = require('./helpers/hydrateJsonSchema');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
@@ -308,11 +309,7 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateJsonSchemaColumn(jsonSchema, definitionJsonSchema) {
-			if (jsonSchema.type === 'variant') {
-				return omit(jsonSchema, ['subtype', 'mode']);
-			}
-
-			return jsonSchema;
+			return hydrateJsonSchemaColumn(jsonSchema, definitionJsonSchema);
 		},
 
 		createTable(tableData, isActivated) {

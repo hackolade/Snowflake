@@ -12,6 +12,7 @@ const getKeyHelper = require('./helpers/keyHelper');
 const getColumnDefinitionHelper = require('./helpers/columnDefinitionHelper');
 const { createView, hydrateView, hydrateViewColumn } = require('./helpers/viewHelper');
 const { FORMATS } = require('./helpers/constants');
+const { hydrateJsonSchemaColumn } = require('./helpers/hydrateJsonSchema');
 
 class DataHubProvider {
 	/**
@@ -92,6 +93,10 @@ class DataHubProvider {
 
 	hydrateViewColumn(data) {
 		return hydrateViewColumn(data);
+	}
+
+	hydrateJsonSchemaColumn(jsonSchema, definitionJsonSchema) {
+		return hydrateJsonSchemaColumn(jsonSchema, definitionJsonSchema);
 	}
 
 	getPlatformSchema() {
