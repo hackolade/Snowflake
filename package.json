@@ -67,7 +67,7 @@
         "bson": "4.6.1",
         "lodash": "4.18.1",
         "snowflake-sdk": "2.3.5",
-        "uuid": "7.0.3"
+        "uuid": "14.0.0"
     },
     "simple-git-hooks": {
         "pre-commit": "npm run package && npx lint-staged --config lint-staged.config.js",
@@ -94,8 +94,9 @@
         "simple-git-hooks": "2.13.1"
     },
     "overrides": {
-        "fast-xml-parser": "5.5.7",
+        "fast-xml-parser": "5.7.1",
         "minimatch": "10.2.4",
-        "@tootallnate/once": "3.0.1"
+        "@tootallnate/once": "3.0.1",
+        "uuid": "$uuid"
     }
 }
