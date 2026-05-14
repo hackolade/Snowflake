@@ -134,8 +134,8 @@ class DataHubProvider {
 							displayName: `${tag.name}: ${tagValue.value}`,
 							name: `${containerAsset.hackoladeMeta?.database}.${containerAsset.hackoladeMeta?.schema}.${tag.name}:${tagValue.value}`,
 							resolutionData: {
-								tagName: tag.name,
-								tagValue: tagValue.value,
+								tagName: tag.id,
+								tagValue: tagValue.id,
 							},
 						};
 					});
