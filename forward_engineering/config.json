@@ -455,9 +455,27 @@
 					"name": "database"
 				}
 			},
-			"Schema"
+			{
+				"type": "Schema",
+				"source": "container",
+				"properties": {
+					"tags": "schemaTags"
+				}
+			}
 		],
-		"datasets": ["Table", "View"],
+		"datasets": [
+			{
+				"type": "Table",
+				"source": "collection",
+				"properties": { "tags": "tableTags" }
+			},
+			{
+				"type": "View",
+				"source": "view",
+				"properties": { "tags": "viewTags" }
+			}
+		],
+		"fieldProperties": { "tags": "columnTags" },
 		"typeMapping": {
 			"DATE": "DateType",
 			"BIGINT": "NumberType",
@@ -501,6 +519,13 @@
 			"convertUrnsToLowerCase": {
 				"use": true,
 				"default": true
+			},
+			"exportTags": {
+				"use": true,
+				"type": "select",
+				"options": ["skip", "with_lineage", "without_lineage"],
+				"default": "skip",
+				"propagateTags": "with_lineage"
 			}
 		},
 		"viewLanguage": "SQL"

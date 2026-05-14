@@ -8,7 +8,6 @@ const { toLower } = require('lodash');
 
 const types = require('./configs/types');
 const defaultTypes = require('./configs/defaultTypes');
-const getKeyHelper = require('./helpers/keyHelper');
 const getColumnDefinitionHelper = require('./helpers/columnDefinitionHelper');
 const { createView, hydrateView, hydrateViewColumn } = require('./helpers/viewHelper');
 const { FORMATS } = require('./helpers/constants');
@@ -105,6 +104,48 @@ class DataHubProvider {
 				tableSchema: '',
 			},
 		};
+	}
+
+	getTags({ data, containerAssets, options }) {
+		if (options.exportTags === 'skip') {
+			return [];
+		}
+
+		return data.containers
+			.flatMap(container => {
+				const containerObject = this.#mergeTabs(container.containerData);
+				const containerAsset = containerAssets.find(asset => asset.hackoladeMeta?.bucketId === container.id);
+
+				if (!containerAsset) {
+					throw new Error(
+						`The the container asset for the "${containerObject.code ?? containerObject.name}" is not found!`,
+					);
+				}
+
+				if (!containerAsset.hackoladeMeta) {
+					throw new Error(
+						`The "database" and "schema" of the container asset "${containerAsset.containerProperties.value.name}" are not found!`,
+					);
+				}
+
+				return (containerObject.tags ?? [])?.flatMap(tag => {
+					return (tag.allowedValues ?? []).map(tagValue => {
+						return {
+							displayName: `${tag.name}: ${tagValue.value}`,
+							name: `${containerAsset.hackoladeMeta?.database}.${containerAsset.hackoladeMeta?.schema}.${tag.name}:${tagValue.value}`,
+							resolutionData: {
+								tagName: tag.id,
+								tagValue: tagValue.id,
+							},
+						};
+					});
+				});
+			})
+			.filter(Boolean);
+	}
+
+	#mergeTabs(tabsData) {
+		return tabsData.reduce((acc, current) => Object.assign(acc, current), {});
 	}
 }
 
