@@ -114,7 +114,6 @@ making sure that you maintain a proper JSON format.
 			}
 
 */
-
 [
 	{
 		"lowerTab": "Details",
@@ -162,10 +161,16 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"dependency": {
 					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
+					"values": [
+						{
+							"key": "external",
+							"value": true
+						},
+						{
+							"key": "hybrid",
+							"value": true
+						}
+					]
 				}
 			},
 			{
@@ -200,6 +205,36 @@ making sure that you maintain a proper JSON format.
 						},
 						{
 							"key": "transient",
+							"value": true
+						},
+						{
+							"key": "hybrid",
+							"value": true
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Hybrid",
+				"propertyKeyword": "hybrid",
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "not",
+					"values": [
+						{
+							"key": "external",
+							"value": true
+						},
+						{
+							"key": "transient",
+							"value": true
+						},
+						{
+							"key": "dynamic",
+							"value": true
+						},
+						{
+							"key": "iceberg",
 							"value": true
 						}
 					]
@@ -584,6 +619,10 @@ making sure that you maintain a proper JSON format.
 						{
 							"key": "external",
 							"value": true
+						},
+						{
+							"key": "hybrid",
+							"value": true
 						}
 					]
 				}
@@ -601,6 +640,10 @@ making sure that you maintain a proper JSON format.
 						},
 						{
 							"key": "external",
+							"value": true
+						},
+						{
+							"key": "hybrid",
 							"value": true
 						}
 					]
@@ -643,6 +686,10 @@ making sure that you maintain a proper JSON format.
 						},
 						{
 							"key": "transient",
+							"value": true
+						},
+						{
+							"key": "hybrid",
 							"value": true
 						}
 					]
@@ -790,7 +837,11 @@ making sure that you maintain a proper JSON format.
 					"ESCAPE_UNENCLOSED_FIELD": "\\",
 					"TRIM_SPACE": false,
 					"FIELD_OPTIONALLY_ENCLOSED_BY": "NONE",
-					"NULL_IF": [{ "NULL_IF_item": "\\N" }],
+					"NULL_IF": [
+						{
+							"NULL_IF_item": "\\N"
+						}
+					],
 					"ERROR_ON_COLUMN_COUNT_MISMATCH": true,
 					"VALIDATE_UTF8": true,
 					"EMPTY_FIELD_AS_NULL": true,
@@ -1029,7 +1080,11 @@ making sure that you maintain a proper JSON format.
 					]
 				},
 				"defaultValue": {
-					"NULL_IF": [{ "NULL_IF_item": "\\N" }]
+					"NULL_IF": [
+						{
+							"NULL_IF_item": "\\N"
+						}
+					]
 				},
 				"structure": [
 					{

@@ -314,6 +314,7 @@ module.exports = (baseProvider, options, app) => {
 
 		createTable(tableData, isActivated) {
 			const schemaName = get(tableData, 'schemaData.schemaName');
+			const hybrid = preSpace(tableData.hybrid && 'HYBRID');
 			const temporary = preSpace(tableData.temporary && 'TEMPORARY');
 			const transient = preSpace(tableData.transient && !tableData.temporary && 'TRANSIENT');
 			const orReplace = preSpace(tableData.orReplace && 'OR REPLACE');
@@ -469,6 +470,7 @@ module.exports = (baseProvider, options, app) => {
 
 			return assignTemplates(templates.createTable, {
 				name: tableData.fullName,
+				hybrid,
 				temporary,
 				transient,
 				tableIfNotExists,
@@ -840,6 +842,7 @@ module.exports = (baseProvider, options, app) => {
 				...tableData,
 				fullName,
 				name: tableName,
+				hybrid: firstTab.hybrid,
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
 				external: firstTab.external,
