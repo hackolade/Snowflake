@@ -701,10 +701,16 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "group",
 				"dependency": {
 					"type": "not",
-					"values": {
-						"key": "external",
-						"value": true
-					}
+					"values": [
+						{
+							"key": "external",
+							"value": true
+						},
+						{
+							"key": "hybrid",
+							"value": true
+						}
+					]
 				},
 				"structure": [
 					{
@@ -1804,6 +1810,73 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "checkbox",
 						"setFieldPropertyBy": "compositeUniqueKey"
+					}
+				]
+			}
+		]
+	},
+	{
+		"lowerTab": "Indexes",
+		"structure": [
+			{
+				"propertyName": "Index",
+				"propertyType": "group",
+				"propertyKeyword": "Indxs",
+				"dependency": {
+					"key": "hybrid",
+					"value": true
+				},
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "indxName",
+						"propertyTooltip": "Index name are needed to drop indexes and appear in error messages when a constraint is violated.",
+						"propertyType": "text",
+						"validation": {
+							"required": true
+						}
+					},
+					{
+						"propertyName": "Activated",
+						"propertyKeyword": "isActivated",
+						"propertyTooltip": "Deactivated item will be not included in FE script",
+						"propertyType": "checkbox",
+						"defaultValue": true
+					},
+					{
+						"propertyName": "Or replace",
+						"propertyKeyword": "orReplace",
+						"propertyType": "checkbox",
+						"disabledOnCondition": {
+							"key": "ifNotExist",
+							"value": true
+						}
+					},
+					{
+						"propertyName": "If not exist",
+						"propertyKeyword": "ifNotExist",
+						"propertyTooltip": "if the specified table already exists, the command should make no changes and return a message that the table exists, rather than terminating with an error. ",
+						"propertyType": "checkbox",
+						"disabledOnCondition": {
+							"key": "orReplace",
+							"value": true
+						}
+					},
+					{
+						"propertyName": "Keys",
+						"propertyKeyword": "indxKey",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"validation": {
+							"required": true,
+							"minLength": 1
+						}
+					},
+					{
+						"propertyName": "Include",
+						"propertyKeyword": "indxIncludeKey",
+						"propertyType": "fieldList",
+						"template": "orderedList"
 					}
 				]
 			}
