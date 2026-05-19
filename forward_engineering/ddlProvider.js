@@ -64,7 +64,7 @@ const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
 
 module.exports = (baseProvider, options, app) => {
-	const { tab, hasType, wrap, clean, divideIntoActivatedAndDeactivated, checkAllKeysDeactivated } =
+	const { tab, hasType, clean, divideIntoActivatedAndDeactivated, checkAllKeysDeactivated } =
 		app.require('@hackolade/ddl-fe-utils').general;
 	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
