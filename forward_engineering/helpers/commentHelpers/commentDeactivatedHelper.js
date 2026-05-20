@@ -3,7 +3,7 @@ const STARTS_QUERY = ['//'];
 const commentIfDeactivated = (statement, data, isPartOfLine) => {
 	if (data.isActivated === false) {
 		if (isPartOfLine) {
-			return '// ' + statement;
+			return '/* ' + statement + ' */';
 		} else if (statement.includes('\n')) {
 			return statement
 				.split('\n')

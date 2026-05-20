@@ -6,7 +6,7 @@ module.exports = {
 	dropSchema: 'DROP SCHEMA IF EXISTS ${name};\n',
 
 	createTable:
-		'CREATE${orReplace}${temporary}${transient} TABLE${tableIfNotExists}\n' +
+		'CREATE${orReplace}${temporary}${transient}${hybrid} TABLE${tableIfNotExists}\n' +
 		'\t${name} (\n' +
 		'\t\t${column_definitions}' +
 		'${out_of_line_constraints}\n' +
@@ -51,6 +51,12 @@ module.exports = {
 		'\t${name} (\n' +
 		'\t\t${column_definitions}${out_of_line_constraints}\n' +
 		'\t)${tableOptions};\n',
+
+	createIndex:
+		'CREATE${orReplace} INDEX${ifNotExists} ${name}\n' +
+		'\tON ${tableName} (\n' +
+		'\t\t${keys}\n' +
+		'\t)${includeKeys};',
 
 	columnDefinition:
 		'${name} ${type}${collation}${default}${identity}${autoincrement}${not_nul}${inline_constraint}${comment}${tag}',

@@ -58,12 +58,14 @@ const {
 } = require('./helpers/tagHelper');
 const { createView, hydrateView, hydrateViewColumn } = require('./helpers/viewHelper');
 const { hydrateJsonSchemaColumn } = require('./helpers/hydrateJsonSchema');
+const { prepareIndexKeys } = require('./helpers/indexHelper');
 
 const DEFAULT_SNOWFLAKE_SEQUENCE_START = 1;
 const DEFAULT_SNOWFLAKE_SEQUENCE_INCREMENT = 1;
 
 module.exports = (baseProvider, options, app) => {
-	const { tab, hasType, clean } = app.require('@hackolade/ddl-fe-utils').general;
+	const { tab, hasType, clean, divideIntoActivatedAndDeactivated, checkAllKeysDeactivated } =
+		app.require('@hackolade/ddl-fe-utils').general;
 	const scriptFormat = options?.targetScriptOptions?.keyword || FORMATS.SNOWSIGHT;
 
 	const keyHelper = require('./helpers/keyHelper')(app);
@@ -314,6 +316,7 @@ module.exports = (baseProvider, options, app) => {
 
 		createTable(tableData, isActivated) {
 			const schemaName = get(tableData, 'schemaData.schemaName');
+			const hybrid = preSpace(tableData.hybrid && 'HYBRID');
 			const temporary = preSpace(tableData.temporary && 'TEMPORARY');
 			const transient = preSpace(tableData.transient && !tableData.temporary && 'TRANSIENT');
 			const orReplace = preSpace(tableData.orReplace && 'OR REPLACE');
@@ -321,6 +324,7 @@ module.exports = (baseProvider, options, app) => {
 
 			const clusterKeys = preSpace(
 				!isEmpty(tableData.clusteringKey) &&
+					!hybrid &&
 					'CLUSTER BY (' +
 						(isActivated
 							? foreignKeysToString(tableData.isCaseSensitive, tableData.clusteringKey)
@@ -469,6 +473,7 @@ module.exports = (baseProvider, options, app) => {
 
 			return assignTemplates(templates.createTable, {
 				name: tableData.fullName,
+				hybrid,
 				temporary,
 				transient,
 				tableIfNotExists,
@@ -577,6 +582,73 @@ module.exports = (baseProvider, options, app) => {
 				statement: foreignKeyStatement,
 				isActivated: isRelationActivated,
 			};
+		},
+
+		hydrateIndex(indexData, tableData, schemaData) {
+			const firstTab = head(tableData) ?? {};
+
+			if (!firstTab.hybrid) {
+				return;
+			}
+
+			const schemaName = getName(firstTab.isCaseSensitive, get(schemaData, 'schemaName'));
+			const databaseName = getName(firstTab.isCaseSensitive, get(schemaData, 'databaseName'));
+			const tableName = getName(firstTab.isCaseSensitive, firstTab.code || firstTab.collectionName);
+			const fullTableName = getFullName(databaseName, getFullName(schemaName, tableName));
+
+			return {
+				indxName: getName(firstTab.isCaseSensitive, indexData.indxName),
+				isTableCaseSensitive: firstTab.isCaseSensitive,
+				fullTableName,
+				indxKey: indexData?.indxKey?.map(key => ({
+					name: key.name,
+					isActivated: key.isActivated,
+				})),
+				indxIncludeKey: indexData?.indxIncludeKey?.map(key => ({
+					name: key.name,
+					isActivated: key.isActivated,
+				})),
+				isActivated: indexData?.isActivated,
+				ifNotExists: indexData?.ifNotExist,
+				orReplace: indexData?.orReplace,
+			};
+		},
+
+		createIndex(_tableName, index, dbData, isParentActivated = true) {
+			if (isEmpty(index.indxKey) || !index.indxName) {
+				return '';
+			}
+
+			const allDeactivated = checkAllKeysDeactivated(index.indxKey || []);
+			const wholeStatementCommented = index.isActivated === false || !isParentActivated || allDeactivated;
+
+			const includeKeys = prepareIndexKeys({
+				indexKeys: index.indxIncludeKey,
+				wholeStatementCommented,
+				isCaseSensitive: index.isTableCaseSensitive,
+				divideIntoActivatedAndDeactivated,
+			});
+			const includeKeysStatement = !includeKeys ? '' : preSpace(`INCLUDE ( ${includeKeys} )`);
+
+			const indexStatement = assignTemplates(templates.createIndex, {
+				name: index.indxName,
+				tableName: index.fullTableName,
+				orReplace: preSpace(index.orReplace && 'OR REPLACE'),
+				ifNotExists: preSpace(index.ifNotExists && 'IF NOT EXISTS'),
+				keys: prepareIndexKeys({
+					indexKeys: index.indxKey,
+					wholeStatementCommented,
+					isCaseSensitive: index.isTableCaseSensitive,
+					divideIntoActivatedAndDeactivated,
+				}),
+				includeKeys: includeKeysStatement,
+			});
+
+			if (wholeStatementCommented) {
+				return commentIfDeactivated(indexStatement, { isActivated: false });
+			} else {
+				return indexStatement;
+			}
 		},
 
 		createView(viewData, dbData, isActivated) {
@@ -840,6 +912,7 @@ module.exports = (baseProvider, options, app) => {
 				...tableData,
 				fullName,
 				name: tableName,
+				hybrid: firstTab.hybrid,
 				temporary: firstTab.temporary,
 				transient: firstTab.transient,
 				external: firstTab.external,
