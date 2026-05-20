@@ -587,6 +587,10 @@ module.exports = (baseProvider, options, app) => {
 		hydrateIndex(indexData, tableData, schemaData) {
 			const firstTab = head(tableData) ?? {};
 
+			if (!firstTab.hybrid) {
+				return;
+			}
+
 			const schemaName = getName(firstTab.isCaseSensitive, get(schemaData, 'schemaName'));
 			const databaseName = getName(firstTab.isCaseSensitive, get(schemaData, 'databaseName'));
 			const tableName = getName(firstTab.isCaseSensitive, firstTab.code || firstTab.collectionName);
