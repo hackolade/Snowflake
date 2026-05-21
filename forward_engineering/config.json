@@ -89,17 +89,66 @@
 					},
 					"defaultValue": {
 						"primaryKey": []
-					}
+					},
+					"applyToValue": "ignore"
+				},
+				{
+					"dependency": {
+						"type": "and",
+						"values": [
+							{
+								"key": "primaryKey",
+								"valueType": "array"
+							},
+							{
+								"type": "not",
+								"values": [
+									{
+										"key": "hybrid",
+										"value": true
+									}
+								]
+							}
+						]
+					},
+					"defaultValue": {
+						"primaryKey": []
+					},
+					"applyToValue": "separate"
 				},
 				{
 					"dependency": {
 						"key": "primaryKey",
 						"valueType": "object"
 					},
-
 					"defaultValue": {
 						"primaryKey": {}
-					}
+					},
+					"applyToValue": "ignore"
+				},
+				{
+					"dependency": {
+						"type": "and",
+						"values": [
+							{
+								"key": "primaryKey",
+								"valueType": "object"
+							},
+							{
+								"type": "not",
+								"values": [
+									{
+										"key": "hybrid",
+										"value": true
+									}
+								]
+							}
+						]
+					},
+					"defaultValue": {
+						"primaryKey": {}
+					},
+					"applyToValue": "separate"
 				},
 				{
 					"dependency": {
@@ -118,7 +167,43 @@
 					"defaultValue": {
 						"primaryKey": false,
 						"compositePrimaryKey": false
-					}
+					},
+					"applyToValue": "ignore"
+				},
+				{
+					"dependency": {
+						"type": "and",
+						"values": [
+							{
+								"type": "or",
+								"values": [
+									{
+										"key": "primaryKey",
+										"value": true
+									},
+									{
+										"key": "compositePrimaryKey",
+										"value": true
+									}
+								]
+							},
+							{
+								"type": "not",
+								"values": [
+									{
+										"level": "root",
+										"key": "hybrid",
+										"value": true
+									}
+								]
+							}
+						]
+					},
+					"defaultValue": {
+						"primaryKey": false,
+						"compositePrimaryKey": false
+					},
+					"applyToValue": "separate"
 				}
 			]
 		},
