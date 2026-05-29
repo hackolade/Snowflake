@@ -179,5 +179,6 @@
 	"CUSTOM_SCRIPT_CONTAINER_VAR_NAME": "Schema name",
 	"CUSTOM_SCRIPT_CONTAINER_VAR": "schemaName",
 	"CUSTOM_SCRIPT_ENTITY_VAR_NAME": "Table name",
-	"CUSTOM_SCRIPT_ENTITY_VAR": "tableName"
+	"CUSTOM_SCRIPT_ENTITY_VAR": "tableName",
+	"DATAHUB_FALLBACK_TO_PARENT_CONTAINER_NAME_WARNING": "Database property is empty for schema \"${objectName}\". The schema name will be used as the database name in DataHub."
 }
