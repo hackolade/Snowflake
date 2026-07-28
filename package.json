@@ -94,9 +94,11 @@
         "uuid": "14.0.0"
     },
     "overrides": {
+        "axios": "1.18.0",
         "fast-xml-parser": "5.7.3",
         "minimatch": "10.2.4",
         "@tootallnate/once": "3.0.1",
-        "uuid": "$uuid"
+        "uuid": "$uuid",
+        "brace-expansion": "5.0.8"
     }
 }
