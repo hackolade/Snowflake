@@ -96,9 +96,9 @@
     "overrides": {
         "axios": "1.18.0",
         "fast-xml-parser": "5.7.3",
-        "minimatch": "10.2.4",
+        "minimatch": "10.2.6",
         "@tootallnate/once": "3.0.1",
         "uuid": "$uuid",
-        "brace-expansion": "5.0.8"
+        "brace-expansion": "5.0.9"
     }
 }
