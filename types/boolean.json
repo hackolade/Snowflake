@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<bool>",
 	"dtdAbbreviation": "{0/1}",
 	"parentType": "boolean",
-	"hiddenOnEntity": "view",
 	"sample": true,
 	"useSample": true,
 	"defaultValues": {

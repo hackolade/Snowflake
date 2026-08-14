@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<int>",
 	"dtdAbbreviation": "{123}",
 	"parentType": "numeric",
-	"hiddenOnEntity": "view",
 	"sample": 15,
 	"useSample": true,
 	"defaultValues": {

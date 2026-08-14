@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<date>",
 	"dtdAbbreviation": "{dt}",
 	"parentType": "string",
-	"hiddenOnEntity": "view",
 	"sample": "2018/03/15",
 	"useSample": true,
 	"defaultValues": {

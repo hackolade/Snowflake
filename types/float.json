@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<flt>",
 	"dtdAbbreviation": "{flt}",
 	"parentType": "numeric",
-	"hiddenOnEntity": "view",
 	"sample": 15,
 	"useSample": true,
 	"defaultValues": {

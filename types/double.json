@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<dbl>",
 	"dtdAbbreviation": "{dbl}",
 	"parentType": "numeric",
-	"hiddenOnEntity": "view",
 	"sample": 15,
 	"useSample": true,
 	"defaultValues": {
