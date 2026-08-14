@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<vchar>",
 	"dtdAbbreviation": "{vchar}",
 	"parentType": "string",
-	"hiddenOnEntity": "view",
 	"useSample": true,
 	"default": true,
 	"defaultValues": {

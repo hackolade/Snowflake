@@ -11,6 +11,12 @@ const createView = ({ viewData, isActivated, scriptFormat, getViewSelectStatemen
 	const ifNotExist = preSpace(viewData.ifNotExist && 'IF NOT EXISTS');
 	const { columnList, tableColumns, tables } = viewData.keys.reduce(
 		(result, key) => {
+			// Keys without an entityName are plain columns that don't reference any table/view column.
+			// They exist for documentation purposes only and can't take part in the SELECT statement.
+			if (!key.entityName) {
+				return result;
+			}
+
 			result.columnList.push({
 				name: `${getName(viewData.isCaseSensitive, key.alias || key.name)}`,
 				isActivated: key.isActivated,
@@ -23,12 +29,10 @@ const createView = ({ viewData, isActivated, scriptFormat, getViewSelectStatemen
 				isActivated: key.isActivated,
 			});
 
-			if (key.entityName) {
-				const tableName = getFullName(key.dbName, key.entityName);
+			const tableName = getFullName(key.dbName, key.entityName);
 
-				if (!result.tables.includes(tableName)) {
-					result.tables.push(tableName);
-				}
+			if (!result.tables.includes(tableName)) {
+				result.tables.push(tableName);
 			}
 
 			return result;

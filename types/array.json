@@ -5,7 +5,6 @@
 	"parentType": "array",
 	"useSample": true,
 	"default": true,
-	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"properties": [],
 		"primaryKey": false,

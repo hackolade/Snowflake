@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<bin>",
 	"dtdAbbreviation": "{BIN}",
 	"parentType": "binary",
-	"hiddenOnEntity": "view",
 	"useSample": false,
 	"default": true,
 	"defaultValues": {

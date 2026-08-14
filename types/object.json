@@ -4,7 +4,6 @@
 	"dtdAbbreviation": "{...}",
 	"parentType": "document",
 	"sample": {},
-	"hiddenOnEntity": "view",
 	"useSample": true,
 	"default": true,
 	"defaultValues": {

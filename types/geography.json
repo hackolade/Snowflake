@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<geog>",
 	"dtdAbbreviation": "{...}",
 	"parentType": "document",
-	"hiddenOnEntity": "view",
 	"jsonType": {
 		"order": 1,
 		"name": "geography",
