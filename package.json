@@ -100,6 +100,7 @@
         "minimatch": "10.2.6",
         "@tootallnate/once": "3.0.1",
         "uuid": "$uuid",
-        "brace-expansion": "5.0.9"
+        "brace-expansion": "5.0.9",
+		"toml": "4.2.0"
     }
 }
