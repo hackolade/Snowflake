@@ -15,7 +15,7 @@ function generateScript(data, logger, callback, app) {
 		}
 
 		const scriptFormat = _.get(data, 'options.targetScriptOptions.keyword');
-		const script = getAlterScript({ scriptFormat, collection, ddlProvider, app });
+		const script = getAlterScript({ scriptFormat, collection, ddlProvider, app, options: data.options });
 
 		const applyDropStatements = data.options?.additionalOptions?.some(
 			option => option.id === 'applyDropStatements' && option.value,

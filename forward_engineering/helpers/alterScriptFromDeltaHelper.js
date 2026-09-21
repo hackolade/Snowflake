@@ -40,7 +40,7 @@ const getAlterContainersScripts = (collection, ddlProvider, app) => {
 	return { addedContainerScripts, deletedContainerScripts, modifiedContainerScripts };
 };
 
-const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat }) => {
+const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat, shouldIgnoreColumnComments = false }) => {
 	const getCollectionScripts = (items, compMode, getScript) =>
 		items.filter(item => item.compMod?.[compMode]).map(getScript);
 
@@ -67,7 +67,7 @@ const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
-		getAddColumnScript({ ddlProvider, scriptFormat }),
+		getAddColumnScript({ ddlProvider, scriptFormat, shouldIgnoreColumnComments }),
 	);
 	const deletedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'deleted', 'values'),
@@ -183,9 +183,17 @@ const getAlterForeignKeysScripts = ({ collection, ddlProvider }) => {
 	return { addedFkScripts, deletedFkScripts, modifiedFkScripts };
 };
 
-const getAlterScript = ({ scriptFormat, collection, ddlProvider, app }) => {
+const getAlterScript = ({ scriptFormat, collection, ddlProvider, app, options }) => {
+	const shouldIgnoreColumnComments =
+		options?.scriptGenerationOptions?.feActiveOptions?.columnComments === 'ignore';
 	const script = {
-		...getAlterCollectionsScripts({ collection, ddlProvider, app, scriptFormat }),
+		...getAlterCollectionsScripts({
+			collection,
+			ddlProvider,
+			app,
+			scriptFormat,
+			shouldIgnoreColumnComments,
+		}),
 		...getAlterContainersScripts(collection, ddlProvider, app),
 		...getAlterViewsScripts({ schema: collection, ddlProvider, app }),
 		...getAlterTagsScripts({ collection, ddlProvider, app }),
