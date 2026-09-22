@@ -17,6 +17,7 @@ const { escapeString } = require('../../utils/escapeString');
 const { getModifyPkScripts } = require('./entityHelper/primaryKeyHelper');
 const { getModifyUkScripts } = require('./entityHelper/uniqueKeyHelper');
 const { getModifyNotNullColumnsScriptDtos } = require('./columnHelpers/notNullConstraintHelper');
+const { getAddedCommentOnColumnScript } = require('./columnHelpers/commentsHelper');
 
 const getAddCollectionScript =
 	({ ddlProvider, scriptFormat }) =>
@@ -70,7 +71,7 @@ const getModifyCollectionScript = ddlProvider => collection => {
 };
 
 const getAddColumnScript =
-	({ ddlProvider, scriptFormat }) =>
+	({ ddlProvider, scriptFormat, shouldIgnoreColumnComments = false }) =>
 	collection => {
 		const collectionSchema = {
 			...collection,
@@ -78,23 +79,35 @@ const getAddColumnScript =
 		};
 		const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 		const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
+		const isContainerActivated = isParentContainerActivated(collection) !== false;
+		const isCollectionActivated = isObjectInDeltaModelActivated(collection) !== false;
 
 		return _.toPairs(collection.properties)
 			.filter(([_, jsonSchema]) => !jsonSchema.compMod)
-			.map(([name, jsonSchema]) =>
-				createColumnDefinitionBySchema({
+			.flatMap(([name, jsonSchema]) => {
+				const columnDefinition = createColumnDefinitionBySchema({
 					name,
 					jsonSchema,
 					parentJsonSchema: collectionSchema,
 					ddlProvider,
 					scriptFormat,
-				}),
-			)
-			.map(ddlProvider.convertColumnDefinition)
-			.map(
-				column =>
-					`ALTER TABLE IF EXISTS ${fullName} ADD COLUMN ${commentIfDeactivated(column.statement, column)};`,
-			);
+				});
+				const column = ddlProvider.convertColumnDefinition(columnDefinition);
+				const isActivated =
+					isContainerActivated && isCollectionActivated && jsonSchema.isActivated !== false;
+				const addColumnScript = `ALTER TABLE IF EXISTS ${fullName} ADD COLUMN ${commentIfDeactivated(column.statement, { isActivated })};`;
+				const commentScript = getAddedCommentOnColumnScript({
+					collection,
+					name,
+					jsonSchema,
+					fullName,
+					scriptFormat,
+					isCaseSensitive: collectionSchema.isCaseSensitive,
+					shouldIgnoreColumnComments,
+				});
+
+				return [addColumnScript, commentScript].filter(Boolean);
+			});
 	};
 
 const getDeleteColumnScript = collection => {
