@@ -1778,6 +1778,14 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "primaryKeySetter",
 						"abbr": "pk",
 						"attributeList": []
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
 					}
 				]
 			},
@@ -1810,6 +1818,14 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "",
 						"propertyType": "checkbox",
 						"setFieldPropertyBy": "compositeUniqueKey"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
 					}
 				]
 			}

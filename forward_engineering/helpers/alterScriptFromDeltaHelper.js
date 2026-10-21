@@ -40,7 +40,13 @@ const getAlterContainersScripts = (collection, ddlProvider, app) => {
 	return { addedContainerScripts, deletedContainerScripts, modifiedContainerScripts };
 };
 
-const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat, shouldIgnoreColumnComments = false }) => {
+const getAlterCollectionsScripts = ({
+	collection,
+	ddlProvider,
+	app,
+	scriptFormat,
+	shouldIgnoreColumnComments = false,
+}) => {
 	const getCollectionScripts = (items, compMode, getScript) =>
 		items.filter(item => item.compMod?.[compMode]).map(getScript);
 
@@ -63,7 +69,9 @@ const getAlterCollectionsScripts = ({ collection, ddlProvider, app, scriptFormat
 		'modified',
 		getModifyCollectionScript(ddlProvider),
 	);
-	const modifyCollectionKeysScripts = modifiedItems.flatMap(getModifyCollectionKeysScript);
+	const modifyCollectionKeysScripts = modifiedItems.flatMap(item =>
+		getModifyCollectionKeysScript(item, scriptFormat),
+	);
 
 	const addedColumnScripts = getColumnScripts(
 		getItems(collection, 'entities', 'added', 'values'),
@@ -184,8 +192,7 @@ const getAlterForeignKeysScripts = ({ collection, ddlProvider }) => {
 };
 
 const getAlterScript = ({ scriptFormat, collection, ddlProvider, app, options }) => {
-	const shouldIgnoreColumnComments =
-		options?.scriptGenerationOptions?.feActiveOptions?.columnComments === 'ignore';
+	const shouldIgnoreColumnComments = options?.scriptGenerationOptions?.feActiveOptions?.columnComments === 'ignore';
 	const script = {
 		...getAlterCollectionsScripts({
 			collection,

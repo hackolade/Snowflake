@@ -674,8 +674,29 @@ module.exports = (baseProvider, options, app) => {
 		},
 
 		hydrateColumn({ columnDefinition, jsonSchema, dbData }) {
-			const pkConstraintName = jsonSchema.compositePrimaryKey ? undefined : jsonSchema.primaryKeyConstraintName;
-			const ukConstraintName = jsonSchema.compositeUniqueKey ? undefined : jsonSchema.uniqueKeyConstraintName;
+			const readKey = (optionsKey, flatNameKey) => {
+				const optionsList = jsonSchema?.[optionsKey];
+				const options = Array.isArray(optionsList) ? optionsList[0] : optionsList;
+
+				return {
+					name: options?.constraintName || jsonSchema?.[flatNameKey] || '',
+					comment: options?.indexComment || '',
+				};
+			};
+
+			const primaryKey = readKey('primaryKeyOptions', 'primaryKeyConstraintName');
+			const uniqueKey = readKey('uniqueKeyOptions', 'uniqueKeyConstraintName');
+
+			const pkOutOfLine = Boolean(
+				!jsonSchema.compositePrimaryKey && jsonSchema.primaryKey && (primaryKey.name || primaryKey.comment),
+			);
+
+			const ukOutOfLine = Boolean(
+				!jsonSchema.compositeUniqueKey && jsonSchema.unique && (uniqueKey.name || uniqueKey.comment),
+			);
+
+			const pkConstraintName = jsonSchema.compositePrimaryKey ? undefined : primaryKey.name || undefined;
+			const ukConstraintName = jsonSchema.compositeUniqueKey ? undefined : uniqueKey.name || undefined;
 
 			return {
 				...columnDefinition,
@@ -708,12 +729,14 @@ module.exports = (baseProvider, options, app) => {
 						})
 					: {},
 				comment: jsonSchema.refDescription || jsonSchema.description,
-				unique: jsonSchema.uniqueKeyConstraintName ? false : jsonSchema.unique,
+				unique: ukOutOfLine ? false : jsonSchema.unique,
 				primaryKeyConstraintName: pkConstraintName,
-				compositePrimaryKey: jsonSchema.compositePrimaryKey || (pkConstraintName && jsonSchema.primaryKey),
-				compositeUniqueKey: jsonSchema.compositeUniqueKey || (ukConstraintName && jsonSchema.unique),
+				primaryKeyComment: primaryKey.comment || undefined,
+				compositePrimaryKey: jsonSchema.compositePrimaryKey || pkOutOfLine,
+				compositeUniqueKey: jsonSchema.compositeUniqueKey || ukOutOfLine,
 				uniqueKeyConstraintName: ukConstraintName,
-				primaryKey: jsonSchema.primaryKeyConstraintName ? false : columnDefinition.primaryKey,
+				uniqueKeyComment: uniqueKey.comment || undefined,
+				primaryKey: pkOutOfLine ? false : columnDefinition.primaryKey,
 				expression: jsonSchema.expression,
 				columnTags: jsonSchema.columnTags ?? [],
 			};
@@ -851,12 +874,29 @@ module.exports = (baseProvider, options, app) => {
 
 			const keyConstraints = keyHelper.getTableKeyConstraints({ jsonSchema });
 
-			const entityLevelCompositeKeysReducer = (keys, data) => ({
-				...keys,
-				[data.name]: data.columns.map(column => {
-					return { name: column.name, isActivated: column.isActivated };
-				}),
-			});
+			const mergeOutOfLineKey = (keys, { name = '', columns, comment = '' }) => {
+				const groupKey = name || `unnamed:${columns.map(column => column.name).join(',')}`;
+				const existing = keys[groupKey];
+
+				return {
+					...keys,
+					[groupKey]: {
+						name,
+						columns: existing ? uniqBy([...existing.columns, ...columns], 'name') : columns,
+						comment: comment || existing?.comment || '',
+					},
+				};
+			};
+
+			const entityLevelCompositeKeysReducer = (keys, data) =>
+				mergeOutOfLineKey(keys, {
+					name: data.name || '',
+					columns: (data.columns || []).map(column => ({
+						name: column.name,
+						isActivated: column.isActivated,
+					})),
+					comment: data.comment || '',
+				});
 
 			const entityLevelCompositePrimaryKeys = keyConstraints
 				.filter(({ keyType }) => keyType === 'PRIMARY KEY')
@@ -869,43 +909,29 @@ module.exports = (baseProvider, options, app) => {
 			const compositePrimaryKeys = tableData.columnDefinitions
 				.filter(column => column.compositePrimaryKey)
 				.reduce((result, column) => {
-					if (!column.primaryKeyConstraintName) {
+					if (!column.primaryKeyConstraintName && !column.primaryKeyComment) {
 						return result;
 					}
 
-					return {
-						...result,
-						[column.primaryKeyConstraintName]: Array.isArray(result[column.primaryKeyConstraintName])
-							? uniqBy(
-									[
-										...result[column.primaryKeyConstraintName],
-										{ name: column.name, isActivated: column.isActivated },
-									],
-									'name',
-								)
-							: [{ name: column.name, isActivated: column.isActivated }],
-					};
+					return mergeOutOfLineKey(result, {
+						name: column.primaryKeyConstraintName || '',
+						columns: [{ name: column.name, isActivated: column.isActivated }],
+						comment: column.primaryKeyComment || '',
+					});
 				}, entityLevelCompositePrimaryKeys);
 
 			const compositeUniqueKeys = tableData.columnDefinitions
 				.filter(column => column.compositeUniqueKey)
 				.reduce((result, column) => {
-					if (!column.uniqueKeyConstraintName) {
+					if (!column.uniqueKeyConstraintName && !column.uniqueKeyComment) {
 						return result;
 					}
 
-					return {
-						...result,
-						[column.uniqueKeyConstraintName]: Array.isArray(result[column.uniqueKeyConstraintName])
-							? uniqBy(
-									[
-										...result[column.uniqueKeyConstraintName],
-										{ name: column.name, isActivated: column.isActivated },
-									],
-									'name',
-								)
-							: [{ name: column.name, isActivated: column.isActivated }],
-					};
+					return mergeOutOfLineKey(result, {
+						name: column.uniqueKeyConstraintName || '',
+						columns: [{ name: column.name, isActivated: column.isActivated }],
+						comment: column.uniqueKeyComment || '',
+					});
 				}, entityLevelCompositeUniqueKeys);
 
 			return {
@@ -990,19 +1016,23 @@ module.exports = (baseProvider, options, app) => {
 				columns: firstTab.external
 					? tableData.columnDefinitions.map(createExternalColumn(scriptFormat))
 					: tableData.columns,
-				compositePrimaryKeys: Object.entries(compositePrimaryKeys).map(([name, keys]) =>
+				compositePrimaryKeys: Object.values(compositePrimaryKeys).map(({ name, columns, comment }) =>
 					generateConstraint({
 						name,
-						keys,
+						keys: columns,
+						comment,
+						scriptFormat,
 						keyType: 'PRIMARY KEY',
 						isActivated: jsonSchema.isActivated,
 						isCaseSensitive: firstTab.isCaseSensitive,
 					}),
 				),
-				compositeUniqueKeys: Object.entries(compositeUniqueKeys).map(([name, keys]) =>
+				compositeUniqueKeys: Object.values(compositeUniqueKeys).map(({ name, columns, comment }) =>
 					generateConstraint({
 						name,
-						keys,
+						keys: columns,
+						comment,
+						scriptFormat,
 						keyType: 'UNIQUE',
 						isActivated: jsonSchema.isActivated,
 						isCaseSensitive: firstTab.isCaseSensitive,

@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { FORMATS } = require('../helpers/constants');
 const { commentDropStatements } = require('../helpers/commentHelpers/commentDropStatements.js');
 const { getAlterScript } = require('../helpers/alterScriptFromDeltaHelper.js');
 
@@ -14,7 +15,7 @@ function generateScript(data, logger, callback, app) {
 			);
 		}
 
-		const scriptFormat = _.get(data, 'options.targetScriptOptions.keyword');
+		const scriptFormat = _.get(data, 'options.targetScriptOptions.keyword') || FORMATS.SNOWSIGHT;
 		const script = getAlterScript({ scriptFormat, collection, ddlProvider, app, options: data.options });
 
 		const applyDropStatements = data.options?.additionalOptions?.some(

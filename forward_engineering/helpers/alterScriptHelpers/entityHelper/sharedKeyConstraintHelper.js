@@ -17,6 +17,25 @@ const templates = require('../../../configs/templates');
 
 const amountOfColumnsInRegularKey = 1;
 
+const optionsKeyByConstraintName = {
+	primaryKeyConstraintName: 'primaryKeyOptions',
+	uniqueKeyConstraintName: 'uniqueKeyOptions',
+};
+
+const getRegularKeyData = (jsonSchema, config) => {
+	const optionsList = jsonSchema?.[optionsKeyByConstraintName[config.constraintNameProperty]];
+	const options = Array.isArray(optionsList) ? optionsList[0] : optionsList;
+
+	return {
+		constraintName: options?.constraintName || jsonSchema?.[config.constraintNameProperty] || '',
+		indexComment: options?.indexComment || '',
+	};
+};
+
+const areKeyDefinitionsEqual = (left, right) =>
+	areConstraintNamesEqual(left.constraintName || '', right.constraintName || '') &&
+	(left.indexComment || '') === (right.indexComment || '');
+
 /**
  * Configuration object for key constraint handling
  * @typedef {Object} KeyConstraintConfig
@@ -82,17 +101,22 @@ const wasCompositeKeyChangedInTransitionFromCompositeToRegular = (collection, co
 		return PrimaryKeyTransitionDto.noTransition();
 	}
 
-	// In Snowflake, compare only constraint names
-	const newConstraintName = newColumnJsonSchema[config.constraintNameProperty] || '';
-	const areNamesEqual = oldKeys.some(compositeKey => {
+	const newKey = getRegularKeyData(newColumnJsonSchema, config);
+	const areDefinitionsEqual = oldKeys.some(compositeKey => {
 		if (compositeKey[config.compositeKeyProperty]?.length !== amountOfColumnsInRegularKey) {
 			return false;
 		}
-		const oldConstraintName = compositeKey.constraintName || '';
-		return areConstraintNamesEqual(oldConstraintName, newConstraintName);
+
+		return areKeyDefinitionsEqual(
+			{
+				constraintName: compositeKey.constraintName || '',
+				indexComment: compositeKey.indexComment || '',
+			},
+			newKey,
+		);
 	});
 
-	return PrimaryKeyTransitionDto.transition(!areNamesEqual);
+	return PrimaryKeyTransitionDto.transition(!areDefinitionsEqual);
 };
 
 /**
@@ -125,25 +149,29 @@ const wasCompositeKeyChangedInTransitionFromRegularToComposite = (collection, co
 		return PrimaryKeyTransitionDto.noTransition();
 	}
 
-	const oldConstraintName = oldColumnJsonSchema[config.constraintNameProperty] || '';
-	const areNamesEqual = newKeys.some(compositeKey => {
+	const oldKey = getRegularKeyData(oldColumnJsonSchema, config);
+	const areDefinitionsEqual = newKeys.some(compositeKey => {
 		if (compositeKey[config.compositeKeyProperty]?.length !== amountOfColumnsInRegularKey) {
 			return false;
 		}
-		const newConstraintName = compositeKey.constraintName || '';
-		return areConstraintNamesEqual(oldConstraintName, newConstraintName);
+
+		return areKeyDefinitionsEqual(oldKey, {
+			constraintName: compositeKey.constraintName || '',
+			indexComment: compositeKey.indexComment || '',
+		});
 	});
 
-	return PrimaryKeyTransitionDto.transition(!areNamesEqual);
+	return PrimaryKeyTransitionDto.transition(!areDefinitionsEqual);
 };
 
 /**
  * Get ADD CONSTRAINT scripts for composite keys
  * @param {AlterCollectionDto} collection
  * @param {KeyConstraintConfig} config
+ * @param {string} scriptFormat
  * @return {Array<KeyScriptModificationDto>}
  */
-const getAddCompositeKeyScriptDtos = (collection, config) => {
+const getAddCompositeKeyScriptDtos = (collection, config, scriptFormat) => {
 	const keyDto = collection?.role?.compMod?.[config.compModKeyName] || {};
 	const newKeys = keyDto.new || [];
 	const oldKeys = keyDto.old || [];
@@ -187,6 +215,8 @@ const getAddCompositeKeyScriptDtos = (collection, config) => {
 			const { statement } = generateConstraint({
 				name: newKey.constraintName,
 				keys: columns,
+				comment: newKey.indexComment,
+				scriptFormat,
 				keyType: config.constraintType,
 				isParentActivated: true,
 				isCaseSensitive,
@@ -278,11 +308,12 @@ const getDropCompositeKeyScriptDtos = (collection, config) => {
  * Get modify scripts for composite keys (drop + add)
  * @param {AlterCollectionDto} collection
  * @param {KeyConstraintConfig} config
+ * @param {string} scriptFormat
  * @return {Array<KeyScriptModificationDto>}
  */
-const getModifyCompositeKeyScriptDtos = (collection, config) => {
+const getModifyCompositeKeyScriptDtos = (collection, config, scriptFormat) => {
 	const dropCompositeKeyScriptDtos = getDropCompositeKeyScriptDtos(collection, config);
-	const addCompositeKeyScriptDtos = getAddCompositeKeyScriptDtos(collection, config);
+	const addCompositeKeyScriptDtos = getAddCompositeKeyScriptDtos(collection, config, scriptFormat);
 	return [...dropCompositeKeyScriptDtos, ...addCompositeKeyScriptDtos].filter(Boolean);
 };
 
@@ -339,10 +370,10 @@ const wasRegularKeyModified = (columnJsonSchema, collection, config) => {
 		return false;
 	}
 
-	const oldConstraintName = oldJsonSchema[config.constraintNameProperty] || '';
-	const newConstraintName = columnJsonSchema[config.constraintNameProperty] || '';
-
-	return !areConstraintNamesEqual(oldConstraintName, newConstraintName);
+	return !areKeyDefinitionsEqual(
+		getRegularKeyData(oldJsonSchema, config),
+		getRegularKeyData(columnJsonSchema, config),
+	);
 };
 
 /**
@@ -377,16 +408,21 @@ const wasRegularKeyChangedInTransitionFromCompositeToRegular = (columnJsonSchema
 	const wasCompositeKeyRemoved = wasTheFieldACompositeKey && !isTheFieldACompositeKey;
 
 	if (isRegularKey && wasCompositeKeyRemoved) {
-		// In Snowflake, only compare constraint names
-		const newConstraintName = columnJsonSchema[config.constraintNameProperty] || '';
-		const areNamesEqual = oldKeys.some(oldCompositeKey => {
+		const newKey = getRegularKeyData(columnJsonSchema, config);
+		const areDefinitionsEqual = oldKeys.some(oldCompositeKey => {
 			if (oldCompositeKey[config.compositeKeyProperty]?.length !== amountOfColumnsInRegularKey) {
 				return false;
 			}
-			const oldConstraintName = oldCompositeKey.constraintName || '';
-			return areConstraintNamesEqual(oldConstraintName, newConstraintName);
+
+			return areKeyDefinitionsEqual(
+				{
+					constraintName: oldCompositeKey.constraintName || '',
+					indexComment: oldCompositeKey.indexComment || '',
+				},
+				newKey,
+			);
 		});
-		return PrimaryKeyTransitionDto.transition(!areNamesEqual);
+		return PrimaryKeyTransitionDto.transition(!areDefinitionsEqual);
 	}
 
 	return PrimaryKeyTransitionDto.noTransition();
@@ -425,16 +461,18 @@ const wasRegularKeyChangedInTransitionFromRegularToComposite = (columnJsonSchema
 	const wasCompositeKeyAdded = isTheFieldACompositeKey && !wasTheFieldACompositeKey;
 
 	if (wasRegularKey && wasCompositeKeyAdded) {
-		// In Snowflake, only compare constraint names
-		const oldConstraintName = oldColumnJsonSchema[config.constraintNameProperty] || '';
-		const areNamesEqual = newKeys.some(newCompositeKey => {
+		const oldKey = getRegularKeyData(oldColumnJsonSchema, config);
+		const areDefinitionsEqual = newKeys.some(newCompositeKey => {
 			if (newCompositeKey[config.compositeKeyProperty]?.length !== amountOfColumnsInRegularKey) {
 				return false;
 			}
-			const newConstraintName = newCompositeKey.constraintName || '';
-			return areConstraintNamesEqual(oldConstraintName, newConstraintName);
+
+			return areKeyDefinitionsEqual(oldKey, {
+				constraintName: newCompositeKey.constraintName || '',
+				indexComment: newCompositeKey.indexComment || '',
+			});
 		});
-		return PrimaryKeyTransitionDto.transition(!areNamesEqual);
+		return PrimaryKeyTransitionDto.transition(!areDefinitionsEqual);
 	}
 
 	return PrimaryKeyTransitionDto.noTransition();
@@ -444,9 +482,10 @@ const wasRegularKeyChangedInTransitionFromRegularToComposite = (columnJsonSchema
  * Get ADD CONSTRAINT scripts for regular (column-level) keys
  * @param {AlterCollectionDto} collection
  * @param {KeyConstraintConfig} config
+ * @param {string} scriptFormat
  * @return {Array<KeyScriptModificationDto>}
  */
-const getAddRegularKeyScriptDtos = (collection, config) => {
+const getAddRegularKeyScriptDtos = (collection, config, scriptFormat) => {
 	const collectionSchema = { ...collection, ..._.omit(collection?.role, 'properties') };
 	const { schemaName, databaseName, tableName } = getNames(collectionSchema, getName, getEntityName);
 	const fullName = getFullName(databaseName, getFullName(schemaName, tableName));
@@ -472,10 +511,13 @@ const getAddRegularKeyScriptDtos = (collection, config) => {
 		})
 		.map(([name, jsonSchema]) => {
 			const columns = [{ name, isActivated: jsonSchema.isActivated }];
+			const keyData = getRegularKeyData(jsonSchema, config);
 
 			const { statement } = generateConstraint({
-				name: jsonSchema[config.constraintNameProperty],
+				name: keyData.constraintName,
 				keys: columns,
+				comment: keyData.indexComment,
+				scriptFormat,
 				keyType: config.constraintType,
 				isParentActivated: true,
 				isCaseSensitive,
@@ -523,9 +565,10 @@ const getDropRegularKeyScriptDtos = (collection, config) => {
 		.map(([name, jsonSchema]) => {
 			const oldName = jsonSchema.compMod.oldField.name;
 			const oldJsonSchema = collection.role.properties[oldName];
+			const oldKey = getRegularKeyData(oldJsonSchema, config);
 
 			const { statement } = generateConstraint({
-				name: getName(isCaseSensitive, oldJsonSchema[config.constraintNameProperty]),
+				name: getName(isCaseSensitive, oldKey.constraintName),
 				keys: [{ name, isActivated: true }],
 				keyType: config.constraintType,
 				isParentActivated: true,
@@ -545,11 +588,12 @@ const getDropRegularKeyScriptDtos = (collection, config) => {
  * Get modify scripts for regular keys (drop + add)
  * @param {AlterCollectionDto} collection
  * @param {KeyConstraintConfig} config
+ * @param {string} scriptFormat
  * @return {Array<KeyScriptModificationDto>}
  */
-const getModifyRegularKeyScriptDtos = (collection, config) => {
+const getModifyRegularKeyScriptDtos = (collection, config, scriptFormat) => {
 	const dropKeyScriptDtos = getDropRegularKeyScriptDtos(collection, config);
-	const addKeyScriptDtos = getAddRegularKeyScriptDtos(collection, config);
+	const addKeyScriptDtos = getAddRegularKeyScriptDtos(collection, config, scriptFormat);
 	return [...dropKeyScriptDtos, ...addKeyScriptDtos].filter(Boolean);
 };
 
@@ -576,11 +620,12 @@ const sortModifyKeyConstraints = constraintDtos => {
  *
  * @param {AlterCollectionDto} collection
  * @param {KeyConstraintConfig} config
+ * @param {string} scriptFormat
  * @return {AlterScriptDto[]}
  * */
-const getModifyKeyScripts = (collection, config) => {
-	const modifyCompositeKeyScriptDtos = getModifyCompositeKeyScriptDtos(collection, config);
-	const modifyRegularKeyScriptDtos = getModifyRegularKeyScriptDtos(collection, config);
+const getModifyKeyScripts = (collection, config, scriptFormat) => {
+	const modifyCompositeKeyScriptDtos = getModifyCompositeKeyScriptDtos(collection, config, scriptFormat);
+	const modifyRegularKeyScriptDtos = getModifyRegularKeyScriptDtos(collection, config, scriptFormat);
 
 	const allDtos = [...modifyCompositeKeyScriptDtos, ...modifyRegularKeyScriptDtos];
 	const sortedAllDtos = sortModifyKeyConstraints(allDtos);
