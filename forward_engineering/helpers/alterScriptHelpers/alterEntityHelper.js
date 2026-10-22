@@ -93,8 +93,7 @@ const getAddColumnScript =
 					scriptFormat,
 				});
 				const column = ddlProvider.convertColumnDefinition(columnDefinition);
-				const isActivated =
-					isContainerActivated && isCollectionActivated && jsonSchema.isActivated !== false;
+				const isActivated = isContainerActivated && isCollectionActivated && jsonSchema.isActivated !== false;
 				const addColumnScript = `ALTER TABLE IF EXISTS ${fullName} ADD COLUMN ${commentIfDeactivated(column.statement, { isActivated })};`;
 				const commentScript = getAddedCommentOnColumnScript({
 					collection,
@@ -223,9 +222,14 @@ const getModifyColumnScript =
 		];
 	};
 
-const getModifyCollectionKeysScript = collection => {
-	const modifyPkScriptDtos = getModifyPkScripts(collection);
-	const modifyUkScriptDtos = getModifyUkScripts(collection);
+/**
+ * @param {AlterCollectionDto} collection
+ * @param {string} scriptFormat
+ * @return {string[]}
+ */
+const getModifyCollectionKeysScript = (collection, scriptFormat) => {
+	const modifyPkScriptDtos = getModifyPkScripts(collection, scriptFormat);
+	const modifyUkScriptDtos = getModifyUkScripts(collection, scriptFormat);
 
 	const allScriptDtos = [...modifyPkScriptDtos, ...modifyUkScriptDtos];
 

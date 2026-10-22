@@ -9,16 +9,22 @@ const { addQuotes } = require('./general');
 module.exports = app => {
 	const { clean } = app.require('@hackolade/ddl-fe-utils').general;
 
-	const mapProperties = (jsonSchema, iteratee) => {
-		return Object.entries(jsonSchema.properties).map(iteratee);
-	};
-
 	const isUniqueKey = column => {
 		return !(column.compositeUniqueKey || !column.unique);
 	};
 
 	const isPrimaryKey = column => {
 		return !(column.compositeUniqueKey || column.compositePrimaryKey || !column.primaryKey);
+	};
+
+	const getKeyDefinition = (schema, optionsKey, flatNameKey) => {
+		const optionsList = schema?.[optionsKey];
+		const options = Array.isArray(optionsList) ? _.first(optionsList) : optionsList;
+
+		return {
+			constraintName: options?.constraintName || schema?.[flatNameKey],
+			indexComment: options?.indexComment,
+		};
 	};
 
 	const hydrateUniqueOptions = (options, columnName, isActivated, jsonSchema) =>
@@ -105,36 +111,7 @@ module.exports = app => {
 			return [];
 		}
 
-		const primaryKeyConstraints = mapProperties(jsonSchema, ([name, schema]) => {
-			if (!isPrimaryKey(schema)) {
-				return;
-			} else if (_.isEmpty(schema.primaryKeyOptions)) {
-				return;
-			}
-
-			return hydratePrimaryKeyOptions(_.first(schema.primaryKeyOptions), name, schema.isActivated, jsonSchema);
-		}).filter(Boolean);
-
-		const uniqueKeyConstraints = _.flatten(
-			mapProperties(jsonSchema, ([name, schema]) => {
-				if (!isUniqueKey(schema)) {
-					return [];
-				} else if (_.isEmpty(schema.uniqueKeyOptions) || !Array.isArray(schema.uniqueKeyOptions)) {
-					return [];
-				}
-
-				return schema.uniqueKeyOptions.map(uniqueKey =>
-					hydrateUniqueOptions(uniqueKey, name, schema.isActivated, jsonSchema),
-				);
-			}),
-		).filter(Boolean);
-
-		return [
-			...primaryKeyConstraints,
-			...getCompositePrimaryKeys(jsonSchema),
-			...uniqueKeyConstraints,
-			...getCompositeUniqueKeys(jsonSchema),
-		];
+		return [...getCompositePrimaryKeys(jsonSchema), ...getCompositeUniqueKeys(jsonSchema)];
 	};
 
 	/**
@@ -183,7 +160,7 @@ module.exports = app => {
 		}
 
 		return hydratePrimaryKeyOptions(
-			{ constraintName: columnDefinition.primaryKeyConstraintName },
+			getKeyDefinition(columnDefinition, 'primaryKeyOptions', 'primaryKeyConstraintName'),
 			columnDefinition.name,
 			columnDefinition.isActivated,
 			jsonSchema,
@@ -200,7 +177,7 @@ module.exports = app => {
 		}
 
 		return hydrateUniqueOptions(
-			{ constraintName: columnDefinition.uniqueKeyConstraintName },
+			getKeyDefinition(columnDefinition, 'uniqueKeyOptions', 'uniqueKeyConstraintName'),
 			columnDefinition.name,
 			columnDefinition.isActivated,
 			jsonSchema,

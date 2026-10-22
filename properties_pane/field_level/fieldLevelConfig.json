@@ -326,9 +326,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -344,7 +346,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -457,13 +474,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -898,9 +932,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -916,7 +952,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -1029,13 +1080,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -1457,9 +1525,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -1475,7 +1545,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -1588,13 +1673,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -2016,9 +2118,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -2034,7 +2138,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -2147,13 +2266,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -2575,9 +2711,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -2593,7 +2731,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -2706,13 +2859,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -3127,9 +3297,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -3145,7 +3317,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -3258,13 +3445,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"default",
 			"sample",
@@ -3607,9 +3811,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -3625,7 +3831,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -3738,13 +3959,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Column Tags",
@@ -4072,9 +4310,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -4090,7 +4330,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -4203,13 +4458,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"pattern",
 			"default",
@@ -4550,9 +4822,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -4568,7 +4842,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -4681,13 +4970,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"pattern",
 			"default",
@@ -5036,9 +5342,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -5054,7 +5362,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -5167,13 +5490,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"pattern",
 			"default",
@@ -5522,9 +5862,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -5540,7 +5882,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -5653,13 +6010,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"pattern",
 			"default",
@@ -6008,9 +6382,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -6026,7 +6402,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -6139,13 +6530,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"pattern",
 			"default",
@@ -6576,9 +6984,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -6594,7 +7004,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -6686,13 +7111,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"minProperties",
 			"maxProperties",
@@ -7034,9 +7476,11 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Primary key constraint name",
-				"propertyKeyword": "primaryKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Primary key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "primaryKeyOptions",
+				"propertyTooltip": "Primary key options",
 				"dependency": {
 					"type": "and",
 					"values": [
@@ -7052,7 +7496,22 @@ making sure that you maintain a proper JSON format.
 							}
 						}
 					]
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			{
 				"propertyName": "Not null",
@@ -7145,13 +7604,30 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
-				"propertyName": "Unique key constraint name",
-				"propertyKeyword": "uniqueKeyConstraintName",
-				"propertyType": "text",
+				"propertyName": "Unique key options",
+				"propertyType": "group",
+				"groupItemLimit": 1,
+				"propertyKeyword": "uniqueKeyOptions",
+				"propertyTooltip": "Unique key options",
 				"dependency": {
 					"key": "unique",
 					"value": true
-				}
+				},
+				"structure": [
+					{
+						"propertyName": "Constraint name",
+						"propertyKeyword": "constraintName",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Comment",
+						"propertyKeyword": "indexComment",
+						"propertyTooltip": "comment",
+						"addTimestampButton": false,
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
 			},
 			"minProperties",
 			"maxProperties",

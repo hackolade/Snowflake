@@ -15,10 +15,11 @@ const UNIQUE_KEY_CONFIG = {
  * Get all modify UK scripts (both composite and regular)
  *
  * @param {AlterCollectionDto} collection
+ * @param {string} scriptFormat
  * @return {AlterScriptDto[]}
  * */
-const getModifyUkScripts = collection => {
-	return getModifyKeyScripts(collection, UNIQUE_KEY_CONFIG);
+const getModifyUkScripts = (collection, scriptFormat) => {
+	return getModifyKeyScripts(collection, UNIQUE_KEY_CONFIG, scriptFormat);
 };
 
 module.exports = {

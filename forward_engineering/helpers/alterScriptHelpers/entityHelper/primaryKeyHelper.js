@@ -15,10 +15,11 @@ const PRIMARY_KEY_CONFIG = {
  * Get all modify PK scripts (both composite and regular)
  *
  * @param {AlterCollectionDto} collection
+ * @param {string} scriptFormat
  * @return {AlterScriptDto[]}
  * */
-const getModifyPkScripts = collection => {
-	return getModifyKeyScripts(collection, PRIMARY_KEY_CONFIG);
+const getModifyPkScripts = (collection, scriptFormat) => {
+	return getModifyKeyScripts(collection, PRIMARY_KEY_CONFIG, scriptFormat);
 };
 
 module.exports = {
