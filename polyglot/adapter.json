@@ -95,5 +95,8 @@
 			],
 			["convertBlockPropertyToGroupProperty", "uniqueKeyOptions"]
 		]
+	},
+	"delete": {
+		"field": ["primaryKeyConstraintName", "uniqueKeyConstraintName"]
 	}
 }
