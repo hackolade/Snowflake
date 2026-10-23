@@ -1,6 +1,6 @@
 {
     "name": "Snowflake",
-    "version": "0.2.64",
+    "version": "0.2.65",
     "author": "hackolade",
     "engines": {
         "hackolade": "8.13.6",
@@ -96,6 +96,6 @@
     },
     "overrides": {
         "uuid": "$uuid",
-		"toml": "5.0.1"
+        "toml": "5.0.1"
     }
 }
