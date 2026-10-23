@@ -9,6 +9,7 @@ const { authByExternalBrowser } = require('./connections/externalBrowserConnecti
 const { authByCredentials } = require('./connections/credentialsConnection.js');
 const { authByKeyPair } = require('./connections/keyPairConnection.js');
 const { getConnection, execute, disconnect } = require('./connections/connection.js');
+const { addTableConstraintComments } = require('./constraintCommentHelper.js');
 
 const ALREADY_CONNECTED_STATUS = 405502;
 const CANT_REACH_SNOWFLAKE_ERROR_STATUS = 401001;
@@ -343,8 +344,9 @@ const getSchemaDDL = async schemaName => {
 const getDDL = async (tableName, logger) => {
 	try {
 		const queryResult = await execute(`SELECT get_ddl('table', '${tableName}');`);
+		const ddl = getFirstObjectItem(_.first(queryResult));
 
-		return getFirstObjectItem(_.first(queryResult));
+		return addTableConstraintComments({ ddl, fullTableName: tableName, logger });
 	} catch (err) {
 		logger.log('error', { tableName, message: err.message, stack: err.stack }, 'Getting table DDL');
 		return '';
