@@ -43,6 +43,7 @@
             "disableDenormalization": true,
             "enableComplexTypesNormalization": true,
             "generateAssociativeEntitiesForManyToManyRelationships": true,
+            "createForeignKeysForConceptualRelationships": true,
             "relationships": {
                 "compositeRelationships": {
                     "allowRelationshipsByProperties": [
