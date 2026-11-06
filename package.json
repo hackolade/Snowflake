@@ -98,6 +98,7 @@
     "overrides": {
         "@azure/msal-node": "7.1.2",
         "uuid": "$uuid",
-        "toml": "5.0.1"
+        "toml": "5.0.1",
+		"follow-redirects": "1.16.2"
     }
 }
