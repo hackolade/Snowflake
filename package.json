@@ -1,6 +1,6 @@
 {
     "name": "Snowflake",
-    "version": "0.2.66",
+    "version": "0.2.67",
     "author": "hackolade",
     "engines": {
         "hackolade": "8.13.6",
@@ -99,6 +99,6 @@
         "@azure/msal-node": "7.1.2",
         "uuid": "$uuid",
         "toml": "5.0.1",
-		"follow-redirects": "1.16.2"
+        "follow-redirects": "1.16.2"
     }
 }
