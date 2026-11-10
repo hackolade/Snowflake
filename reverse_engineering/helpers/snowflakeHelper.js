@@ -1242,6 +1242,26 @@ const getTags = async ({ dbName, schemaName, logger }) => {
 	}
 };
 
+const schemaTagReference = ({ tagDatabase = '', tagSchema = '', tagName = '', dbName = '', schemaName = '' }) => {
+	const isSame = (tagTarget, entity) =>
+		!tagTarget || removeQuotes(tagTarget).toLowerCase() === removeQuotes(entity).toLowerCase();
+
+	const isSameDb = isSame(tagDatabase, dbName);
+	const isSameSchema = isSame(tagSchema, schemaName);
+
+	if (isSameDb && isSameSchema) {
+		return tagName;
+	}
+
+	const tagPath = [tagSchema, tagName];
+
+	if (!isSameDb) {
+		tagPath.unshift(tagDatabase);
+	}
+
+	return tagPath.filter(Boolean).join('.');
+};
+
 const getSchemaTags = async ({ dbName, schemaName, logger }) => {
 	try {
 		const rows = await execute(
@@ -1249,7 +1269,13 @@ const getSchemaTags = async ({ dbName, schemaName, logger }) => {
 		);
 
 		return rows.map(row => ({
-			tagName: row['TAG_NAME'],
+			tagName: schemaTagReference({
+				tagDatabase: row['TAG_DATABASE'],
+				tagSchema: row['TAG_SCHEMA'],
+				tagName: row['TAG_NAME'],
+				dbName,
+				schemaName,
+			}),
 			tagValue: row['TAG_VALUE'],
 		}));
 	} catch (error) {

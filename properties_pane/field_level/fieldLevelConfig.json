@@ -599,7 +599,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -610,7 +611,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -621,6 +623,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -629,6 +632,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -646,7 +650,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -661,6 +666,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -670,6 +676,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -1210,7 +1217,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -1221,7 +1229,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -1232,6 +1241,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -1240,6 +1250,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -1257,7 +1268,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -1272,6 +1284,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -1281,6 +1294,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -1803,7 +1817,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -1814,7 +1829,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -1825,6 +1841,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -1833,6 +1850,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -1850,7 +1868,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -1865,6 +1884,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -1874,6 +1894,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -2396,7 +2417,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -2407,7 +2429,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -2418,6 +2441,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -2426,6 +2450,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -2443,7 +2468,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -2458,6 +2484,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -2467,6 +2494,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -2989,7 +3017,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -3000,7 +3029,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -3011,6 +3041,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -3019,6 +3050,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -3036,7 +3068,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -3051,6 +3084,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -3060,6 +3094,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -3487,7 +3522,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -3498,7 +3534,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -3509,6 +3546,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -3517,6 +3555,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -3534,7 +3573,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -3549,6 +3589,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -3558,6 +3599,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -3999,7 +4041,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -4010,7 +4053,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -4021,6 +4065,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -4029,6 +4074,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -4046,7 +4092,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -4061,6 +4108,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -4070,6 +4118,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -4502,7 +4551,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -4513,7 +4563,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -4524,6 +4575,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -4532,6 +4584,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -4549,7 +4602,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -4564,6 +4618,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -4573,6 +4628,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -5014,7 +5070,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -5025,7 +5082,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -5036,6 +5094,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -5044,6 +5103,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -5061,7 +5121,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -5076,6 +5137,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -5085,6 +5147,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -5534,7 +5597,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -5545,7 +5609,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -5556,6 +5621,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -5564,6 +5630,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -5581,7 +5648,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -5596,6 +5664,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -5605,6 +5674,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -6054,7 +6124,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -6065,7 +6136,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -6076,6 +6148,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -6084,6 +6157,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -6101,7 +6175,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -6116,6 +6191,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -6125,6 +6201,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -6574,7 +6651,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -6585,7 +6663,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -6596,6 +6675,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -6604,6 +6684,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -6621,7 +6702,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -6636,6 +6718,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -6645,6 +6728,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -7155,7 +7239,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -7166,7 +7251,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -7177,6 +7263,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -7185,6 +7272,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -7202,7 +7290,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -7217,6 +7306,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -7226,6 +7316,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -7648,7 +7739,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -7659,7 +7751,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -7670,6 +7763,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -7678,6 +7772,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -7695,7 +7790,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -7710,6 +7806,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -7719,6 +7816,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
@@ -7835,7 +7933,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -7846,7 +7945,8 @@ making sure that you maintain a proper JSON format.
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -7857,6 +7957,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -7865,6 +7966,7 @@ making sure that you maintain a proper JSON format.
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -7882,7 +7984,8 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -7897,6 +8000,7 @@ making sure that you maintain a proper JSON format.
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -7906,6 +8010,7 @@ making sure that you maintain a proper JSON format.
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
