@@ -123,7 +123,8 @@
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.*.name"
+							"source": "tags.*.name",
+							"scope": "allContainers"
 						}
 					},
 					{
@@ -134,7 +135,8 @@
 						"withEmptyOption": true,
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -145,6 +147,7 @@
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										}
@@ -153,6 +156,7 @@
 								{
 									"level": "container",
 									"source": "tags.${tagName}",
+									"scope": "allContainers",
 									"key": "allowedValues",
 									"exist": true
 								}
@@ -170,7 +174,8 @@
 						"propertyType": "text",
 						"propertySource": {
 							"level": "container",
-							"source": "tags.${tagName}.allowedValues.*.value"
+							"source": "tags.${tagName}.allowedValues.*.value",
+							"scope": "allContainers"
 						},
 						"dependency": {
 							"type": "and",
@@ -185,6 +190,7 @@
 										{
 											"level": "container",
 											"source": "tags.${tagName}",
+											"scope": "allContainers",
 											"key": "allowedValues",
 											"isEmpty": true
 										},
@@ -194,6 +200,7 @@
 												{
 													"level": "container",
 													"source": "tags.${tagName}",
+													"scope": "allContainers",
 													"key": "allowedValues",
 													"exist": true
 												}
